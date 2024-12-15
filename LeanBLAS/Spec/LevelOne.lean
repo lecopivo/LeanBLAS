@@ -8,6 +8,7 @@ class LevelOneData (R K : outParam Type) (Array : Type) [Scalar R K] where
 
   size (X : Array) : Nat
   get (X : Array) (i : Nat) : K
+  ofFn (f : Fin n → K) : Array
 
   /-- dot product of two vectors
       N : number of elements
@@ -95,8 +96,10 @@ structure InBounds (X : Array) (offX incX) (i : Nat) where
 end
 
 open BLAS.LevelOneData Scalar in
-class BLAS.LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [BLAS.LevelOneData R C Array] : Prop  where
+class LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [BLAS.LevelOneData R C Array] : Prop  where
 
+  ofFn_size (f : Fin n → C) :
+    size (ofFn (Array:=Array) f) = n
 
   dot_spec (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) :
     InBounds X offX incX (N-1)
@@ -135,6 +138,15 @@ class BLAS.LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [B
     (copy N Y offY incY X offX incX,
      copy N X offX incX Y offY incY)
 
+  swap_size_x (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) :
+    size (swap N X offX incX Y offY incX).1
+    =
+    size X
+
+  swap_size_y (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) :
+    size (swap N X offX incX Y offY incX).2
+    =
+    size Y
 
   copy_spec (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) :
     InBounds X offX incX (N-1)
@@ -142,13 +154,18 @@ class BLAS.LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [B
     InBounds Y offY incY (N-1)
     →
     ∀ i : Nat, i < size Y →
-      get (axpy N α X offX incX Y offY incY) i
+      get (copy N X offX incX Y offY incY) i
       =
       if (i - offY) % incY = 0 then
         let j := ((i - offY) / incY) * incX + offX
         get X j
       else
         get Y i
+
+  copy_size (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) :
+    size (copy N X offX incX Y offY incY)
+    =
+    size Y
 
   axpy_spec (N : Nat) (α : C) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) :
     InBounds X offX incX (N-1)
@@ -163,6 +180,11 @@ class BLAS.LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [B
         get Y i + α * get X j
       else
         get Y i
+
+  axpy_size (N : Nat) (α : C) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) :
+    size (axpy N α X offX incX Y offY incY)
+    =
+    size Y
 
   -- rotg_spec (a b : C) :
   --   rotg a b
@@ -180,7 +202,20 @@ class BLAS.LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [B
       =
       if (i - offX) % incX = 0 then α * get X i else get X i
 
+  scal_size (N : Nat) (α : C) (X : Array) (offX incX : Nat) :
+    size (scal N α X offX incX)
+    =
+    size X
+
+attribute [simp]
+  LevelOneSpec.ofFn_size
+  LevelOneSpec.swap_size_x
+  LevelOneSpec.swap_size_y
+  LevelOneSpec.copy_size
+  LevelOneSpec.axpy_size
+  LevelOneSpec.scal_size
 
 
-class BLAS.LevelOne (R K : Type) (Array : Type) [Scalar R R] [Scalar R K] [BLAS.LevelOneData R K Array]
+
+class LevelOne (R K : Type) (Array : Type) [Scalar R R] [Scalar R K]
     extends BLAS.LevelOneData R K Array, BLAS.LevelOneSpec R K Array

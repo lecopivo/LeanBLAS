@@ -8,8 +8,8 @@ namespace BLAS
 summary: computes the product of a matrix and a vector
 
 inputes:
-- N: the number of rows in the matrix
-- M: the number of columns in the matrix
+- M: the number of rows in the matrix
+- N: the number of columns in the matrix
 - alpha: the scalar
 - A: the matrix
 - offA: starting offset of elements of A
@@ -32,7 +32,7 @@ void cblas_dgemv(const enum CBLAS_ORDER Order, const enum C, const int M, const 
 ```
 -/
 @[extern "leanblas_cblas_dgemv"]
-opaque dgemv (order : Order) (transA : Transpose) (N : USize) (M : USize) (alpha : Float)
+opaque dgemv (order : Order) (transA : Transpose) (M : USize) (N : USize) (alpha : Float)
     (A : @& FloatArray) (offA : USize) (lda : USize)
     (X : @& FloatArray) (offX incX : USize) (beta : Float)
     (Y : FloatArray) (offY incY : USize) : FloatArray

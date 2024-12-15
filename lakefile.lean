@@ -6,17 +6,17 @@ package leanblast
 def linkArgs := #["-lblas"]
 
 @[default_target]
-lean_lib LeanBLAS {
+lean_lib LeanBLAS where
   defaultFacets := #[LeanLib.sharedFacet,LeanLib.staticFacet]
   moreLinkArgs := linkArgs
   roots := #[`LeanBLAS]
-}
+
 
 @[test_driver]
-lean_exe Test {
+lean_exe Test where
   root := `Test.cblas_level_one
   moreLinkArgs := linkArgs
-}
+
 
 
 extern_lib libleanffi pkg := do
@@ -28,4 +28,5 @@ extern_lib libleanffi pkg := do
       let weakArgs := #["-I", (← getLeanIncludeDir).toString]
       oFiles := oFiles.push (← buildO oFile srcJob weakArgs #["-fPIC"] "gcc" getLeanTrace)
   let name := nameToStaticLib "leanffi"
-  buildStaticLib (pkg.nativeLibDir / name) oFiles
+
+  buildLeanSharedLib (pkg.nativeLibDir / name) oFiles
