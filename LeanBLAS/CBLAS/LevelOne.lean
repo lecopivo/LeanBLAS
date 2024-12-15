@@ -27,10 +27,6 @@ outputs:
 @[extern "leanblas_cblas_ddot"]
 opaque ddot (N : USize) (X : @& FloatArray) (offX incX : USize) (Y : @& FloatArray) (offY incY : USize) : Float
 
-structure Precondition.ddot (N : Nat) (X : @& FloatArray) (offX incX : Nat) (Y : @& FloatArray) (offY incY : Nat) where
-  hx_size : offX + 1 + (N-1) * incX ≤ X.size
-  hy_size : offY + 1 + (N-1) * incY ≤ X.size
-
 
 /-- zdot (complex dot product)
 
@@ -72,9 +68,6 @@ double cblas_dnrm2(const int N, const double *X, const int incX);
 -/
 @[extern "leanblas_cblas_dnrm2"]
 opaque dnrm2 (N : USize) (X : @& FloatArray) (offX incX : USize) : Float
-
-structure Precondition.dnrm2 (N : Nat) (X : @& FloatArray) (offX incX : Nat) where
-  hx_size : offX + 1 + (N-1) * incX ≤ X.size
 
 
 /-- dasum
