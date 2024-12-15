@@ -1,13 +1,6 @@
 #include <lean/lean.h>
 #include <cblas.h>
-
-
-void ensure_exclusive_float_array(lean_object ** X){
-  if (!lean_is_exclusive(*X)) {
-    printf("warning: making array copy!\n");
-    *X = lean_copy_float_array(*X);
-  }
-}
+#include "util.h"
 
 
 /** ddot
@@ -29,6 +22,38 @@ LEAN_EXPORT double leanblas_ddot(const size_t N,
                                  const b_lean_obj_arg Y, const size_t offY, const size_t incY){
   return cblas_ddot((int)N, lean_float_array_cptr(X) + offX, (int)incX, lean_float_array_cptr(Y) + offY, (int)incY);
 }
+
+
+
+/** zdot
+ *
+  * Computes the dot product of two complex vectors.
+  *
+  * @param N Number of elements in input vectors
+  * @param X Pointer to first input vector
+  * @param offX starting index of X
+  * @param incX Increment for the elements of X
+  * @param Y Pointer to second input vector
+  * @param offY starting index of Y
+  * @param incY Increment for the elements of Y
+  *
+  * @return Dot product of X and Y
+  */
+LEAN_EXPORT lean_obj_res leanblas_zdot(const size_t N,
+                                       const b_lean_obj_arg X, const size_t offX, const size_t incX,
+                                       const b_lean_obj_arg Y, const size_t offY, const size_t incY){
+
+  double r[2];
+  cblas_zdotc_sub((int)N, (void *)(lean_float_array_cptr(X) + 2*offX), (int)incX,
+                          (void *)(lean_float_array_cptr(Y) + 2*offY), (int)incY, r);
+
+  lean_obj_res lean_res = lean_alloc_ctor(0, 0, 2*sizeof(double));
+  lean_ctor_set_float(lean_res, 0*sizeof(double), r[0]);
+  lean_ctor_set_float(lean_res, 1*sizeof(double), r[1]);
+  return lean_res;
+}
+
+
 
 
 /** dnrm2

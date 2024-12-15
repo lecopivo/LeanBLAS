@@ -1,5 +1,6 @@
 import LeanBLAS
 
+open BLAS
 
 def test_ddot : IO Unit := do
   let x : FloatArray := ⟨#[1.0,2.0,3.0]⟩
@@ -20,6 +21,18 @@ def test_ddot_2 : IO Unit := do
   IO.println s!"{r} == {expected} = {r == expected}"
   if r != expected then
     throw $ IO.userError "test_ddot_2 failed"
+
+
+def test_zdot : IO Unit := do
+  let x := ComplexFloatArray.mkEmpty |>.push ⟨1,2⟩ |>.push ⟨3,4⟩ |>.push ⟨5,6⟩
+  let y := ComplexFloatArray.mkEmpty |>.push ⟨7,8⟩ |>.push ⟨9,10⟩ |>.push ⟨11,12⟩
+  let r := zdot 3 x 0 1 y 0 1
+  let expected : ComplexFloat := (.conj ⟨1,2⟩) * ⟨7,8⟩ + .conj ⟨3,4⟩ * ⟨9,10⟩ + .conj ⟨5,6⟩ * ⟨11,12⟩
+  IO.println s!"zdot 3 {x} 1 {y} 1"
+  IO.println s!"{r} == {expected} = {r == expected}"
+  if r != expected then
+    throw $ IO.userError "test_zdot failed"
+
 
 def test_dnrm2 : IO Unit := do
   let x : FloatArray := ⟨#[1.0,2.0,3.0]⟩
@@ -90,8 +103,8 @@ def test_dswap : IO Unit := do
   let y : FloatArray := ⟨#[-1.0,2.0,-3.0,-4.0]⟩
   let (x',y') := dswap 4 x 0 1 y 0 1
   IO.println s!"dswap 3 {x} 1 {y} 1"
-  IO.println s!"{x} == {y'} = {x == y'}"
-  IO.println s!"{y} == {x'} = {y == x'}"
+  IO.println s!"{x'} == {y} = {x' == y}"
+  IO.println s!"{y'} == {x} = {y' == x}"
   if x != y' then
     throw $ IO.userError "test_dswap failed"
 
@@ -107,9 +120,49 @@ def test_dswap_2 : IO Unit := do
   if x' != x'_expected then
     throw $ IO.userError "test_dswap_2 failed"
 
+def test_dcopy : IO Unit := do
+  let x : FloatArray := ⟨#[1.0,-2.0,3.0,4.0]⟩
+  let y : FloatArray := ⟨#[0.0,0.0,0.0,0.0]⟩
+  let y' := dcopy 4 x 0 1 y 0 1
+  IO.println s!"dcopy 4 {x} 0 1 {y} 0 1"
+  IO.println s!"{y'} == {x} = {y' == x}"
+  if y' != x then
+    throw $ IO.userError "test_dcopy failed"
+
+def test_dcopy_2 : IO Unit := do
+  let x : FloatArray := ⟨#[1.0,2.0,3.0,4.0,5.0]⟩
+  let y : FloatArray := ⟨#[0.0,0.0,0.0,0.0,0.0]⟩
+  let y' := dcopy 3 x 0 2 y 1 1
+  let y_expected : FloatArray := ⟨#[0.0,1.0,3.0,5.0,0.0]⟩
+  IO.println s!"dcopy 3 {x} 0 2 {y} 1 1"
+  IO.println s!"{y'} == {y_expected} = {y' == y_expected}"
+  if y' != y_expected then
+    throw $ IO.userError "test_dcopy_2 failed"
+
+def test_daxpy : IO Unit := do
+  let x : FloatArray := ⟨#[1.0,-2.0,3.0,4.0]⟩
+  let y : FloatArray := ⟨#[-1.0,4.0,2.0,1.0]⟩
+  let y' := daxpy 4 2.0 x 0 1 y 0 1
+  let y_expected : FloatArray := ⟨#[1.0,0.0,8.0,9.0]⟩
+  IO.println s!"daxpy 4 2.0 {x} 0 1 {y} 0 1"
+  IO.println s!"{y'} == {y_expected} = {y' == y_expected}"
+  if y' != y_expected then
+    throw $ IO.userError "test_daxpy failed"
+
+def test_daxpy_2 : IO Unit := do
+  let x : FloatArray := ⟨#[1.0,2.0,3.0,4.0,5.0]⟩
+  let y : FloatArray := ⟨#[5.0,4.0,3.0,2.0,1.0]⟩
+  let y' := daxpy 3 2.0 x 0 2 y 1 1
+  let y_expected : FloatArray := ⟨#[5.0,6.0,9.0,12.0,1.0]⟩
+  IO.println s!"daxpy 3 2.0 {x} 0 2 {y} 1 1"
+  IO.println s!"{y'} == {y_expected} = {y' == y_expected}"
+  if y' != y_expected then
+    throw $ IO.userError "test_daxpy_2 failed"
+
 def main : IO Unit := do
   test_ddot
   test_ddot_2
+  test_zdot
   test_dnrm2
   test_dnrm2_2
   test_dasum
@@ -118,3 +171,7 @@ def main : IO Unit := do
   test_idamax_2
   test_dswap
   test_dswap_2
+  test_dcopy
+  test_dcopy_2
+  test_daxpy
+  test_daxpy_2

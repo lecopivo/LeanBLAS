@@ -1,5 +1,11 @@
+import LeanBLAS.ComplexFloat
+import LeanBLAS.Spec.LevelOne
+
+namespace BLAS
+
 /-! Lean bindings to BLAS
 -/
+
 
 /-- ddot
 
@@ -17,11 +23,6 @@ inputs:
 outputs:
 - the dot product of X and Y
 
-C interface
-```
-double cblas_ddot(const int N, const double *X, const int incX,
-                  const double *Y, const int incY);
-```
 -/
 @[extern "leanblas_ddot"]
 opaque ddot (N : USize) (X : @& FloatArray) (offX incX : USize) (Y : @& FloatArray) (offY incY : USize) : Float
@@ -29,6 +30,26 @@ opaque ddot (N : USize) (X : @& FloatArray) (offX incX : USize) (Y : @& FloatArr
 structure Precondition.ddot (N : Nat) (X : @& FloatArray) (offX incX : Nat) (Y : @& FloatArray) (offY incY : Nat) where
   hx_size : offX + 1 + (N-1) * incX ≤ X.size
   hy_size : offY + 1 + (N-1) * incY ≤ X.size
+
+
+/-- zdot (complex dot product)
+
+summary: computes the dot product of two complex vectors
+
+inputs:
+- N: the number of elements in the vectors
+- X: the first complex vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+- Y: the second complex vector
+- offY: starting offset of elements of Y
+- incY: the increment for the elements of Y
+
+outputs:
+- the dot product of X and Y
+-/
+@[extern "leanblas_zdot"]
+opaque zdot (N : USize) (X : @& ComplexFloatArray) (offX incX : USize) (Y : @& ComplexFloatArray) (offY incY : USize) : ComplexFloat
 
 
 /-- dnrm2
@@ -266,3 +287,26 @@ void cblas_dscal(const int N, const double alpha, double *X, const int incX);
 -/
 @[extern "leanblas_dscal"]
 opaque dscal (N : USize) (a : Float) (X : FloatArray) (offX incX : USize) : FloatArray
+
+
+
+instance : LevelOneData Float Float FloatArray where
+  size x := x.size
+  get x i := x.get! i
+  dot N X offX incX Y offY incY := ddot N.toUSize X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize
+  nrm2 N X offX incX := dnrm2 N.toUSize X offX.toUSize incX.toUSize
+  asum N X offX incX := dasum N.toUSize X offX.toUSize incX.toUSize
+  iamax N X offX incX := idamax N.toUSize X offX.toUSize incX.toUSize |>.toNat
+  swap N X offX incX Y offY incY := dswap N.toUSize X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize
+  copy N X offX incX Y offY incY := dcopy N.toUSize X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize
+  axpy N a X offX incX Y offY incY := daxpy N.toUSize a X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize
+  rotg a b := drotg a b
+  rotmg d1 d2 b1 b2 := drotmg d1 d2 b1 b2
+  rot N X offX incX Y offY incY c s := drot N.toUSize X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize c s
+  scal N a X offX incX := dscal N.toUSize a X offX.toUSize incX.toUSize
+
+
+@[instance]
+axiom cblasLevelOne : BLAS.LevelOneSpec Float Float FloatArray
+
+instance : BLAS.LevelOne Float Float FloatArray := ⟨⟩
