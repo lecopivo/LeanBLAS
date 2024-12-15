@@ -17,7 +17,7 @@
  *
  * @return Dot product of X and Y
  */
-LEAN_EXPORT double leanblas_ddot(const size_t N,
+LEAN_EXPORT double leanblas_cblas_ddot(const size_t N,
                                  const b_lean_obj_arg X, const size_t offX, const size_t incX,
                                  const b_lean_obj_arg Y, const size_t offY, const size_t incY){
   return cblas_ddot((int)N, lean_float_array_cptr(X) + offX, (int)incX, lean_float_array_cptr(Y) + offY, (int)incY);
@@ -39,7 +39,7 @@ LEAN_EXPORT double leanblas_ddot(const size_t N,
   *
   * @return Dot product of X and Y
   */
-LEAN_EXPORT lean_obj_res leanblas_zdot(const size_t N,
+LEAN_EXPORT lean_obj_res leanblas_cblas_zdot(const size_t N,
                                        const b_lean_obj_arg X, const size_t offX, const size_t incX,
                                        const b_lean_obj_arg Y, const size_t offY, const size_t incY){
 
@@ -67,7 +67,7 @@ LEAN_EXPORT lean_obj_res leanblas_zdot(const size_t N,
  *
  * @return Euclidean norm of X
  */
-LEAN_EXPORT double leanblas_dnrm2(const size_t N, const b_lean_obj_arg X, const size_t offX, const size_t incX){
+LEAN_EXPORT double leanblas_cblas_dnrm2(const size_t N, const b_lean_obj_arg X, const size_t offX, const size_t incX){
   return cblas_dnrm2((int)N, lean_float_array_cptr(X) + offX, (int)incX);
 }
 
@@ -83,7 +83,7 @@ LEAN_EXPORT double leanblas_dnrm2(const size_t N, const b_lean_obj_arg X, const 
  *
  * @return Sum of the absolute values of the elements of X
  */
-LEAN_EXPORT double leanblas_dasum(const size_t N, const b_lean_obj_arg X, const size_t offX, const size_t incX){
+LEAN_EXPORT double leanblas_cblas_dasum(const size_t N, const b_lean_obj_arg X, const size_t offX, const size_t incX){
   return cblas_dasum((int)N, lean_float_array_cptr(X) + offX, (int)incX);
 }
 
@@ -98,7 +98,7 @@ LEAN_EXPORT double leanblas_dasum(const size_t N, const b_lean_obj_arg X, const 
  *
  * @return Index of the first element with maximum absolute value
  */
-LEAN_EXPORT size_t leanblas_idamax(const size_t N, const b_lean_obj_arg X, const size_t offX, const size_t incX){
+LEAN_EXPORT size_t leanblas_cblas_idamax(const size_t N, const b_lean_obj_arg X, const size_t offX, const size_t incX){
   return cblas_idamax((int)N, lean_float_array_cptr(X) + offX, (int)incX);
 }
 
@@ -117,7 +117,7 @@ LEAN_EXPORT size_t leanblas_idamax(const size_t N, const b_lean_obj_arg X, const
 
   * @return X and Y with their elements interchanged
   */
-LEAN_EXPORT lean_obj_res leanblas_dswap(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX,
+LEAN_EXPORT lean_obj_res leanblas_cblas_dswap(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX,
                                 lean_obj_arg Y, const size_t offY, const size_t incY){
   ensure_exclusive_float_array(&X);
   ensure_exclusive_float_array(&Y);
@@ -144,7 +144,7 @@ LEAN_EXPORT lean_obj_res leanblas_dswap(const size_t N, lean_obj_arg X, const si
   *
   * @return Y with the elements of X copied to it
   */
-LEAN_EXPORT lean_obj_res leanblas_dcopy(const size_t N, const b_lean_obj_arg X, const size_t offX, const size_t incX,
+LEAN_EXPORT lean_obj_res leanblas_cblas_dcopy(const size_t N, const b_lean_obj_arg X, const size_t offX, const size_t incX,
                                 lean_obj_arg Y, const size_t offY, const size_t incY){
   ensure_exclusive_float_array(&Y);
   cblas_dcopy((int)N, lean_float_array_cptr(X) + offX, (int)incX, lean_float_array_cptr(Y) + offY, (int)incY);
@@ -166,7 +166,7 @@ LEAN_EXPORT lean_obj_res leanblas_dcopy(const size_t N, const b_lean_obj_arg X, 
   *
   * @return Y with the elements of alpha*X added to it
   */
-LEAN_EXPORT lean_obj_res leanblas_daxpy(const size_t N, const double alpha, const b_lean_obj_arg X, const size_t offX, const size_t incX,
+LEAN_EXPORT lean_obj_res leanblas_cblas_daxpy(const size_t N, const double alpha, const b_lean_obj_arg X, const size_t offX, const size_t incX,
                                 lean_obj_arg Y, const size_t offY, const size_t incY){
   ensure_exclusive_float_array(&Y);
   cblas_daxpy((int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX, lean_float_array_cptr(Y) + offY, (int)incY);
@@ -186,7 +186,7 @@ LEAN_EXPORT lean_obj_res leanblas_daxpy(const size_t N, const double alpha, cons
   *
   * @return a, b, c, and s with the Givens plane rotation constructed
   */
-LEAN_EXPORT lean_obj_res leanblas_drotg(double a, double b){
+LEAN_EXPORT lean_obj_res leanblas_cblas_drotg(double a, double b){
   double c, s;
   cblas_drotg(&a, &b, &c, &s);
 
@@ -211,7 +211,7 @@ LEAN_EXPORT lean_obj_res leanblas_drotg(double a, double b){
   *
   * @return d1, d2, x1, y1, and param with the modified Givens plane rotation constructed
   */
-LEAN_EXPORT lean_obj_res leanblas_drotmg(const double d1, const double d2, const double x1, const double y1){
+LEAN_EXPORT lean_obj_res leanblas_cblas_drotmg(const double d1, const double d2, const double x1, const double y1){
   double d1_out, d2_out, x1_out, y1_out;
   double param[5];
   cblas_drotmg(&d1_out, &d2_out, &x1_out, y1_out, param);
@@ -244,7 +244,7 @@ LEAN_EXPORT lean_obj_res leanblas_drotmg(const double d1, const double d2, const
   *
   * @return X and Y with the Givens plane rotation applied
   */
-LEAN_EXPORT lean_obj_res leanblas_drot(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX,
+LEAN_EXPORT lean_obj_res leanblas_cblas_drot(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX,
                                lean_obj_arg Y, const size_t offY, const size_t incY, const double c, const double s){
   ensure_exclusive_float_array(&X);
   ensure_exclusive_float_array(&Y);
@@ -269,7 +269,7 @@ LEAN_EXPORT lean_obj_res leanblas_drot(const size_t N, lean_obj_arg X, const siz
   *
   * @return X with the elements scaled by alpha
   */
-LEAN_EXPORT lean_obj_res leanblas_dscal(const size_t N, const double alpha, lean_obj_arg X, const size_t offX, const size_t incX){
+LEAN_EXPORT lean_obj_res leanblas_cblas_dscal(const size_t N, const double alpha, lean_obj_arg X, const size_t offX, const size_t incX){
   ensure_exclusive_float_array(&X);
   cblas_dscal((int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX);
   return X;

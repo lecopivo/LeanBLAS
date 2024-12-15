@@ -24,7 +24,7 @@ outputs:
 - the dot product of X and Y
 
 -/
-@[extern "leanblas_ddot"]
+@[extern "leanblas_cblas_ddot"]
 opaque ddot (N : USize) (X : @& FloatArray) (offX incX : USize) (Y : @& FloatArray) (offY incY : USize) : Float
 
 structure Precondition.ddot (N : Nat) (X : @& FloatArray) (offX incX : Nat) (Y : @& FloatArray) (offY incY : Nat) where
@@ -48,7 +48,7 @@ inputs:
 outputs:
 - the dot product of X and Y
 -/
-@[extern "leanblas_zdot"]
+@[extern "leanblas_cblas_zdot"]
 opaque zdot (N : USize) (X : @& ComplexFloatArray) (offX incX : USize) (Y : @& ComplexFloatArray) (offY incY : USize) : ComplexFloat
 
 
@@ -70,7 +70,7 @@ C interface
 double cblas_dnrm2(const int N, const double *X, const int incX);
 ```
 -/
-@[extern "leanblas_dnrm2"]
+@[extern "leanblas_cblas_dnrm2"]
 opaque dnrm2 (N : USize) (X : @& FloatArray) (offX incX : USize) : Float
 
 structure Precondition.dnrm2 (N : Nat) (X : @& FloatArray) (offX incX : Nat) where
@@ -95,7 +95,7 @@ C interface
 double cblas_dasum(const int N, const double *X, const int incX);
 ```
 -/
-@[extern "leanblas_dasum"]
+@[extern "leanblas_cblas_dasum"]
 opaque dasum (N : USize) (X : @& FloatArray) (offX incX : USize) : Float
 
 
@@ -117,7 +117,7 @@ C interface
 int cblas_idamax(const int N, const double *X, const int incX);
 ```
 -/
-@[extern "leanblas_idamax"]
+@[extern "leanblas_cblas_idamax"]
 opaque idamax (N : USize) (X : @& FloatArray) (offX incX : USize) : USize
 
 
@@ -141,7 +141,7 @@ C interface
 void cblas_dswap(const int N, double *X, const int incX, double *Y, const int incY);
 ```
 -/
-@[extern "leanblas_dswap"]
+@[extern "leanblas_cblas_dswap"]
 opaque dswap (N : USize) (X : FloatArray) (offX incX : USize) (Y : FloatArray) (offY incY : USize) : FloatArray × FloatArray
 
 
@@ -165,7 +165,7 @@ C interface
 void cblas_dcopy(const int N, const double *X, const int incX, double *Y, const int incY);
 ```
 -/
-@[extern "leanblas_dcopy"]
+@[extern "leanblas_cblas_dcopy"]
 opaque dcopy (N : USize) (X : @& FloatArray) (offX incX : USize) (Y : FloatArray) (offY incY : USize) : FloatArray
 
 
@@ -191,7 +191,7 @@ void cblas_daxpy(const int N, const double alpha, const double *X,
                  const int incX, double *Y, const int incY);
 ```
 -/
-@[extern "leanblas_daxpy"]
+@[extern "leanblas_cblas_daxpy"]
 opaque daxpy (N : USize) (a : Float) (X : @& FloatArray) (offX incX : USize) (Y : FloatArray) (offY incY : USize) : FloatArray
 
 
@@ -215,7 +215,7 @@ C interface
 void cblas_drotg(double *a, double *b, double *c, double *s);
 ```
 -/
-@[extern "leanblas_drotg"]
+@[extern "leanblas_cblas_drotg"]
 opaque drotg (a : Float) (b : Float) : (Float × Float × Float × Float)
 
 
@@ -236,7 +236,7 @@ C interface
 void cblas_drotmg(double *d1, double *d2, double *b1, const double b2, double *P);
 ```
 -/
-@[extern "leanblas_drotmg"]
+@[extern "leanblas_cblas_drotmg"]
 opaque drotmg (d1 : Float) (d2 : Float) (b1 : Float) (b2 : Float) : (Float × Float × Float × Float × Float)
 
 
@@ -263,7 +263,7 @@ void cblas_drot(const int N, double *X, const int incX, double *Y, const int inc
                 const double c, const double s);
 ```
 -/
-@[extern "leanblas_drot"]
+@[extern "leanblas_cblas_drot"]
 opaque drot (N : USize) (X : FloatArray) (offX incX : USize) (Y : FloatArray) (offY incY : USize) (c s : Float) : FloatArray × FloatArray
 
 
@@ -285,7 +285,7 @@ C interface
 void cblas_dscal(const int N, const double alpha, double *X, const int incX);
 ```
 -/
-@[extern "leanblas_dscal"]
+@[extern "leanblas_cblas_dscal"]
 opaque dscal (N : USize) (a : Float) (X : FloatArray) (offX incX : USize) : FloatArray
 
 
@@ -307,6 +307,27 @@ instance : LevelOneData Float Float FloatArray where
 
 
 @[instance]
-axiom cblasLevelOne : BLAS.LevelOneSpec Float Float FloatArray
+axiom cblasLevelOneDoubleAxiom : BLAS.LevelOneSpec Float Float FloatArray
 
 instance : BLAS.LevelOne Float Float FloatArray := ⟨⟩
+
+
+-- instance : LevelOneData Float ComplexFloat ComplexFloatArray where
+--   size x := x.size
+--   get x i := x.get! i
+--   dot N X offX incX Y offY incY := zdot N.toUSize X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize
+--   nrm2 N X offX incX := znrm2 N.toUSize X offX.toUSize incX.toUSize
+--   asum N X offX incX := zasum N.toUSize X offX.toUSize incX.toUSize
+--   iamax N X offX incX := izamax N.toUSize X offX.toUSize incX.toUSize |>.toNat
+--   swap N X offX incX Y offY incY := zswap N.toUSize X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize
+--   copy N X offX incX Y offY incY := zcopy N.toUSize X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize
+--   axpy N a X offX incX Y offY incY := zaxpy N.toUSize a X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize
+--   rotg a b := zrotg a b
+--   rotmg d1 d2 b1 b2 := zrotmg d1 d2 b1 b2
+--   rot N X offX incX Y offY incY c s := zrot N.toUSize X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize c s
+--   scal N a X offX incX := zscal N.toUSize a X offX.toUSize incX.toUSize
+
+-- @[instance]
+-- axiom cblasLevelOneComplexDoubleAxiom : BLAS.LevelOneSpec Float ComplexFloat ComplexFloatArray
+
+-- instance : BLAS.LevelOne Float ComplexFloat ComplexFloatArray := ⟨⟩

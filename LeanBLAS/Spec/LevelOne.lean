@@ -164,7 +164,11 @@ class BLAS.LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [B
       else
         get Y i
 
-  -- rotg
+  -- rotg_spec (a b : C) :
+  --   rotg a b
+  --   =
+  --   sorry
+
   -- rogmg
   -- rot
 
