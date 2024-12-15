@@ -27,8 +27,6 @@ CBLAS_TRANSPOSE leanblas_cblas_transpose(const uint8_t trans) {
       return CblasTrans;
     case 2:
       return CblasConjTrans;
-    case 3:
-      return CblasConjNoTrans;
     default:
       return CblasNoTrans;
   }

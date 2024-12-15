@@ -10,7 +10,6 @@ inductive Transpose where
   | NoTrans
   | Trans
   | ConjTrans
-  | ConjNoTrans
 
 -- move this to Spec directory
 inductive UpLo where
