@@ -31,7 +31,7 @@ void cblas_dgemv(const enum CBLAS_ORDER Order, const enum C, const int M, const 
                  const int incX, const double beta, double *Y, const int incY);
 ```
 -/
-@[extern "leanblas_dgemv"]
+@[extern "leanblas_cblas_dgemv"]
 opaque dgemv (order : Order) (transA : Transpose) (N : USize) (M : USize) (alpha : Float)
     (A : @& FloatArray) (offA : USize) (lda : USize)
     (X : @& FloatArray) (offX incX : USize) (beta : Float)
@@ -62,7 +62,7 @@ inputs:
 
 outputs: Y with the product of A and X
 -/
-@[extern "leanblas_dgbmv"]
+@[extern "leanblas_cblas_dgbmv"]
 opaque dbmv (order : Order) (transA : Transpose) (N : USize) (M : USize) (KL KU : USize) (alpha : Float)
     (A : @& FloatArray) (offA : USize) (lda : USize)
     (X : @& FloatArray) (offX incX : USize) (beta : Float)
@@ -84,7 +84,7 @@ inputs:
 
 outputs: X with the product of A and X
 -/
-@[extern "leanblas_dtrmv"]
+@[extern "leanblas_cblas_dtrmv"]
 opaque dtrmv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N : USize)
     (A : @& FloatArray) (offA : USize) (lda : USize)
@@ -107,7 +107,7 @@ inputs:
 
 outputs: X with the product of A and X
 -/
-@[extern "leanblas_dtbmv"]
+@[extern "leanblas_cblas_dtbmv"]
 opaque dtbmv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N K : USize)
     (A : @& FloatArray) (offA : USize) (lda : USize)
@@ -128,7 +128,7 @@ inputs:
 
 outputs: X with the product of A and X
 -/
-@[extern "leanblas_dtpmv"]
+@[extern "leanblas_cblas_dtpmv"]
 opaque dtpmv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N : USize)
     (A : @& FloatArray) (offA : USize)
@@ -150,7 +150,7 @@ inputs:
 
 outputs: X with the solution of the system
 -/
-@[extern "leanblas_dtrsv"]
+@[extern "leanblas_cblas_dtrsv"]
 opaque dtrsv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N : USize)
     (A : @& FloatArray) (offA : USize) (lda : USize)
@@ -173,7 +173,7 @@ inputs:
 
 outputs: X with the solution of the system
 -/
-@[extern "leanblas_dtbsv"]
+@[extern "leanblas_cblas_dtbsv"]
 opaque dtbsv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N K : USize)
     (A : @& FloatArray) (offA : USize) (lda : USize)
@@ -194,7 +194,7 @@ inputs:
 
 outputs: X with the solution of the system
 -/
-@[extern "leanblas_dtpsv"]
+@[extern "leanblas_cblas_dtpsv"]
 opaque dtpsv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N : USize)
     (A : @& FloatArray) (offA : USize)

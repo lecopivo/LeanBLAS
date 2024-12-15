@@ -12,22 +12,20 @@ lean_lib LeanBLAS {
   roots := #[`LeanBLAS]
 }
 
-
-lean_exe Main {
-  root := `Main
-  supportInterpreter := true
+@[test_driver]
+lean_exe Test {
+  root := `Test.cblas_level_one
   moreLinkArgs := linkArgs
 }
 
 
-target ffi.o pkg : FilePath := do
-  let oFile := pkg.buildDir / "c" / "ffi.o"
-  let srcJob ← inputTextFile <| pkg.dir / "c" / "levelone.c"
-  let weakArgs := #["-I", (← getLeanIncludeDir).toString]
-  buildO oFile srcJob weakArgs #["-fPIC"] "gcc" getLeanTrace
-
-
 extern_lib libleanffi pkg := do
-  let ffiO ← ffi.o.fetch
+  let mut oFiles : Array (BuildJob FilePath) := #[]
+  for file in (← (pkg.dir / "c").readDir) do
+    if file.path.extension == some "c" then
+      let oFile := pkg.buildDir / "c" / (file.fileName.stripSuffix ".c" ++ ".o")
+      let srcJob ← inputTextFile file.path
+      let weakArgs := #["-I", (← getLeanIncludeDir).toString]
+      oFiles := oFiles.push (← buildO oFile srcJob weakArgs #["-fPIC"] "gcc" getLeanTrace)
   let name := nameToStaticLib "leanffi"
-  buildStaticLib (pkg.nativeLibDir / name) #[ffiO]
+  buildStaticLib (pkg.nativeLibDir / name) oFiles

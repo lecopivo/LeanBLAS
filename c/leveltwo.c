@@ -41,38 +41,39 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dgemv(const uint8_t order, const uint8_t
 
 
 
-/** dbmv
- *
- * Computes a matrix-vector product using a band matrix.
- *
- * @param order Row or column major
- * @param transA No transpose, transpose, or conjugate transpose
- * @param N Number of rows in matrix
- * @param K Number of super-diagonals in matrix
- * @param alpha Scalar multiplier
- * @param A Pointer to input matrix
- * @param offA starting index of A
- * @param lda Leading dimension of A
- * @param K1 Number of sub-diagonals in matrix
- * @param X Pointer to input vector
- * @param offX starting index of X
- * @param incX Increment for the elements of X
- * @param beta Scalar multiplier
- * @param Y Pointer to output vector
- * @param offY starting index of Y
- * @param incY Increment for the elements of Y
- *
- * @return Y with the matrix-vector product added to it
- */
-LEAN_EXPORT lean_obj_res leanblas_cblas_dbmv(const uint8_t order, const uint8_t transA,
-                                const size_t N, const size_t K, const double alpha,
+/** dgbmv
+  *
+  * Computes a matrix-vector product using a general band matrix.
+  
+    * @param order Row or column
+    * @param transA No transpose, transpose, or conjugate transpose
+    * @param N Number of rows in matrix
+    * @param M Number of columns in matrix
+    * @param KL Number of sub-diagonals in matrix
+    * @param KU Number of super-diagonals in matrix
+    * @param alpha Scalar multiplier
+    * @param A Pointer to input matrix
+    * @param offA starting index of A
+    * @param lda Leading dimension of A
+    * @param X Pointer to input vector
+    * @param offX starting index of X
+    * @param incX Increment for the elements of X
+    * @param beta Scalar multiplier
+    * @param Y Pointer to output vector
+    * @param offY starting index of Y
+    * @param incY Increment for the elements of Y
+    *
+    * @return Y with the matrix-vector product added to it
+    */
+LEAN_EXPORT lean_obj_res leanblas_cblas_dgbmv(const uint8_t order, const uint8_t transA,
+                                const size_t N, const size_t M, const size_t KL, const size_t KU, const double alpha,
                                 const b_lean_obj_arg A, const size_t offA, const size_t lda,
-                                const size_t K1, const b_lean_obj_arg X, const size_t offX, const size_t incX,
+                                const b_lean_obj_arg X, const size_t offX, const size_t incX,
                                 const double beta, lean_obj_arg Y, const size_t offY, const size_t incY){
   ensure_exclusive_float_array(&Y);
 
-  cblas_dbmv(leanblas_cblas_order(order), leanblas_cblas_transpose(transA),
-              (int)N, (int)K, alpha, lean_float_array_cptr(A) + offA, (int)lda,
+  cblas_dgbmv(leanblas_cblas_order(order), leanblas_cblas_transpose(transA),
+              (int)N, (int)M, (int)KL, (int)KU, alpha, lean_float_array_cptr(A) + offA, (int)lda,
               lean_float_array_cptr(X) + offX, (int)incX, beta, lean_float_array_cptr(Y) + offY, (int)incY);
 
   return Y;
@@ -222,7 +223,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dtbsv(const uint8_t order, const uint8_t
                                 lean_obj_arg X, const size_t offX, const size_t incX){
   ensure_exclusive_float_array(&X);
 
-  cblas_dtbsv(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo), leanblas_cbals_transpose(transA), leanblas_cblas_diag(diag),
+  cblas_dtbsv(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo), leanblas_cblas_transpose(transA), leanblas_cblas_diag(diag),
               (int)N, (int)K, lean_float_array_cptr(A) + offA, (int)lda, lean_float_array_cptr(X) + offX, (int)incX);
 
   return X;
