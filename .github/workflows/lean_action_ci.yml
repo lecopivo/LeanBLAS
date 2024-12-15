@@ -1,0 +1,68 @@
+name: Lean Action CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install BLAS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libblas-dev
+
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+
+      - name: Build project
+        run: lake build
+
+      - name: Test project
+        run: lake test
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install BLAS
+        run: |
+          choco install openblas
+
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+
+      - name: Build project
+        run: lake build
+
+      - name: Test project
+        run: lake test
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install BLAS
+        run: |
+          brew install openblas
+
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+
+      - name: Build project
+        run: lake build
+
+      - name: Test project
+        run: lake test
