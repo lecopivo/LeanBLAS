@@ -79,6 +79,24 @@ class LevelOneData (R K : outParam Type) (Array : Type) [Scalar R K] where
 
   scal (N : Nat) (α : K) (X : Array) (offX incX : Nat) : Array
 
+class LevelOneDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where
+  const (N : Nat) (a : K) : Array
+  sum (N : Nat) (X : Array) (offX incX : Nat) : K
+  axpby (N : Nat) (α β : K) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array
+
+  /- Element wise operations -/
+  mul (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array
+  div (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array
+  inv (N : Nat) (X : Array) (offX incX : Nat) : Array
+  abs (N : Nat) (X : Array) (offX incX : Nat) : Array
+  sqrt (N : Nat) (X : Array) (offX incX : Nat) : Array
+  exp (N : Nat) (X : Array) (offX incX : Nat) : Array
+  log (N : Nat) (X : Array) (offX incX : Nat) : Array
+  sin (N : Nat) (X : Array) (offX incX : Nat) : Array
+  cos (N : Nat) (X : Array) (offX incX : Nat) : Array
+
+
+
 export LevelOneData (get dot nrm2 asum iamax swap copy axpy rotg rotmg rot scal)
 
 
@@ -102,9 +120,9 @@ class LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [BLAS.L
     size (ofFn (Array:=Array) f) = n
 
   dot_spec (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) :
-    InBounds X offX incX (N-1)
+    (∀ i : Fin N, InBounds X offX incX i)
     →
-    InBounds Y offY incY (N-1)
+    (∀ i : Fin N, InBounds Y offY incY i)
     →
     (dot N X offX incX Y offY incY)
     =
@@ -120,7 +138,7 @@ class LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [BLAS.L
 
 
   asum_spec (N : Nat) (X : Array) (offX incX : Nat) :
-    InBounds X offX incX (N-1)
+    (∀ i : Fin N, InBounds X offX incX i)
     →
     (asum N X offX incX)
     =
@@ -195,7 +213,7 @@ class LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [BLAS.L
   -- rot
 
   scal_spec (N : Nat) (α : C) (X : Array) (offX incX : Nat) :
-    InBounds X offX incX (N-1)
+    (∀ i : Fin N, InBounds X offX incX i)
     →
     ∀ i : Nat, i < size X →
       get (scal N α X offX incX) i
