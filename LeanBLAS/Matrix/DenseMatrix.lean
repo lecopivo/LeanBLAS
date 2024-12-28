@@ -1,8 +1,8 @@
 import LeanBLAS.Spec.LevelOne
 import LeanBLAS.Spec.LevelTwo
 import LeanBLAS.CBLAS.LevelOne
-
 import LeanBLAS.Vector.DenseVector
+import LeanBLAS.Util
 
 namespace BLAS
 
@@ -30,6 +30,14 @@ def IsValid (strg : Storage) (dataSize m n : Nat) : Prop :=
     m ≤ strg.lda
     ∧
     (strg.lda * n) + strg.offset ≤ dataSize
+
+instance (strg : Storage) (dataSize m n : Nat) : Decidable (IsValid strg dataSize m n) :=
+  by
+    unfold IsValid
+    exact
+     match h : strg.order with
+     | .RowMajor => inferInstance
+     | .ColMajor => inferInstance
 
 
 /-- Linear index of matrix element `(i, j)` in a matrix of size `m` by `n`. -/
@@ -120,15 +128,6 @@ theorem toIJ_linIdx (strg : Storage) (dataSize m n : Nat) (i : Fin m) (j : Fin n
     · simp_all only [Nat.add_mul_div_left, Nat.div_eq_of_lt, Nat.zero_add]
 
 
-instance (strg : Storage) (dataSize m n : Nat) : Decidable (IsValid strg dataSize m n) :=
-  by
-    unfold IsValid
-    exact
-     match h : strg.order with
-     | .RowMajor => inferInstance
-     | .ColMajor => inferInstance
-
-
 /-- Is the data packed according to the storage? i.e. `data` stores m by n` matrix in
 a contiguous block of memory.  -/
 def IsPacked
@@ -163,19 +162,7 @@ structure DenseMatrix (Array : Type) (strg : DenseMatrix.Storage) (m n : Nat)
     {R : Type} (K : Type) [Scalar R K] [LevelOneData R K Array]
   where
   data : Array
-  is_valid : strg.IsValid (size data) m n
-
-/-- Is the data packed according to the storage? i.e. `data` stores m by n` matrix in
-a contiguous block of memory.  -/
-def DenseMatrix.IsPacked {Array : Type}
-    {strg : DenseMatrix.Storage} {m n : Nat}
-    {R K : Type}[Scalar R K] [LevelOneData R K Array]
-    (A : DenseMatrix Array strg m n K) : Prop := strg.IsPacked (size A.data) m n
-
-/-- Dense matrix with `m` rows and `n` columns.  -/
-def PackedDenseMatrix (Array : Type) (strg : DenseMatrix.Storage) (m n : Nat)
-    {R : Type} (K : Type) [Scalar R K] [LevelOneData R K Array] :=
-  {A : DenseMatrix Array strg m n K // A.IsPacked}
+  valid_storage : strg.IsValid (size data) m n
 
 
 namespace DenseMatrix
@@ -188,6 +175,10 @@ variable
 
 local notation K "^[" m ", " n "]" => DenseMatrix Array mstrg m n K
 local notation K "^[" n "]" => DenseVector Array vstrg n K
+
+/-- Is the data packed according to the storage? i.e. `data` stores m by n` matrix in
+a contiguous block of memory.  -/
+def IsPacked (A : K^[m,n]) : Prop := mstrg.IsPacked (size A.data) m n
 
 /-- Is `idx` a valid linear index for and element of matrix `A`? -/
 def IsValidLinearIndex (A : K^[m,n]) (idx : Nat) : Prop :=
@@ -225,7 +216,7 @@ theorem missing_theorem (n m i : Nat) (h : i < m) : n + n * i ≤ n * m := by
 theorem inbounds_row (A : K^[m,n]) (h : mstrg.order = .RowMajor) (i : Fin m) (j : Fin n) :
     j.1 + mstrg.lda * i.1 + mstrg.offset < size A.data := by
   rcases mstrg with ⟨order,lda,offset⟩
-  have h' := A.is_valid
+  have h' := A.valid_storage
   simp_all only [Storage.IsValid, h]
   have := h'.1
   have := h'.2
@@ -238,7 +229,7 @@ theorem inbounds_row (A : K^[m,n]) (h : mstrg.order = .RowMajor) (i : Fin m) (j 
 theorem inbounds_col (A : K^[m,n]) (h : mstrg.order = .ColMajor) (i : Fin m) (j : Fin n) :
     i.1 + mstrg.lda * j.1 + mstrg.offset < size A.data := by
   rcases mstrg with ⟨order,lda,offset⟩
-  have h' := A.is_valid
+  have h' := A.valid_storage
   simp_all only [Storage.IsValid, h]
   have := h'.1
   have := h'.2
@@ -270,7 +261,7 @@ def get (x : K^[m,n]) (i : Fin m) (j : Fin n) : K :=
   LevelOneData.get x.data (mstrg.linIdx i j)
 
 @[simp]
-theorem ofFn_get (f : Fin m → Fin n → K) (i : Fin m) (j : Fin n) :
+theorem get_ofFn (f : Fin m → Fin n → K) (i : Fin m) (j : Fin n) :
     get (ofFn (Array:=Array) (mstrg:=mstrg) f) i j = f i j := by
   simp[ofFn, get]
   cases mstrg.order
@@ -278,7 +269,7 @@ theorem ofFn_get (f : Fin m → Fin n → K) (i : Fin m) (j : Fin n) :
   · sorry
 
 @[simp]
-theorem get_ofFn (A : K^[m,n]) (hA : A.IsPacked) :
+theorem ofFn_get (A : K^[m,n]) (hA : A.IsPacked) :
     (ofFn (Array:=Array) (mstrg:=mstrg) (fun i j => get A i j)) = A := by
   rcases mstrg with ⟨order,lda,offset⟩
   simp[get,ofFn]
@@ -304,7 +295,7 @@ def lift (A : K^[m,n]) (f : Nat → Array → Nat → Nat → Array)
     (hf : ∀ N data off inc, size (f N data off inc) = size data) : K^[m,n] :=
   if A.IsPacked then
     ⟨f (m*n) A.data 0 1, by
-     have := A.is_valid
+     have := A.valid_storage
      simp_all⟩
   else
     match mstrg.order with
@@ -316,17 +307,6 @@ def lift (A : K^[m,n]) (f : Nat → Array → Nat → Nat → Array)
       ⟨Fin.foldl (init := A.data) n (fun data j =>
         f m data (mstrg.offset + j.1*mstrg.lda) 1),
         sorry⟩
-
-def Fin.reducelD {α : Type} {n : Nat} (d : α) (f : α → α → α) (g : Fin n → α) : α :=
-  if h : n = 0 then d
-  else if h : n = 1 then g ⟨0, by omega⟩
-  else loop (g ⟨0, by omega⟩) 1
-  where
-  loop (x : α) (i : Nat) : α :=
-    if h : i < n then loop (f x (g ⟨i, h⟩)) (i+1) else x
-  termination_by n - i
-  decreasing_by decreasing_trivial_pre_omega
-
 
 @[inline]
 def liftRed (A : K^[m,n]) (f : Nat → Array → Nat → Nat → α) (op : α → α → α) (default : α) (finalize : α → α := id) : α :=
@@ -346,8 +326,8 @@ def lift₂ (A B : K^[m,n]) (f : Nat → Array → Nat → Nat → Array → Nat
     (hf : ∀ N data data' off inc off' inc', size (f N data off inc data' off' inc') = size data') : K^[m,n] :=
   if A.IsPacked then
     ⟨f (m*n) A.data 0 1 B.data 0 1, by
-     have := A.is_valid
-     have := B.is_valid
+     have := A.valid_storage
+     have := B.valid_storage
      simp_all⟩
   else
     match mstrg.order with
@@ -356,14 +336,14 @@ def lift₂ (A B : K^[m,n]) (f : Nat → Array → Nat → Nat → Array → Nat
         f n A.data (mstrg.offset + i.1*mstrg.lda) 1 data (mstrg.offset + i.1*mstrg.lda) 1),
         by
           induction m
-          · simp[Fin.foldl,Fin.foldl.loop,B.is_valid]
+          · simp[Fin.foldl,Fin.foldl.loop,B.valid_storage]
           · sorry⟩
     | .ColMajor =>
       ⟨Fin.foldl (init := B.data) n (fun data j =>
         f m A.data (mstrg.offset + j.1*mstrg.lda) 1 data (mstrg.offset + j.1*mstrg.lda) 1),
         by
           induction n
-          · simp[Fin.foldl,Fin.foldl.loop,B.is_valid]
+          · simp[Fin.foldl,Fin.foldl.loop,B.valid_storage]
           · sorry⟩
 
 @[inline]

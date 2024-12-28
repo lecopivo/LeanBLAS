@@ -13,11 +13,13 @@ lean_lib LeanBLAS where
 
 
 @[test_driver]
-lean_exe Test where
+lean_exe CBLASLevelOneTest where
   root := `Test.cblas_level_one
   moreLinkArgs := linkArgs
 
-
+lean_exe DenseVectorTest where
+  root := `Test.dense_vector
+  moreLinkArgs := linkArgs
 
 extern_lib libleanffi pkg := do
   let mut oFiles : Array (BuildJob FilePath) := #[]
