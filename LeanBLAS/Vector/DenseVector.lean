@@ -99,6 +99,9 @@ def sum (x : K^[n]) : K :=
 def axpby (a : K) (x : K^[n]) (b : K) (y : K^[n]) : K^[n] :=
   ⟨LevelOneDataExt.axpby n a x.data vstrg.offset vstrg.inc b y.data vstrg.offset vstrg.inc, by sorry⟩
 
+def scalAdd (a : K) (x : K^[n]) (b : K) : K^[n] :=
+  ⟨LevelOneDataExt.scaladd n a x.data vstrg.offset vstrg.inc b, by sorry⟩
+
 def imaxRe (x : K^[n]) (h : n ≠ 0) : Fin n :=
   ⟨LevelOneDataExt.imaxRe n x.data vstrg.offset vstrg.inc h, sorry⟩
 
