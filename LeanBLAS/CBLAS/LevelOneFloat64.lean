@@ -367,6 +367,23 @@ outputs: `alpha*X + beta*Y` at appropriate indices
 opaque daxpby (N : USize) (alpha : Float) (X : @&FloatArray) (offX : USize) (incX : USize)
                           (beta : Float)  (Y :   FloatArray) (offY : USize) (incY : USize) : FloatArray
 
+/-- scaladd
+
+summary: computes `alpha*X + beta`
+
+inputs:
+- N: the number of elements in the vectors
+- alpha: the scalar
+- beta: the scalar
+- X: the vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+
+outputs: `alpha*X + beta` at appropriate indices
+-/
+@[extern "leanblas_cblas_dscaladd"]
+opaque dscaladd (N : USize) (alpha : Float) (X : FloatArray) (offX : USize) (incX : USize) (beta : Float) : FloatArray
+
 /-- dimaxRe
 
 summary: finds the index of the element with the largest real part in a vector
@@ -565,6 +582,7 @@ instance : LevelOneDataExt Float Float FloatArray where
   const N a := dconst N.toUSize a
   sum N X offX incX := dsum N.toUSize X offX.toUSize incX.toUSize
   axpby N a X offX incX b Y offY incY := daxpby N.toUSize a X offX.toUSize incX.toUSize b Y offY.toUSize incY.toUSize
+  scaladd N a X offX incX b := dscaladd N.toUSize a X offX.toUSize incX.toUSize b
 
   imaxRe N X offX incX h := (dimaxRe N.toUSize X offX.toUSize incX.toUSize).toNat
   imaxIm N X offX incX h := offX

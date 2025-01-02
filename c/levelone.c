@@ -334,6 +334,17 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_daxpby(const size_t N, const double alph
 }
 
 
+LEAN_EXPORT lean_obj_res leanblas_cblas_dscaladd(const size_t N, const double alpha, lean_obj_arg X, const size_t offX, const size_t incX,
+                                                                  const double beta){
+  ensure_exclusive_float_array(&X);
+  double * xptr = lean_float_array_cptr(X);
+  for (size_t i = 0; i < N; i++){
+    xptr[offX + i*incX] = alpha*xptr[offX + i*incX] + beta;
+  }
+  return X;
+}
+
+
 LEAN_EXPORT size_t leanblas_cblas_dimax_re(const size_t N, const b_lean_obj_arg X, const size_t offX, const size_t incX){
   double * xptr = lean_float_array_cptr(X);
   double max = xptr[offX];

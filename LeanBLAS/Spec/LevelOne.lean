@@ -83,6 +83,8 @@ class LevelOneDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where
   const (N : Nat) (a : K) : Array
   sum (N : Nat) (X : Array) (offX incX : Nat) : K
   axpby (N : Nat) (a : K) (X : Array) (offX incX : Nat) (b : K)  (Y : Array) (offY incY : Nat) : Array
+  /-- return `a•x + b` -/
+  scaladd (N : Nat) (a : K) (X : Array) (offX incX : Nat) (b : K) : Array
 
   imaxRe (N : Nat) (X : Array) (offX incX : Nat) (h : N ≠ 0) : Nat
   imaxIm (N : Nat) (X : Array) (offX incX : Nat) (h : N ≠ 0) : Nat
