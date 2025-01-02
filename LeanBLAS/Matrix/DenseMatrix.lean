@@ -66,7 +66,7 @@ theorem missing_theorem (n m i : Nat) (h : i < m) : n + n * i ≤ n * m := by
 
 theorem inbounds_row (A : K^[m,n]) (h : mstrg.order = .RowMajor) (i : Fin m) (j : Fin n) :
     j.1 + mstrg.lda * i.1 + mstrg.offset < size A.data := by
-  rcases mstrg with ⟨order,lda,offset⟩
+  rcases mstrg with ⟨order,lda,offset,bufferSize⟩
   have h' := A.valid_storage
   simp_all only [Storage.IsValid, h]
   have := h'.1
@@ -75,11 +75,11 @@ theorem inbounds_row (A : K^[m,n]) (h : mstrg.order = .RowMajor) (i : Fin m) (j 
        _ ≤  lda + lda * i + offset := by omega
        _ ≤  lda + lda * (m - 1) + offset := by have := i.2; sorry -- nlinarith
        _ =  lda * m + offset := by sorry -- ring
-       _ ≤  size A.data := by rw[Nat.mul_comm]; exact h'.2
+       _ ≤  size A.data := by rw[Nat.mul_comm]; cases bufferSize <;> simp_all
 
 theorem inbounds_col (A : K^[m,n]) (h : mstrg.order = .ColMajor) (i : Fin m) (j : Fin n) :
     i.1 + mstrg.lda * j.1 + mstrg.offset < size A.data := by
-  rcases mstrg with ⟨order,lda,offset⟩
+  rcases mstrg with ⟨order,lda,offset,bufferSize⟩
   have h' := A.valid_storage
   simp_all only [Storage.IsValid, h]
   have := h'.1
@@ -88,9 +88,7 @@ theorem inbounds_col (A : K^[m,n]) (h : mstrg.order = .ColMajor) (i : Fin m) (j 
        _ ≤  lda + lda * j + offset := by omega
        _ ≤  lda + lda * (n - 1) + offset := by have := i.2; sorry  -- nlinarith
        _ =  lda * n + offset := by sorry  -- ring
-       _ ≤  size A.data := by exact h'.2
-
-
+       _ ≤  size A.data := by cases bufferSize <;> simp_all
 
 
 -- Can we do faster implementations here?

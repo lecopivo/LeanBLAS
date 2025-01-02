@@ -2,12 +2,18 @@ import LeanBLAS.Scalar
 
 namespace BLAS
 
+inductive DenseVector.Storage.BufferSize
+  | exact
+  | relaxed
 
+/-- Storage options for dense vectors -/
 structure DenseVector.Storage where
   /-- Starting offset -/
   offset : Nat
   /-- Element increment -/
   inc : Nat
+  /-- Whether -/
+  bufferSize : Storage.BufferSize
 
 namespace DenseVector.Storage
 
@@ -16,10 +22,17 @@ variable {R K Array : Type} [Scalar R K]
 def IsValid (strg : Storage) (dataSize : Nat) (n : Nat) : Prop :=
   1 ≤ strg.inc
   ∧
-  strg.inc * n + strg.offset ≤ dataSize
+  match strg.bufferSize with
+  | .exact =>
+    strg.inc * n + strg.offset = dataSize
+  | .relaxed =>
+    strg.inc * n + strg.offset ≤ dataSize
 
 instance (strg : Storage) (dataSize n : Nat) : Decidable (IsValid strg dataSize n) := by
-  unfold IsValid; infer_instance
+  unfold IsValid;
+  match strg.bufferSize with
+  | .exact => infer_instance
+  | .relaxed => infer_instance
 
 def linIdx (strg : Storage) (i : Fin n) : Nat :=
   strg.offset + i.1 * strg.inc

@@ -3,6 +3,12 @@ import LeanBLAS.Spec.LevelTwo
 
 namespace BLAS
 
+
+inductive DenseMatrix.Storage.BufferSize
+  | exact
+  | relaxed
+
+
 /-- Storage for dense matrix storage. -/
 structure DenseMatrix.Storage where
   /-- Row or column major order -/
@@ -11,6 +17,8 @@ structure DenseMatrix.Storage where
   lda : Nat
   /-- Starting offset -/
   offset : Nat
+  /-- Is the size of data buffer exact or larger then necessary -/
+  bufferSize : Storage.BufferSize
 
 namespace DenseMatrix.Storage
 
@@ -20,19 +28,33 @@ def IsValid (strg : Storage) (dataSize m n : Nat) : Prop :=
   | .RowMajor =>
     n ≤ strg.lda
     ∧
-    (m * strg.lda) + strg.offset ≤ dataSize
+    match strg.bufferSize with
+    | .exact =>
+      (m * strg.lda) + strg.offset = dataSize
+    | .relaxed =>
+      (m * strg.lda) + strg.offset ≤ dataSize
   | .ColMajor =>
     m ≤ strg.lda
     ∧
-    (strg.lda * n) + strg.offset ≤ dataSize
+    match strg.bufferSize with
+    | .exact =>
+      (strg.lda * n) + strg.offset = dataSize
+    | .relaxed =>
+      (strg.lda * n) + strg.offset ≤ dataSize
 
 instance (strg : Storage) (dataSize m n : Nat) : Decidable (IsValid strg dataSize m n) :=
   by
     unfold IsValid
     exact
      match h : strg.order with
-     | .RowMajor => inferInstance
-     | .ColMajor => inferInstance
+     | .RowMajor =>
+       match strg.bufferSize with
+       | .exact => inferInstance
+       | .relaxed => inferInstance
+     | .ColMajor =>
+       match strg.bufferSize with
+       | .exact => inferInstance
+       | .relaxed => inferInstance
 
 
 /-- Linear index of matrix element `(i, j)` in a matrix of size `m` by `n`. -/
