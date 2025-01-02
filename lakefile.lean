@@ -1,7 +1,7 @@
 import Lake
 open System Lake DSL
 
-package leanblast
+package leanblas
 
 def linkArgs := #["-lblas"]
 
@@ -21,7 +21,7 @@ lean_exe DenseVectorTest where
   root := `Test.dense_vector
   moreLinkArgs := linkArgs
 
-extern_lib libleanffi pkg := do
+extern_lib libleanblasc pkg := do
   let mut oFiles : Array (BuildJob FilePath) := #[]
   for file in (← (pkg.dir / "c").readDir) do
     if file.path.extension == some "c" then
@@ -29,6 +29,6 @@ extern_lib libleanffi pkg := do
       let srcJob ← inputTextFile file.path
       let weakArgs := #["-I", (← getLeanIncludeDir).toString]
       oFiles := oFiles.push (← buildO oFile srcJob weakArgs #["-fPIC"] "gcc" getLeanTrace)
-  let name := nameToStaticLib "leanffi"
+  let name := nameToStaticLib "leanblasc"
 
   buildLeanSharedLib (pkg.nativeLibDir / name) oFiles

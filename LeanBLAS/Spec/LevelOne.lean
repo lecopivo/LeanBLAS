@@ -82,12 +82,12 @@ class LevelOneData (R K : outParam Type) (Array : Type) [Scalar R K] where
 class LevelOneDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where
   const (N : Nat) (a : K) : Array
   sum (N : Nat) (X : Array) (offX incX : Nat) : K
-  axpby (N : Nat) (α β : K) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array
+  axpby (N : Nat) (a : K) (X : Array) (offX incX : Nat) (b : K)  (Y : Array) (offY incY : Nat) : Array
 
-  maxRe (N : Nat) (X : Array) (offX incX : Nat) : R
-  maxIm (N : Nat) (X : Array) (offX incX : Nat) : R
-  minRe (N : Nat) (X : Array) (offX incX : Nat) : R
-  minIm (N : Nat) (X : Array) (offX incX : Nat) : R
+  imaxRe (N : Nat) (X : Array) (offX incX : Nat) (h : N ≠ 0) : Nat
+  imaxIm (N : Nat) (X : Array) (offX incX : Nat) (h : N ≠ 0) : Nat
+  iminRe (N : Nat) (X : Array) (offX incX : Nat) (h : N ≠ 0) : Nat
+  iminIm (N : Nat) (X : Array) (offX incX : Nat) (h : N ≠ 0) : Nat
 
   /- Element wise operations -/
   mul (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array

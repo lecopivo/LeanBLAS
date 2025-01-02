@@ -1,6 +1,6 @@
 import LeanBLAS
 
-open BLAS
+open BLAS CBLAS
 
 def test_ddot : IO Unit := do
   let x : FloatArray := ⟨#[1.0,2.0,3.0]⟩
@@ -159,6 +159,16 @@ def test_daxpy_2 : IO Unit := do
   if y' != y_expected then
     throw $ IO.userError "test_daxpy_2 failed"
 
+
+def test_dconst : IO Unit := do
+
+  let x_expected : FloatArray := ⟨#[4.2,4.2,4.2]⟩
+  let x := dconst 3 4.2
+
+  IO.println s!"dconst 3 4.2"
+  IO.println s!"{x} == {x_expected} = {x == x_expected}"
+
+
 def main : IO Unit := do
   test_ddot
   test_ddot_2
@@ -175,3 +185,4 @@ def main : IO Unit := do
   test_dcopy_2
   test_daxpy
   test_daxpy_2
+  test_dconst

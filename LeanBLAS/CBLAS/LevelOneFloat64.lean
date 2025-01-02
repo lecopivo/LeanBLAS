@@ -1,7 +1,7 @@
 import LeanBLAS.ComplexFloat
 import LeanBLAS.Spec.LevelOne
 
-namespace BLAS
+namespace BLAS.CBLAS
 
 /-! Lean bindings to BLAS
 -/
@@ -290,3 +290,293 @@ instance : LevelOneData Float Float FloatArray where
 axiom cblasLevelOneDoubleAxiom : BLAS.LevelOneSpec Float Float FloatArray
 
 instance : BLAS.LevelOne Float Float FloatArray := ⟨⟩
+
+
+-- class LevelOneDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where
+--   const (N : Nat) (a : K) : Array
+--   sum (N : Nat) (X : Array) (offX incX : Nat) : K
+--   axpby (N : Nat) (a : K) (X : Array) (offX incX : Nat) (b : K)  (Y : Array) (offY incY : Nat) : Array
+
+--   maxRe (N : Nat) (X : Array) (offX incX : Nat) : R
+--   maxIm (N : Nat) (X : Array) (offX incX : Nat) : R
+--   minRe (N : Nat) (X : Array) (offX incX : Nat) : R
+--   minIm (N : Nat) (X : Array) (offX incX : Nat) : R
+
+--   /- Element wise operations -/
+--   mul (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array
+--   div (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array
+--   inv (N : Nat) (X : Array) (offX incX : Nat) : Array
+--   abs (N : Nat) (X : Array) (offX incX : Nat) : Array
+--   sqrt (N : Nat) (X : Array) (offX incX : Nat) : Array
+--   exp (N : Nat) (X : Array) (offX incX : Nat) : Array
+--   log (N : Nat) (X : Array) (offX incX : Nat) : Array
+--   sin (N : Nat) (X : Array) (offX incX : Nat) : Array
+--   cos (N : Nat) (X : Array) (offX incX : Nat) : Array
+
+
+
+/-- dconst
+
+summary: creates a vector with a constant value
+
+inputs:
+- N: the number of elements in the vector
+- alpha: the constant value
+
+outputs: a vector with all elements equal to alpha
+-/
+@[extern "leanblas_cblas_dconst"]
+opaque dconst (N : USize) (alpha : Float) : FloatArray
+
+
+/-- dsum
+
+summary: computes the sum of the elements of a vector
+
+inputs:
+- N: the number of elements in the vector
+- X: the vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+
+outputs:
+- the sum of the elements of X
+-/
+@[extern "leanblas_cblas_dsum"]
+opaque dsum (N : USize) (X : @&FloatArray) (offX : USize) (incX : USize) : Float
+
+
+/-- daxpby
+
+summary: computes `alpha*X + beta*Y`
+
+inputs:
+- N: the number of elements in the vectors
+- alpha: the scalar
+- X: the vector to be scaled and added
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+- beta: the scalar
+- Y: the vector to be added to
+- offY: starting offset of elements of Y
+- incY: the increment for the elements of Y
+
+outputs: `alpha*X + beta*Y` at appropriate indices
+-/
+@[extern "leanblas_cblas_daxpby"]
+opaque daxpby (N : USize) (alpha : Float) (X : @&FloatArray) (offX : USize) (incX : USize)
+                          (beta : Float)  (Y :   FloatArray) (offY : USize) (incY : USize) : FloatArray
+
+/-- dimaxRe
+
+summary: finds the index of the element with the largest real part in a vector
+
+inputs:
+- N: the number of elements in the vector
+- X: the vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+
+outputs:
+- the index of the element with the largest real part in X
+
+-/
+@[extern "leanblas_cblas_dimax_re"]
+opaque dimaxRe (N : USize) (X : @&FloatArray) (offX : USize) (incX : USize) : USize
+
+
+/-- diminRe
+
+summary: finds the index of the element with the smallest real part in a vector
+
+inputs:
+- N: the number of elements in the vector
+- X: the vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+
+outputs:
+- the index of the element with the smallest real part in X
+-/
+@[extern "leanblas_cblas_dimin_re"]
+opaque diminRe (N : USize) (X : @&FloatArray) (offX : USize) (incX : USize) : USize
+
+
+/-- dmul
+
+summary: computes the element-wise product of two vectors
+
+inputs:
+- N: the number of elements in the vectors
+- X: the first vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+- Y: the second vector
+- offY: starting offset of elements of Y
+- incY: the increment for the elements of Y
+
+outputs: the element-wise product of X and Y
+
+-/
+@[extern "leanblas_cblas_dmul"]
+opaque dmul (N : USize) (X : FloatArray) (offX : USize) (incX : USize) (Y : @&FloatArray) (offY : USize) (incY : USize) : FloatArray
+
+
+/-- ddiv
+
+summary: computes the element-wise division of two vectors
+
+inputs:
+- N: the number of elements in the vectors
+- X: the first vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+- Y: the second vector
+- offY: starting offset of elements of Y
+
+outputs: the element-wise division of X and Y
+
+-/
+@[extern "leanblas_cblas_ddiv"]
+opaque ddiv (N : USize) (X : FloatArray) (offX : USize) (incX : USize) (Y : @&FloatArray) (offY : USize) (incY : USize) : FloatArray
+
+
+/-- dinv
+
+summary: computes the element-wise inverse of a vector
+
+inputs:
+- N: the number of elements in the vector
+- X: the vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+
+outputs: the element-wise inverse of X
+
+-/
+@[extern "leanblas_cblas_dinv"]
+opaque dinv (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+
+
+/-- dabs
+
+summary: computes the element-wise absolute value of a vector
+
+inputs:
+- N: the number of elements in the vector
+- X: the vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+
+outputs: the element-wise absolute value of X
+
+-/
+@[extern "leanblas_cblas_dabs"]
+opaque dabs (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+
+
+/-- dsqrt
+
+summary: computes the element-wise square root of a vector
+
+inputs:
+- N: the number of elements in the vector
+- X: the vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+
+outputs: the element-wise square root of X
+
+-/
+@[extern "leanblas_cblas_dsqrt"]
+opaque dsqrt (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+
+
+/-- dexp
+
+summary: computes the element-wise exponential of a vector
+
+inputs:
+- N: the number of elements in the vector
+- X: the vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+
+outputs: the element-wise exponential of X
+
+-/
+@[extern "leanblas_cblas_dexp"]
+opaque dexp (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+
+
+/-- dlog
+
+summary: computes the element-wise natural logarithm of a vector
+
+inputs:
+- N: the number of elements in the vector
+- X: the vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+
+outputs: the element-wise natural logarithm of X
+
+-/
+@[extern "leanblas_cblas_dlog"]
+opaque dlog (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+
+
+/-- dsin
+
+summary: computes the element-wise sine of a vector
+
+inputs:
+- N: the number of elements in the vector
+- X: the vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+
+outputs: the element-wise sine of X
+
+-/
+@[extern "leanblas_cblas_dsin"]
+opaque dsin (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+
+
+/-- dcos
+
+summary: computes the element-wise cosine of a vector
+
+inputs:
+- N: the number of elements in the vector
+- X: the vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+
+outputs: the element-wise cosine of X
+
+-/
+@[extern "leanblas_cblas_dcos"]
+opaque dcos (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+
+
+set_option linter.unusedVariables false in
+instance : LevelOneDataExt Float Float FloatArray where
+  const N a := dconst N.toUSize a
+  sum N X offX incX := dsum N.toUSize X offX.toUSize incX.toUSize
+  axpby N a X offX incX b Y offY incY := daxpby N.toUSize a X offX.toUSize incX.toUSize b Y offY.toUSize incY.toUSize
+
+  imaxRe N X offX incX h := (dimaxRe N.toUSize X offX.toUSize incX.toUSize).toNat
+  imaxIm N X offX incX h := offX
+  iminRe N X offX incX h := (diminRe N.toUSize X offX.toUSize incX.toUSize).toNat
+  iminIm N X offX incX h := offX
+
+  mul N X offX incX Y offY incY := dmul N.toUSize X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize
+  div N X offX incX Y offY incY := ddiv N.toUSize X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize
+  inv N X offX incX := dinv N.toUSize X offX.toUSize incX.toUSize
+  abs N X offX incX := dabs N.toUSize X offX.toUSize incX.toUSize
+  sqrt N X offX incX := dsqrt N.toUSize X offX.toUSize incX.toUSize
+  exp N X offX incX := dexp N.toUSize X offX.toUSize incX.toUSize
+  log N X offX incX := dlog N.toUSize X offX.toUSize incX.toUSize
+  sin N X offX incX := dsin N.toUSize X offX.toUSize incX.toUSize
+  cos N X offX incX := dcos N.toUSize X offX.toUSize incX.toUSize

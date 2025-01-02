@@ -1,6 +1,8 @@
 #include <lean/lean.h>
 #include <cblas.h>
+#include <math.h>
 #include "util.h"
+
 
 
 /** ddot
@@ -274,3 +276,184 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dscal(const size_t N, const double alpha
   cblas_dscal((int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX);
   return X;
 }
+
+
+
+
+/* class LevelOneDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where */
+/*   const (N : Nat) (a : K) : Array */
+/*   sum (N : Nat) (X : Array) (offX incX : Nat) : K */
+/*   axpby (N : Nat) (α β : K) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array */
+
+/*   imaxRe (N : Nat) (X : Array) (offX incX : Nat) : R */
+/*   imaxIm (N : Nat) (X : Array) (offX incX : Nat) : R */
+/*   iminRe (N : Nat) (X : Array) (offX incX : Nat) : R */
+/*   iminIm (N : Nat) (X : Array) (offX incX : Nat) : R */
+
+/*   /- Element wise operations -/ */
+/*   mul (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array */
+/*   div (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array */
+/*   inv (N : Nat) (X : Array) (offX incX : Nat) : Array */
+/*   abs (N : Nat) (X : Array) (offX incX : Nat) : Array */
+/*   sqrt (N : Nat) (X : Array) (offX incX : Nat) : Array */
+/*   exp (N : Nat) (X : Array) (offX incX : Nat) : Array */
+/*   log (N : Nat) (X : Array) (offX incX : Nat) : Array */
+/*   sin (N : Nat) (X : Array) (offX incX : Nat) : Array */
+/*   cos (N : Nat) (X : Array) (offX incX : Nat) : Array */
+
+
+
+LEAN_EXPORT lean_obj_res leanblas_cblas_dconst(const size_t N, const double a){
+
+  lean_obj_res arr = lean_alloc_sarray(sizeof(double), N, N);
+  double * ptr = lean_float_array_cptr(arr);
+
+  for (size_t i = 0; i < N; i++){
+    ptr[i] = a;
+  }
+
+  return arr;
+}
+
+
+LEAN_EXPORT lean_obj_res leanblas_cblas_dsum(const size_t N, const b_lean_obj_arg X, const size_t offX, const size_t incX){
+  double sum = 0;
+  double * xptr = lean_float_array_cptr(X);
+  for (size_t i = 0; i < N; i++){
+    sum += xptr[offX + i*incX];
+  }
+  return lean_box(sum);
+}
+
+
+LEAN_EXPORT lean_obj_res leanblas_cblas_daxpby(const size_t N, const double alpha, const b_lean_obj_arg X, const size_t offX, const size_t incX,
+                                                               const double beta,          lean_obj_arg Y, const size_t offY, const size_t incY){
+  ensure_exclusive_float_array(&Y);
+  cblas_daxpby((int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX, beta, lean_float_array_cptr(Y) + offY, (int)incY);
+  return Y;
+}
+
+
+LEAN_EXPORT size_t leanblas_cblas_dimax_re(const size_t N, const b_lean_obj_arg X, const size_t offX, const size_t incX){
+  double * xptr = lean_float_array_cptr(X);
+  double max = xptr[offX];
+  size_t max_index = 0;
+  for (size_t i = 1; i < N; i++){
+    if (xptr[offX + i*incX] > max){
+      max = xptr[offX + i*incX];
+      max_index = i;
+    }
+  }
+  return offX + max_index*incX;
+}
+
+
+LEAN_EXPORT size_t leanblas_cblas_dimin_re(const size_t N, const b_lean_obj_arg X, const size_t offX, const size_t incX){
+  double * xptr = lean_float_array_cptr(X);
+  double min = xptr[offX];
+  size_t min_index = 0;
+  for (size_t i = 1; i < N; i++){
+    if (xptr[offX + i*incX] < min){
+      min = xptr[offX + i*incX];
+      min_index = i;
+    }
+  }
+  return offX + min_index*incX;
+}
+
+
+
+LEAN_EXPORT lean_obj_res leanblas_cblas_dmul(const size_t N,         lean_obj_arg X, const size_t offX, const size_t incX,
+                                                             const b_lean_obj_arg Y, const size_t offY, const size_t incY){
+  ensure_exclusive_float_array(&X);
+  double * xptr = lean_float_array_cptr(X);
+  double * yptr = lean_float_array_cptr(Y);
+  for (size_t i = 0; i < N; i++){
+    xptr[offX + i*incX] *= yptr[offY + i*incY];
+  }
+  return Y;
+}
+
+
+LEAN_EXPORT lean_obj_res leanblas_cblas_ddiv(const size_t N,         lean_obj_arg X, const size_t offX, const size_t incX,
+                                                             const b_lean_obj_arg Y, const size_t offY, const size_t incY){
+  ensure_exclusive_float_array(&X);
+  double * xptr = lean_float_array_cptr(X);
+  double * yptr = lean_float_array_cptr(Y);
+  for (size_t i = 0; i < N; i++){
+    xptr[offX + i*incX] /= yptr[offY + i*incY];
+  }
+  return Y;
+}
+
+
+LEAN_EXPORT lean_obj_res leanblas_cblas_dinv(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX){
+  ensure_exclusive_float_array(&X);
+  double * xptr = lean_float_array_cptr(X);
+  for (size_t i = 0; i < N; i++){
+    xptr[offX + i*incX] = 1.0 / xptr[offX + i*incX];
+  }
+  return X;
+}
+
+
+LEAN_EXPORT lean_obj_res leanblas_cblas_dabs(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX){
+  ensure_exclusive_float_array(&X);
+  double * xptr = lean_float_array_cptr(X);
+  for (size_t i = 0; i < N; i++){
+    xptr[offX + i*incX] = fabs(xptr[offX + i*incX]);
+  }
+  return X;
+}
+
+
+LEAN_EXPORT lean_obj_res leanblas_cblas_dsqrt(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX){
+  ensure_exclusive_float_array(&X);
+  double * xptr = lean_float_array_cptr(X);
+  for (size_t i = 0; i < N; i++){
+    xptr[offX + i*incX] = sqrt(xptr[offX + i*incX]);
+  }
+  return X;
+}
+
+
+LEAN_EXPORT lean_obj_res leanblas_cblas_dexp(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX){
+  ensure_exclusive_float_array(&X);
+  double * xptr = lean_float_array_cptr(X);
+  for (size_t i = 0; i < N; i++){
+    xptr[offX + i*incX] = exp(xptr[offX + i*incX]);
+  }
+  return X;
+}
+
+
+LEAN_EXPORT lean_obj_res leanblas_cblas_dlog(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX){
+  ensure_exclusive_float_array(&X);
+  double * xptr = lean_float_array_cptr(X);
+  for (size_t i = 0; i < N; i++){
+    xptr[offX + i*incX] = log(xptr[offX + i*incX]);
+  }
+  return X;
+}
+
+
+LEAN_EXPORT lean_obj_res leanblas_cblas_dsin(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX){
+  ensure_exclusive_float_array(&X);
+  double * xptr = lean_float_array_cptr(X);
+  for (size_t i = 0; i < N; i++){
+    xptr[offX + i*incX] = sin(xptr[offX + i*incX]);
+  }
+  return X;
+}
+
+
+LEAN_EXPORT lean_obj_res leanblas_cblas_dcos(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX){
+  ensure_exclusive_float_array(&X);
+  double * xptr = lean_float_array_cptr(X);
+  for (size_t i = 0; i < N; i++){
+    xptr[offX + i*incX] = cos(xptr[offX + i*incX]);
+  }
+  return X;
+}
+
+
