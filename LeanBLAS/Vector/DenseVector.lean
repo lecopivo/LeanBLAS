@@ -158,3 +158,16 @@ def sin (x : K^[n]) : K^[n] :=
 
 def cos (x : K^[n]) : K^[n] :=
   ⟨LevelOneDataExt.cos n x.data vstrg.offset vstrg.inc, by sorry⟩
+
+
+
+/- Level 1 derived operations -/
+
+/-- Turn `x` into vector with normal storage -/
+def toNormal (x : K^[n]) : DenseVector Array .normal n K :=
+  let y : DenseVector Array .normal n K := const n .normal 0 -- can we avoid zero initialization?
+  ⟨LevelOneData.copy n x.data vstrg.offset vstrg.inc y.data 0 1, sorry⟩
+
+/-- Set `x` to `y`, modifies `x` inplace if possible -/
+def set (x : K^[n]) (y : K^[n]') : K^[n] :=
+  ⟨LevelOneData.copy n y.data vstrg'.offset vstrg'.inc x.data vstrg.offset vstrg.inc, sorry⟩
