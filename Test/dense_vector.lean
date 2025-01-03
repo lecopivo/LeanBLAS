@@ -2,10 +2,7 @@ import LeanBLAS
 
 open BLAS
 
-
-#check DenseVector
-
-def u : DenseVector FloatArray {offset := 4, inc := 3} 10 Float :=
+def u : DenseVector FloatArray (.subvector (offset := 4) (inc := 3)) 10 Float :=
   DenseVector.ofFn (fun i => i.1.toFloat)
 
 
@@ -18,6 +15,4 @@ def main : IO Unit := do
   IO.println s!"u.iamax = {u.iamax}"
 
   IO.println s!"u.axpy 1 u = {u.axpy 1 u}"
-  IO.println s!"u.scal (-2) = {u|>.reinterpret {offset := 7, inc := 6} 4 (by decide)
-                                |>.scal (-2)
-                                |>.reinterpret {offset := 4, inc := 3} 10 (by sorry)}"
+  IO.println s!"u.scal (-2) = {u|>.scal (-2)}"
