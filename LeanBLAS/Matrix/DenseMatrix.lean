@@ -66,55 +66,6 @@ local notation K "^[" n "]" => DenseVector Array vstrg n K
 -- instance {A : K^[m,n]} {idx : Nat} : Decidable (A.IsValidLinearIndex idx) := by
 --   unfold IsValidLinearIndex; infer_instance
 
--- abbrev toIJ (A : K^[m,n]) (idx : Nat) (h : A.IsValidLinearIndex idx) : Fin m × Fin n :=
---   mstrg.toIJ (size A.data) m n idx h
-
--- set_option linter.unusedVariables false in
--- abbrev linIdx (A : K^[m,n]) (i : Fin m) (j : Fin n) : Nat :=
---   mstrg.linIdx i j
-
--- /-- Matrices `A` and `A'` have identical data that is not directly indexed by indices
--- `i : Fin m` and `j : Fin n`. -/
--- def EqualAmbientData (A A' : K^[m,n]) : Prop :=
---   ∀ i, ¬(A.IsValidLinearIndex i) → i < size A.data →
---        LevelOneData.get A.data i = LevelOneData.get A'.data i
-
-
--- theorem inbounds (A : K^[m,n]) :
---     ∀ (i : Fin (size A.data)), InBounds A.data 0 1 i := by
---   intro i; constructor <;> simp
-
--- theorem inbounds' (A : K^[m,n]) (i : Fin m) (j : Fin n) : mstrg.linIdx i j < size A.data := sorry
-
--- theorem missing_theorem (n m i : Nat) (h : i < m) : n + n * i ≤ n * m := by
---   sorry -- nlinarith
-
--- theorem inbounds_row (A : K^[m,n]) (h : mstrg.order = .RowMajor) (i : Fin m) (j : Fin n) :
---     j.1 + mstrg.lda * i.1 + mstrg.offset < size A.data := by
---   rcases mstrg with ⟨order,lda,offset,bufferSize⟩
---   have h' := A.valid_storage
---   simp_all only [Storage.IsValid, h]
---   have := h'.1
---   have := h'.2
---   calc _ <  n + lda * i + offset := by have := j.2; omega
---        _ ≤  lda + lda * i + offset := by omega
---        _ ≤  lda + lda * (m - 1) + offset := by have := i.2; sorry -- nlinarith
---        _ =  lda * m + offset := by sorry -- ring
---        _ ≤  size A.data := by rw[Nat.mul_comm]; cases bufferSize <;> simp_all
-
--- theorem inbounds_col (A : K^[m,n]) (h : mstrg.order = .ColMajor) (i : Fin m) (j : Fin n) :
---     i.1 + mstrg.lda * j.1 + mstrg.offset < size A.data := by
---   rcases mstrg with ⟨order,lda,offset,bufferSize⟩
---   have h' := A.valid_storage
---   simp_all only [Storage.IsValid, h]
---   have := h'.1
---   have := h'.2
---   calc _ <  m + lda * j + offset := by have := j.2; omega
---        _ ≤  lda + lda * j + offset := by omega
---        _ ≤  lda + lda * (n - 1) + offset := by have := i.2; sorry  -- nlinarith
---        _ =  lda * n + offset := by sorry  -- ring
---        _ ≤  size A.data := by cases bufferSize <;> simp_all
-
 def toLinIdx {m n} (order : Order) (strg : Storage) (i : Fin m) (j : Fin n) : Nat :=
   match order, strg with
   | .RowMajor, .normal => j.1 + n * i.1
@@ -157,18 +108,21 @@ theorem ofFn_get (A : DenseMatrix Array ord .normal m n K) :
   sorry
 
 
--- /-- Change storage pattern of matrix `A`. This is potentially expensive and it has to move all
--- the data of `A`. -/
--- def changeStorage (A : K^[m,n]) (mstrg' : Storage) (h : mstrg'.IsValid (size A.data) m n) :
---     DenseMatrix Array mstrg' m n K :=
---   sorry
---   -- reshufle data accordingly
---   -- ⟨A.data, h⟩
+def toString [ToString K] (x : K^[m,n]) : String := Id.run do
+  let mut s : String := "["
 
--- theorem get_changeStorage (A : K^[m,n]) (mstrg' : Storage) (h : mstrg'.IsValid (size A.data) m n)
---     (i : Fin m) (j : Fin n) :
---     get (changeStorage A mstrg' h) i j = get A i j := by
---   sorry
+  for i in [0:m] do
+    let i : Fin m := ⟨i, sorry⟩
+    for j in [0:n] do
+      let j : Fin n := ⟨j, sorry⟩
+      s := s ++ ToString.toString (x.get i j)
+      if j +1 < n then
+        s := s ++ ", "
+    if i + 1< m then
+      s := s ++ ";\n"
+  return s ++ "]"
+
+instance [ToString K] : ToString (K^[m,n]) := ⟨toString⟩
 
 /-- Lift unary operation on buffers to matrix -/
 @[inline]
@@ -182,13 +136,23 @@ def lift (A : K^[m,n]) (f : Nat → Array → Nat → Nat → Array)
   | .submatrix offset lda =>
     match ord with
     | .RowMajor =>
-      ⟨Fin.foldl (init := A.data) m (fun data i =>
-        f n data (offset + i.1*lda) 1),
-        sorry⟩
+      if m≤n then
+        ⟨Fin.foldl (init := A.data) m (fun data i =>
+          f n data (offset + i.1*lda) 1),
+          sorry⟩
+      else
+        ⟨Fin.foldl (init := A.data) n (fun data j =>
+          f m data (offset + j.1) lda),
+          sorry⟩
     | .ColMajor =>
-      ⟨Fin.foldl (init := A.data) n (fun data j =>
-        f m data (offset + j.1*lda) 1),
-        sorry⟩
+      if n≤m then
+        ⟨Fin.foldl (init := A.data) n (fun data j =>
+          f m data (offset + j.1*lda) 1),
+          sorry⟩
+      else
+        ⟨Fin.foldl (init := A.data) m (fun data i =>
+          f n data (offset + i.1) lda),
+          sorry⟩
 
 @[inline]
 def liftRed (A : K^[m,n]) (f : Nat → Array → Nat → Nat → α) (op : α → α → α) (default : α) (finalize : α → α := id) : α :=
@@ -198,9 +162,15 @@ def liftRed (A : K^[m,n]) (f : Nat → Array → Nat → Nat → α) (op : α �
   | .submatrix offset lda =>
     match ord with
     | .RowMajor =>
-      finalize <| Fin.reducelD default op (fun (i : Fin m) => f n A.data (offset + i.1*lda) 1)
+      if m≤n then
+        finalize <| Fin.reducelD default op (fun (i : Fin m) => f n A.data (offset + i.1*lda) 1)
+      else
+        finalize <| Fin.reducelD default op (fun (j : Fin n) => f m A.data (offset + j.1) lda)
     | .ColMajor =>
-      finalize <| Fin.reducelD default op (fun (j : Fin n) => f m A.data (offset + j.1*lda) 1)
+      if n≤m then
+        finalize <| Fin.reducelD default op (fun (j : Fin n) => f m A.data (offset + j.1*lda) 1)
+      else
+        finalize <| Fin.reducelD default op (fun (i : Fin m) => f n A.data (offset + i.1) lda)
 
 
 /-- Lift binary operation on buffers to matrices -/
@@ -282,7 +252,9 @@ def const (m n : Nat) (mstrg : Storage) (k : K) : DenseMatrix Array ord mstrg m 
     | .ColMajor => ⟨LevelOneDataExt.const (n*lda + offset) k, sorry⟩
 
 def sum (A : K^[m,n]) : K :=
-  LevelOneDataExt.sum (size A.data) A.data mstrg.offset 1
+  liftRed A (fun N data off inc => LevelOneDataExt.sum N data off inc)
+    (·+·)
+    0
 
 def axpby (a : K) (X : K^[m,n]) (b : K) (Y : K^[m,n]) : K^[m,n] :=
   lift₂ X Y (LevelOneDataExt.axpby (a:=a) (b:=b)) (by intros; sorry)
@@ -350,7 +322,6 @@ def trace (A : K^[n,n]) : K :=
   | .normal => LevelOneDataExt.sum n A.data 0 (n+1)
   | .submatrix offset lda => LevelOneDataExt.sum n A.data offset (lda+1)
 
-
 def rowStorage (order : Order) (strg : Storage) (i : Fin m) (n : Nat) : DenseVector.Storage :=
   match order, strg with
   | .RowMajor, .normal => .subvector (offset := i.1*n) (inc := 1)
@@ -396,12 +367,10 @@ def row' (A : K^[m,n]) (i : Fin m) : DenseMatrix Array ord (rowStorage' ord mstr
 def col' (A : K^[m,n]) (j : Fin n) : DenseMatrix Array ord (colStorage' ord mstrg m j) m 1 K :=
   ⟨A.data, by sorry⟩
 
-
 def diag (v : K^[n]) : K^[n,n] :=
   let A : K^[n,n] := const n n mstrg 0
   ⟨LevelOneData.copy n v.data  vstrg.offset vstrg.inc A.data mstrg.offset ((mstrg.lda ord m n)+1),
    by sorry⟩
-
 
 def diagonal (A : K^[n,n]) : K^[n] :=
   let vdata : Array := LevelOneDataExt.const n 0
