@@ -1,6 +1,7 @@
 import LeanBLAS.Spec.LevelOne
 import LeanBLAS.Spec.LevelTwo
 import LeanBLAS.CBLAS.LevelOne
+import LeanBLAS.CBLAS.LevelTwo
 import LeanBLAS.Vector.DenseVector
 import LeanBLAS.Matrix.Storage
 
@@ -21,7 +22,7 @@ namespace DenseMatrix
 variable
   {Array : Type} {R K : Type} {n m : Nat} {mstrg : Storage} [Scalar R R] [Scalar R K]
   {vstrg : DenseVector.Storage}
-  [LevelOne R K Array] [LevelOneDataExt R K Array] [LevelTwoData R K Array]
+  [LevelOne R K Array]
 
 
 local notation K "^[" m ", " n "]" => DenseMatrix Array mstrg m n K
@@ -53,8 +54,6 @@ def EqualAmbientData (A A' : K^[m,n]) : Prop :=
        LevelOneData.get A.data i = LevelOneData.get A'.data i
 
 
-
-omit [LevelTwoData R K Array] [LevelOneDataExt R K Array] in
 theorem inbounds (A : K^[m,n]) :
     ∀ (i : Fin (size A.data)), InBounds A.data 0 1 i := by
   intro i; constructor <;> simp
@@ -241,6 +240,8 @@ def scal (a : K) (A : K^[m,n])   : K^[m,n] := lift A (LevelOneData.scal (α:=a))
 
 /- Level 1 operations extension -/
 
+variable [LevelOneDataExt R K Array]
+
 def const (m n : Nat) (mstrg : Storage) (k : K) : DenseMatrix Array mstrg m n K :=
   match mstrg.order with
   | .RowMajor => ⟨LevelOneDataExt.const (m*mstrg.lda + mstrg.offset) k, sorry⟩
@@ -394,5 +395,27 @@ def diagonal (A : K^[n,n]) : K^[n] :=
   ⟨LevelOneData.copy n A.data mstrg.offset (mstrg.lda+1) vdata vstrg.offset vstrg.inc,
    by sorry⟩
 
+
+/-  Level 2 operations -/
+
+variable  [LevelTwoData R K Array]
+
+def gemv (a : K) (A : K^[m,n]) (x : K^[n]) (b : K) (y : K^[m]) : K^[m] :=
+  ⟨LevelTwoData.gemv mstrg.order .NoTrans m n 1
+    A.data mstrg.offset mstrg.lda
+    x.data vstrg.offset vstrg.inc b
+    y.data vstrg.offset vstrg.inc, sorry⟩
+
+def gemvT (a : K) (A : K^[m,n]) (x : K^[m]) (b : K) (y : K^[n]) : K^[n] :=
+  ⟨LevelTwoData.gemv mstrg.order .Trans m n 1
+    A.data mstrg.offset mstrg.lda
+    x.data vstrg.offset vstrg.inc b
+    y.data vstrg.offset vstrg.inc, sorry⟩
+
+def gemvH (a : K) (A : K^[m,n]) (x : K^[m]) (b : K) (y : K^[n]) : K^[n] :=
+  ⟨LevelTwoData.gemv mstrg.order .ConjTrans m n 1
+    A.data mstrg.offset mstrg.lda
+    x.data vstrg.offset vstrg.inc b
+    y.data vstrg.offset vstrg.inc, sorry⟩
 
 end DenseMatrix

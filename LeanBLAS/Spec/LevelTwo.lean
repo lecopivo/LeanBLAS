@@ -27,17 +27,16 @@ inductive Diag where
   | Unit
 
 
-
 class LevelTwoData (R K : outParam Type) (Array : Type) [Scalar R K] where
 
-  gemv (order : Order) (transA : Transpose) (M : Nat) (N : Nat) (alpha : Float)
+  gemv (order : Order) (transA : Transpose) (M : Nat) (N : Nat) (alpha : K)
     (A : Array) (offA : Nat) (lda : Nat)
-    (X : Array) (offX incX : Nat) (beta : Float)
+    (X : Array) (offX incX : Nat) (beta : K)
     (Y : Array) (offY incY : Nat) : Array
 
-  bmv (order : Order) (transA : Transpose) (M : Nat) (N : Nat) (KL KU : Nat) (alpha : Float)
+  bmv (order : Order) (transA : Transpose) (M : Nat) (N : Nat) (KL KU : Nat) (alpha : K)
     (A : Array) (offA : Nat) (lda : Nat)
-    (X : Array) (offX incX : Nat) (beta : Float)
+    (X : Array) (offX incX : Nat) (beta : K)
     (Y : Array) (offY incY : Nat) : Array
 
   trmv (order : Order) (uplo : UpLo)
@@ -69,3 +68,17 @@ class LevelTwoData (R K : outParam Type) (Array : Type) [Scalar R K] where
     (transA : Transpose) (diag : Bool) (N : Nat)
     (A : Array) (offA : Nat)
     (X : Array) (offX incX : Nat) : Array
+
+  ger (order : Order) (M : Nat) (N : Nat) (alpha : K)
+    (X : Array) (offX incX : Nat)
+    (Y : Array) (offY incY : Nat)
+    (A : Array) (offA : Nat) (lda : Nat) : Array
+
+  her (order : Order) (uplo : UpLo) (N : Nat) (alpha : K)
+    (X : Array) (offX incX : Nat)
+    (A : Array) (offA : Nat) (lda : Nat) : Array
+
+  her2 (order : Order) (uplo : UpLo) (N : Nat) (alpha : K)
+    (X : Array) (offX incX : Nat)
+    (Y : Array) (offY incY : Nat)
+    (A : Array) (offA : Nat) (lda : Nat) : Array

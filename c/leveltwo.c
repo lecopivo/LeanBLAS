@@ -257,3 +257,103 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dtpsv(const uint8_t order, const uint8_t
 }
 
 
+/** ger
+ *
+ * Computes the outer product of two vectors.
+ *
+ * @param order Row or column major
+ * @param M Number of rows in matrix
+ * @param N Number of columns in matrix
+ * @param alpha Scalar multiplier
+ * @param X Pointer to input vector
+ * @param offX starting index of X
+ * @param incX Increment for the elements of X
+ * @param Y Pointer to input vector
+ * @param offY starting index of Y
+ * @param incY Increment for the elements of Y
+ * @param A Pointer to output matrix
+ * @param offA starting index of A
+ * @param lda Leading dimension of A
+ *
+ * @return A with the outer product added to it
+ */
+LEAN_EXPORT lean_obj_res leanblas_cblas_dger(const uint8_t order, const size_t M, const size_t N, const double alpha,
+                                const b_lean_obj_arg X, const size_t offX, const size_t incX,
+                                const b_lean_obj_arg Y, const size_t offY, const size_t incY,
+                                lean_obj_arg A, const size_t offA, const size_t lda){
+  ensure_exclusive_float_array(&A);
+
+  cblas_dger(leanblas_cblas_order(order), (int)M, (int)N, alpha,
+             lean_float_array_cptr(X) + offX, (int)incX, lean_float_array_cptr(Y) + offY, (int)incY,
+             lean_float_array_cptr(A) + offA, (int)lda);
+
+  return A;
+}
+
+
+
+/** syr
+  *
+  * Computes the outer product of a vector with itself and adds it to a symmetric matrix.
+  *
+  * @param order Row or column major
+  * @param uplo Upper or lower triangular
+  * @param N Number of rows in matrix
+  * @param alpha Scalar multiplier
+  * @param X Pointer to input vector
+  * @param offX starting index of X
+  * @param incX Increment for the elements of X
+  * @param A Pointer to output matrix
+  * @param offA starting index of A
+  * @param lda Leading dimension of A
+  *
+  * @return A with the outer product added to it
+  */
+LEAN_EXPORT lean_obj_res leanblas_cblas_dsyr(const uint8_t order, const uint8_t uplo,
+                              const size_t N, const double alpha,
+                              const b_lean_obj_arg X, const size_t offX, const size_t incX,
+                              lean_obj_arg A, const size_t offA, const size_t lda){
+  ensure_exclusive_float_array(&A);
+
+  cblas_dsyr(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo),
+             (int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX,
+             lean_float_array_cptr(A) + offA, (int)lda);
+
+  return A;
+}
+
+
+/** syr2
+  *
+  * Computes the outer product of two vectors and adds it to a symmetric matrix.
+  *
+  * @param order Row or column major
+  * @param uplo Upper or lower triangular
+  * @param N Number of rows in matrix
+  * @param alpha Scalar multiplier
+  * @param X Pointer to input vector
+  * @param offX starting index of X
+  * @param incX Increment for the elements of X
+  * @param Y Pointer to input vector
+  * @param offY starting index of Y
+  * @param incY Increment for the elements of Y
+  * @param A Pointer to output matrix
+  * @param offA starting index of A
+  * @param lda Leading dimension of A
+  *
+  * @return A with the outer product added to it
+  */
+LEAN_EXPORT lean_obj_res leanblas_cblas_dsyr2(const uint8_t order, const uint8_t uplo,
+                               const size_t N, const double alpha,
+                               const b_lean_obj_arg X, const size_t offX, const size_t incX,
+                               const b_lean_obj_arg Y, const size_t offY, const size_t incY,
+                               lean_obj_arg A, const size_t offA, const size_t lda){
+  ensure_exclusive_float_array(&A);
+
+  cblas_dsyr2(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo),
+              (int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX,
+              lean_float_array_cptr(Y) + offY, (int)incY,
+              lean_float_array_cptr(A) + offA, (int)lda);
+
+  return A;
+}
