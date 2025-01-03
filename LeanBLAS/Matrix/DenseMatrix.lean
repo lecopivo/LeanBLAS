@@ -418,4 +418,10 @@ def gemvH (a : K) (A : K^[m,n]) (x : K^[m]) (b : K) (y : K^[n]) : K^[n] :=
     x.data vstrg.offset vstrg.inc b
     y.data vstrg.offset vstrg.inc, sorry⟩
 
+def ger (a : K) (x : K^[m]) (y : K^[n]) (A : K^[m,n]) : K^[m,n] :=
+  ⟨LevelTwoData.ger mstrg.order m n a
+    x.data vstrg.offset vstrg.inc
+    y.data vstrg.offset vstrg.inc
+    A.data mstrg.offset mstrg.lda, sorry⟩
+
 end DenseMatrix
