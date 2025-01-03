@@ -365,22 +365,22 @@ def col (A : K^[m,n]) (i : Fin n) : K^[m] :=
     ⟨LevelOneData.copy n A.data (mstrg.offset + mstrg.lda * i.1) 1 vdata vstrg.offset vstrg.inc,
      by sorry⟩
 
-def colSet (A : K^[m,n]) (i : Fin m) (v : K^[n]) : K^[m,n] :=
+def colSet (A : K^[m,n]) (j : Fin n) (v : K^[m]) : K^[m,n] :=
   match mstrg.order with
   | .RowMajor =>
-    ⟨LevelOneData.copy n v.data vstrg.offset vstrg.inc A.data (mstrg.offset + i.1) mstrg.lda,
+    ⟨LevelOneData.copy n v.data vstrg.offset vstrg.inc A.data (mstrg.offset + j.1) mstrg.lda,
      by sorry⟩
   | .ColMajor =>
-    ⟨LevelOneData.copy n v.data vstrg.offset vstrg.inc A.data (mstrg.offset + mstrg.lda * i.1) 1,
+    ⟨LevelOneData.copy n v.data vstrg.offset vstrg.inc A.data (mstrg.offset + mstrg.lda * j.1) 1,
      by sorry⟩
 
-def colAxpby (i : Fin m) (a : K) (v : K^[n]) (b : K) (A : K^[m,n]) : K^[m,n] :=
+def colAxpby (j : Fin n) (a : K) (v : K^[m]) (b : K) (A : K^[m,n]) : K^[m,n] :=
   match mstrg.order with
   | .RowMajor =>
-    ⟨LevelOneDataExt.axpby n a v.data vstrg.offset vstrg.inc b A.data (mstrg.offset + i.1) 1,
+    ⟨LevelOneDataExt.axpby n a v.data vstrg.offset vstrg.inc b A.data (mstrg.offset + j.1) 1,
      by sorry⟩
   | .ColMajor =>
-    ⟨LevelOneDataExt.axpby n a v.data vstrg.offset vstrg.inc b A.data (mstrg.offset + mstrg.lda * i.1) mstrg.lda,
+    ⟨LevelOneDataExt.axpby n a v.data vstrg.offset vstrg.inc b A.data (mstrg.offset + mstrg.lda * j.1) mstrg.lda,
      by sorry⟩
 
 
