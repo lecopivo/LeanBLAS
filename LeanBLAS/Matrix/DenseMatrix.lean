@@ -369,12 +369,12 @@ def col' (A : K^[m,n]) (j : Fin n) : DenseMatrix Array ord (colStorage' ord mstr
 
 def diag (v : K^[n]) : K^[n,n] :=
   let A : K^[n,n] := const n n mstrg 0
-  ⟨LevelOneData.copy n v.data  vstrg.offset vstrg.inc A.data mstrg.offset ((mstrg.lda ord m n)+1),
+  ⟨LevelOneData.copy n v.data  vstrg.offset vstrg.inc A.data mstrg.offset ((mstrg.lda ord n n)+1),
    by sorry⟩
 
 def diagonal (A : K^[n,n]) : K^[n] :=
   let vdata : Array := LevelOneDataExt.const n 0
-  ⟨LevelOneData.copy n A.data mstrg.offset ((mstrg.lda ord m n)+1) vdata vstrg.offset vstrg.inc,
+  ⟨LevelOneData.copy n A.data mstrg.offset ((mstrg.lda ord n n)+1) vdata vstrg.offset vstrg.inc,
    by sorry⟩
 
 
