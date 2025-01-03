@@ -242,13 +242,43 @@ def scal (a : K) (A : K^[m,n])   : K^[m,n] := lift A (LevelOneData.scal (α:=a))
 /- Level 1 operations extension -/
 
 def const (m n : Nat) (mstrg : Storage) (k : K) : DenseMatrix Array mstrg m n K :=
-  ⟨LevelOneDataExt.const (m*mstrg.lda + mstrg.offset) k, sorry⟩
+  match mstrg.order with
+  | .RowMajor => ⟨LevelOneDataExt.const (m*mstrg.lda + mstrg.offset) k, sorry⟩
+  | .ColMajor => ⟨LevelOneDataExt.const (n*mstrg.lda + mstrg.offset) k, sorry⟩
 
 def sum (A : K^[m,n]) : K :=
   LevelOneDataExt.sum (size A.data) A.data mstrg.offset 1
 
 def axpby (a : K) (X : K^[m,n]) (b : K) (Y : K^[m,n]) : K^[m,n] :=
   lift₂ X Y (LevelOneDataExt.axpby (a:=a) (b:=b)) (by intros; sorry)
+
+def scalAdd (a : K) (A : K^[m,n]) (b : K) : K^[m,n] := lift A (LevelOneDataExt.scaladd (a:=a) (b:=b)) sorry
+
+def imaxRe [LT R] [DecidableRel ((·<·) : R → R → Prop)] (A : K^[m,n]) (h : 0 < m ∧ 0 < n) : Fin m × Fin n :=
+  let (idx,_) :=
+    liftRed A (fun N data off inc =>
+      let idx := LevelOneDataExt.imaxRe N data off inc sorry
+      (idx, Scalar.real (LevelOneData.get data idx)))
+      (fun (idx,val) (idx',val') =>
+         if val < val' then
+           (idx',val')
+         else
+           (idx,val))
+      (0, 0)
+  A.toIJ idx sorry
+
+def iminRe [LT R] [DecidableRel ((·<·) : R → R → Prop)] (A : K^[m,n]) (h : 0 < m ∧ 0 < n) : Fin m × Fin n :=
+  let (idx,_) :=
+    liftRed A (fun N data off inc =>
+      let idx := LevelOneDataExt.imaxRe N data off inc sorry
+      (idx, Scalar.real (LevelOneData.get data idx)))
+      (fun (idx,val) (idx',val') =>
+         if val' < val then
+           (idx',val')
+         else
+           (idx,val))
+      (0, 0)
+  A.toIJ idx sorry
 
 def mul (X Y : K^[m,n]) : K^[m,n] :=
   lift₂ X Y (LevelOneDataExt.mul) (by intros; sorry)
@@ -282,6 +312,20 @@ def cos (X : K^[m,n]) : K^[m,n] :=
 
 def trace (A : K^[n,n]) : K := LevelOneDataExt.sum n A.data mstrg.offset (mstrg.lda+1)
 
+def sumRows (A : K^[m,n]) : K^[m] :=
+  match mstrg.order with
+  | .RowMajor =>
+    DenseVector.ofFn fun i => LevelOneDataExt.sum n A.data (mstrg.offset + i.1*mstrg.lda) 1
+  | .ColMajor =>
+    DenseVector.ofFn fun i => LevelOneDataExt.sum n A.data (mstrg.offset + i.1) (mstrg.lda)
+
+def sumCols (A : K^[m,n]) : K^[n] :=
+  match mstrg.order with
+  | .RowMajor =>
+    DenseVector.ofFn fun j => LevelOneDataExt.sum n A.data (mstrg.offset + j.1) mstrg.lda
+  | .ColMajor =>
+    DenseVector.ofFn fun j => LevelOneDataExt.sum n A.data (mstrg.offset + j.1*mstrg.lda) 1
+
 def row (A : K^[m,n]) (i : Fin m) : K^[n] :=
   let vdata : Array := LevelOneDataExt.const (vstrg.offset + vstrg.inc*n) 0
   match mstrg.order with
@@ -310,7 +354,7 @@ def rowAxpby (i : Fin m) (a : K) (v : K^[n]) (b : K) (A : K^[m,n]) : K^[m,n] :=
     ⟨LevelOneDataExt.axpby n a v.data vstrg.offset vstrg.inc b A.data (mstrg.offset + i.1) mstrg.lda,
      by sorry⟩
 
-def col (A : K^[m,n]) (i : Fin m) : K^[n] :=
+def col (A : K^[m,n]) (i : Fin n) : K^[m] :=
   let vdata : Array := LevelOneDataExt.const (vstrg.offset + vstrg.inc*n) 0
   match mstrg.order with
   | .RowMajor =>
