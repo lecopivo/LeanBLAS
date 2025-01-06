@@ -267,6 +267,7 @@ opaque dscal (N : USize) (a : Float) (X : FloatArray) (offX incX : USize) : Floa
 instance : LevelOneData Float Float FloatArray where
   size x := x.size
   get x i := x.get! i
+  set x i v := x.set! i v
   ofFn {n} f := Id.run do
     let mut x : FloatArray := FloatArray.mkEmpty n
     for h : i in [0:n] do

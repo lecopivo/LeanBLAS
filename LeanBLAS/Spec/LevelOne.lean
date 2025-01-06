@@ -8,6 +8,7 @@ class LevelOneData (R K : outParam Type) (Array : Type) [Scalar R K] where
 
   size (X : Array) : Nat
   get (X : Array) (i : Nat) : K
+  set (X : Array) (i : Nat) (v : K) : Array
   ofFn (f : Fin n → K) : Array
 
   /-- dot product of two vectors

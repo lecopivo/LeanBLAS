@@ -65,6 +65,11 @@ def get (x : K^[n]) (i : Fin n) : K :=
   | .normal => LevelOneData.get x.data i
   | .subvector offset inc => LevelOneData.get x.data (offset + i.1*inc)
 
+def set (x : K^[n]) (i : Fin n) (v : K) : K^[n] :=
+  match vstrg with
+  | .normal => ⟨LevelOneData.set x.data i v, sorry⟩
+  | .subvector offset inc => ⟨LevelOneData.set x.data (offset + i.1*inc) v, sorry⟩
+
 @[simp]
 theorem get_ofFn (f : Fin n → K) (i : Fin n) :
     get (ofFn (Array:=Array) (vstrg:=vstrg) f) i = f i := by
@@ -169,5 +174,5 @@ def toNormal (x : K^[n]) : DenseVector Array .normal n K :=
   ⟨LevelOneData.copy n x.data vstrg.offset vstrg.inc y.data 0 1, sorry⟩
 
 /-- Set `x` to `y`, modifies `x` inplace if possible -/
-def set (x : K^[n]) (y : K^[n]') : K^[n] :=
+def setArray (x : K^[n]) (y : K^[n]') : K^[n] :=
   ⟨LevelOneData.copy n y.data vstrg'.offset vstrg'.inc x.data vstrg.offset vstrg.inc, sorry⟩
