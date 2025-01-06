@@ -97,6 +97,9 @@ def ofFn (f : Fin m → Fin n → K) : K^[m,n] :=
 def get (x : K^[m,n]) (i : Fin m) (j : Fin n) : K :=
   LevelOneData.get x.data (toLinIdx ord mstrg i j)
 
+def set (x : K^[m,n]) (i : Fin m) (j : Fin n) (v : K) : K^[m,n] :=
+  ⟨LevelOneData.set x.data (toLinIdx ord mstrg i j) v, sorry⟩
+
 @[simp]
 theorem get_ofFn (f : Fin m → Fin n → K) (i : Fin m) (j : Fin n) :
     get (ofFn (Array:=Array) (ord:=ord) (mstrg:=mstrg) f) i j = f i j := by
