@@ -130,12 +130,12 @@ def scalAdd (a : K) (x : K^[n]) (b : K) : K^[n] :=
 def imaxRe (x : K^[n]) (h : n ≠ 0) : Fin n :=
   ⟨LevelOneDataExt.imaxRe n x.data vstrg.offset vstrg.inc h, sorry⟩
 
-def imaxIm (x : K^[n]) (h : n ≠ 0) : Fin n := ⟨0, by omega⟩
+def imaxIm (_x : K^[n]) (h : n ≠ 0) : Fin n := ⟨0, by omega⟩
 
 def iminRe (x : K^[n]) (h : n ≠ 0) : Fin n :=
   ⟨LevelOneDataExt.iminRe n x.data vstrg.offset vstrg.inc h, sorry⟩
 
-def iminIm (x : K^[n]) (h : n ≠ 0) : Fin n := ⟨0, by omega⟩
+def iminIm (_x : K^[n]) (h : n ≠ 0) : Fin n := ⟨0, by omega⟩
 
 def mul (x y : K^[n]) : K^[n] :=
   ⟨LevelOneDataExt.mul n x.data vstrg.offset vstrg.inc y.data vstrg.offset vstrg.inc, by sorry⟩
