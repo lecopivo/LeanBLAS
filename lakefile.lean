@@ -1,9 +1,12 @@
 import Lake
 open System Lake DSL
 
-package leanblas
-
 def linkArgs := #["-lblas"]
+
+package leanblas {
+  precompileModules := true
+  moreLinkArgs := linkArgs
+}
 
 @[default_target]
 lean_lib LeanBLAS where
