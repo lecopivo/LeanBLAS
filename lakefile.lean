@@ -11,18 +11,18 @@ package leanblas {
 @[default_target]
 lean_lib LeanBLAS where
   defaultFacets := #[LeanLib.sharedFacet,LeanLib.staticFacet]
-  moreLinkArgs := linkArgs
+  -- moreLinkArgs := linkArgs
   roots := #[`LeanBLAS]
 
 
 @[test_driver]
 lean_exe CBLASLevelOneTest where
   root := `Test.cblas_level_one
-  moreLinkArgs := linkArgs
+  -- moreLinkArgs := linkArgs
 
 lean_exe DenseVectorTest where
   root := `Test.dense_vector
-  moreLinkArgs := linkArgs
+  -- moreLinkArgs := linkArgs
 
 extern_lib libleanblasc pkg := do
   let mut oFiles : Array (BuildJob FilePath) := #[]
@@ -31,7 +31,7 @@ extern_lib libleanblasc pkg := do
       let oFile := pkg.buildDir / "c" / (file.fileName.stripSuffix ".c" ++ ".o")
       let srcJob ← inputTextFile file.path
       let weakArgs := #["-I", (← getLeanIncludeDir).toString]
-      oFiles := oFiles.push (← buildO oFile srcJob weakArgs #["-fPIC"] "gcc" getLeanTrace)
+      oFiles := oFiles.push (← buildO oFile srcJob weakArgs #["-DNDEBUG", "-O3", "-fPIC"] "gcc" getLeanTrace)
   let name := nameToStaticLib "leanblasc"
 
   buildLeanSharedLib (pkg.nativeLibDir / name) oFiles
