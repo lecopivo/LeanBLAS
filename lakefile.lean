@@ -14,6 +14,7 @@ lean_lib LeanBLAS where
   -- moreLinkArgs := linkArgs
   roots := #[`LeanBLAS]
 
+require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.15.0"
 
 @[test_driver]
 lean_exe CBLASLevelOneTest where
