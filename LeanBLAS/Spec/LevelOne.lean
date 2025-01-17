@@ -96,7 +96,9 @@ class LevelOneDataExt (R K : outParam Type) (Array : Type) where
   iminIm (N : Nat) (X : Array) (offX incX : Nat) : Nat
 
   /- Element wise operations -/
+  /-- Element wise multiplication, array `X` is modified in place if possible  -/
   mul (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array
+  /-- Element wise division, array `X` is modified in place if possible  -/
   div (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array
   inv (N : Nat) (X : Array) (offX incX : Nat) : Array
   abs (N : Nat) (X : Array) (offX incX : Nat) : Array
@@ -105,7 +107,6 @@ class LevelOneDataExt (R K : outParam Type) (Array : Type) where
   log (N : Nat) (X : Array) (offX incX : Nat) : Array
   sin (N : Nat) (X : Array) (offX incX : Nat) : Array
   cos (N : Nat) (X : Array) (offX incX : Nat) : Array
-
 
 
 export LevelOneData (get dot nrm2 asum iamax swap copy axpy rotg rotmg rot scal)
