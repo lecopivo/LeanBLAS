@@ -1,11 +1,13 @@
 import Lake
 open System Lake DSL
 
-def linkArgs := #["-lblas"]
+def linkArgs := #["-L/opt/homebrew/opt/openblas/lib","-lblas"]
+def inclArgs := #["-I/opt/homebrew/opt/openblas/include"]
 
 package leanblas {
   precompileModules := true
   moreLinkArgs := linkArgs
+  moreLeancArgs := inclArgs
 }
 
 @[default_target]
@@ -31,7 +33,7 @@ extern_lib libleanblasc pkg := do
       let oFile := pkg.buildDir / "c" / (file.fileName.stripSuffix ".c" ++ ".o")
       let srcJob ← inputTextFile file.path
       let weakArgs := #["-I", (← getLeanIncludeDir).toString]
-      oFiles := oFiles.push (← buildO oFile srcJob weakArgs #["-DNDEBUG", "-O3", "-fPIC"] "gcc" getLeanTrace)
+      oFiles := oFiles.push (← buildO oFile srcJob weakArgs (#["-DNDEBUG", "-O3", "-fPIC"] ++ inclArgs) "gcc" getLeanTrace)
   let name := nameToStaticLib "leanblasc"
 
   buildLeanSharedLib (pkg.nativeLibDir / name) oFiles
