@@ -2,6 +2,8 @@
 
 Bindings and specifications for BLAS (Basic Linear Algebra Subprograms).
 
+The goal of the specification is to formalize mathematics of BLAS rather than what is happening on the bit level. Therefore we work with `Nat` rather than `Int32/64` and `ℝ` rather than `Float`.
+
 ## Build Instructions
 
 ### Prerequisites

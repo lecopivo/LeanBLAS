@@ -73,12 +73,13 @@ def toLinIdx {m n} (order : Order) (strg : Storage) (i : Fin m) (j : Fin n) : Na
   | .RowMajor, .submatrix offset lda => j.1 + lda * i.1 + offset
   | .ColMajor, .submatrix offset lda => i.1 + lda * j.1 + offset
 
+set_option linter.unusedVariables false in
 def toIJ (order : Order) (strg : Storage) (idx : Nat) (h : True /- valid index -/) : Fin m × Fin n :=
   match order, strg with
-  | .RowMajor, .normal => (⟨idx / n, sorry⟩, ⟨idx % n, sorry⟩)
-  | .ColMajor, .normal => (⟨idx % m, sorry⟩, ⟨idx / m, sorry⟩)
-  | .RowMajor, .submatrix offset lda => (⟨(idx-offset) / lda, sorry⟩, ⟨(idx-offset) % lda, sorry⟩)
-  | .ColMajor, .submatrix offset lda => (⟨(idx-offset) % lda, sorry⟩, ⟨(idx-offset) / lda, sorry⟩)
+  | .RowMajor, .normal => (⟨idx / n, silentSorry⟩, ⟨idx % n, silentSorry⟩)
+  | .ColMajor, .normal => (⟨idx % m, silentSorry⟩, ⟨idx / m, silentSorry⟩)
+  | .RowMajor, .submatrix offset lda => (⟨(idx-offset) / lda, silentSorry⟩, ⟨(idx-offset) % lda, silentSorry⟩)
+  | .ColMajor, .submatrix offset lda => (⟨(idx-offset) % lda, silentSorry⟩, ⟨(idx-offset) / lda, silentSorry⟩)
 
 def minDataSize (order : Order) (strg : Storage) (m n : Nat) : Nat :=
   match order, strg with
@@ -90,34 +91,34 @@ def minDataSize (order : Order) (strg : Storage) (m n : Nat) : Nat :=
 def ofFn (f : Fin m → Fin n → K) : K^[m,n] :=
   let dataSize := minDataSize ord mstrg m n
   ⟨LevelOneData.ofFn fun (idx : Fin dataSize) =>
-     let (i,j) := toIJ ord mstrg idx.1 sorry
+     let (i,j) := toIJ ord mstrg idx.1 silentSorry
      f i j,
-   sorry⟩
+   silentSorry⟩
 
 def get (x : K^[m,n]) (i : Fin m) (j : Fin n) : K :=
   LevelOneData.get x.data (toLinIdx ord mstrg i j)
 
 def set (x : K^[m,n]) (i : Fin m) (j : Fin n) (v : K) : K^[m,n] :=
-  ⟨LevelOneData.set x.data (toLinIdx ord mstrg i j) v, sorry⟩
+  ⟨LevelOneData.set x.data (toLinIdx ord mstrg i j) v, silentSorry⟩
 
 @[simp]
 theorem get_ofFn (f : Fin m → Fin n → K) (i : Fin m) (j : Fin n) :
     get (ofFn (Array:=Array) (ord:=ord) (mstrg:=mstrg) f) i j = f i j := by
-  sorry
+  exact silentSorry
 
 @[simp]
 theorem ofFn_get (A : DenseMatrix Array ord .normal m n K) :
     (ofFn (fun i j => get A i j)) = A := by
-  sorry
+  exact silentSorry
 
 
 def toString [ToString K] (x : K^[m,n]) : String := Id.run do
   let mut s : String := "["
 
   for i in [0:m] do
-    let i : Fin m := ⟨i, sorry⟩
+    let i : Fin m := ⟨i, silentSorry⟩
     for j in [0:n] do
-      let j : Fin n := ⟨j, sorry⟩
+      let j : Fin n := ⟨j, silentSorry⟩
       s := s ++ ToString.toString (x.get i j)
       if j +1 < n then
         s := s ++ ", "
@@ -142,20 +143,20 @@ def lift (A : K^[m,n]) (f : Nat → Array → Nat → Nat → Array)
       if m≤n then
         ⟨Fin.foldl (init := A.data) m (fun data i =>
           f n data (offset + i.1*lda) 1),
-          sorry⟩
+          silentSorry⟩
       else
         ⟨Fin.foldl (init := A.data) n (fun data j =>
           f m data (offset + j.1) lda),
-          sorry⟩
+          silentSorry⟩
     | .ColMajor =>
       if n≤m then
         ⟨Fin.foldl (init := A.data) n (fun data j =>
           f m data (offset + j.1*lda) 1),
-          sorry⟩
+          silentSorry⟩
       else
         ⟨Fin.foldl (init := A.data) m (fun data i =>
           f n data (offset + i.1) lda),
-          sorry⟩
+          silentSorry⟩
 
 @[inline]
 def liftRed (A : K^[m,n]) (f : Nat → Array → Nat → Nat → α) (op : α → α → α) (default : α) (finalize : α → α := id) : α :=
@@ -191,11 +192,11 @@ def lift₂ (A B : K^[m,n]) (f : Nat → Array → Nat → Nat → Array → Nat
     | .RowMajor =>
       ⟨Fin.foldl (init := B.data) m (fun data i =>
         f n A.data (offset + i.1*lda) 1 data (offset + i.1*lda) 1),
-        sorry⟩
+        silentSorry⟩
     | .ColMajor =>
       ⟨Fin.foldl (init := B.data) n (fun data j =>
         f m A.data (mstrg.offset + j.1*lda) 1 data (offset + j.1*lda) 1),
-        sorry⟩
+        silentSorry⟩
 
 @[inline]
 def liftRed₂ (A B : K^[m,n]) (f : Nat → Array → Nat → Nat → Array → Nat → Nat → α)
@@ -236,7 +237,7 @@ def iamax [LT R] [DecidableRel ((·<·) : R → R → Prop)] (A : K^[m,n]) : Fin
          else
            (idx,val))
       (0, 0)
-  toIJ ord mstrg idx sorry
+  toIJ ord mstrg idx silentSorry
 
 def axpy (a : K) (A B : K^[m,n]) : K^[m,n] := lift₂ A B (LevelOneData.axpy (α:=a)) (by intros; simp)
 def scal (a : K) (A : K^[m,n])   : K^[m,n] := lift A (LevelOneData.scal (α:=a)) (by intros; simp)
@@ -248,11 +249,11 @@ variable [LevelOneDataExt R K Array]
 
 def const (m n : Nat) (mstrg : Storage) (k : K) : DenseMatrix Array ord mstrg m n K :=
   match mstrg with
-  | .normal => ⟨LevelOneDataExt.const (m*n) k, sorry⟩
+  | .normal => ⟨LevelOneDataExt.const (m*n) k, silentSorry⟩
   | .submatrix offset lda =>
     match ord with
-    | .RowMajor => ⟨LevelOneDataExt.const (m*lda + offset) k, sorry⟩
-    | .ColMajor => ⟨LevelOneDataExt.const (n*lda + offset) k, sorry⟩
+    | .RowMajor => ⟨LevelOneDataExt.const (m*lda + offset) k, silentSorry⟩
+    | .ColMajor => ⟨LevelOneDataExt.const (n*lda + offset) k, silentSorry⟩
 
 def sum (A : K^[m,n]) : K :=
   liftRed A (fun N data off inc => LevelOneDataExt.sum N data off inc)
@@ -260,14 +261,15 @@ def sum (A : K^[m,n]) : K :=
     0
 
 def axpby (a : K) (X : K^[m,n]) (b : K) (Y : K^[m,n]) : K^[m,n] :=
-  lift₂ X Y (LevelOneDataExt.axpby (a:=a) (b:=b)) (by intros; sorry)
+  lift₂ X Y (LevelOneDataExt.axpby (a:=a) (b:=b)) (by intros; sorry_proof)
 
-def scalAdd (a : K) (A : K^[m,n]) (b : K) : K^[m,n] := lift A (LevelOneDataExt.scaladd (a:=a) (b:=b)) sorry
+def scalAdd (a : K) (A : K^[m,n]) (b : K) : K^[m,n] := lift A (LevelOneDataExt.scaladd (a:=a) (b:=b)) sorry_proof
 
+set_option linter.unusedVariables false in
 def imaxRe [LT R] [DecidableRel ((·<·) : R → R → Prop)] (A : K^[m,n]) (h : 0 < m ∧ 0 < n) : Fin m × Fin n :=
   let (idx,_) :=
     liftRed A (fun N data off inc =>
-      let idx := LevelOneDataExt.imaxRe N data off inc sorry
+      let idx := LevelOneDataExt.imaxRe N data off inc sorry_proof
       (idx, Scalar.real (LevelOneData.get data idx)))
       (fun (idx,val) (idx',val') =>
          if val < val' then
@@ -275,12 +277,13 @@ def imaxRe [LT R] [DecidableRel ((·<·) : R → R → Prop)] (A : K^[m,n]) (h :
          else
            (idx,val))
       (0, 0)
-  toIJ ord mstrg idx sorry
+  toIJ ord mstrg idx sorry_proof
 
+set_option linter.unusedVariables false in
 def iminRe [LT R] [DecidableRel ((·<·) : R → R → Prop)] (A : K^[m,n]) (h : 0 < m ∧ 0 < n) : Fin m × Fin n :=
   let (idx,_) :=
     liftRed A (fun N data off inc =>
-      let idx := LevelOneDataExt.imaxRe N data off inc sorry
+      let idx := LevelOneDataExt.imaxRe N data off inc sorry_proof
       (idx, Scalar.real (LevelOneData.get data idx)))
       (fun (idx,val) (idx',val') =>
          if val' < val then
@@ -288,34 +291,34 @@ def iminRe [LT R] [DecidableRel ((·<·) : R → R → Prop)] (A : K^[m,n]) (h :
          else
            (idx,val))
       (0, 0)
-  toIJ ord mstrg idx sorry
+  toIJ ord mstrg idx sorry_proof
 
 def mul (X Y : K^[m,n]) : K^[m,n] :=
-  lift₂ X Y (LevelOneDataExt.mul) (by intros; sorry)
+  lift₂ X Y (LevelOneDataExt.mul) (by intros; sorry_proof)
 
 def div (X Y : K^[m,n]) : K^[m,n] :=
-  lift₂ X Y (LevelOneDataExt.div) (by intros; sorry)
+  lift₂ X Y (LevelOneDataExt.div) (by intros; sorry_proof)
 
 def inv (X : K^[m,n]) : K^[m,n] :=
-  lift X (LevelOneDataExt.inv) (by intros; sorry)
+  lift X (LevelOneDataExt.inv) (by intros; sorry_proof)
 
 def abs (X : K^[m,n]) : K^[m,n] :=
-  lift X (LevelOneDataExt.abs) (by intros; sorry)
+  lift X (LevelOneDataExt.abs) (by intros; sorry_proof)
 
 def sqrt (X : K^[m,n]) : K^[m,n] :=
-  lift X (LevelOneDataExt.sqrt) (by intros; sorry)
+  lift X (LevelOneDataExt.sqrt) (by intros; sorry_proof)
 
 def exp (X : K^[m,n]) : K^[m,n] :=
-  lift X (LevelOneDataExt.exp) (by intros; sorry)
+  lift X (LevelOneDataExt.exp) (by intros; sorry_proof)
 
 def log (X : K^[m,n]) : K^[m,n] :=
-  lift X (LevelOneDataExt.log) (by intros; sorry)
+  lift X (LevelOneDataExt.log) (by intros; sorry_proof)
 
 def sin (X : K^[m,n]) : K^[m,n] :=
-  lift X (LevelOneDataExt.sin) (by intros; sorry)
+  lift X (LevelOneDataExt.sin) (by intros; sorry_proof)
 
 def cos (X : K^[m,n]) : K^[m,n] :=
-  lift X (LevelOneDataExt.cos) (by intros; sorry)
+  lift X (LevelOneDataExt.cos) (by intros; sorry_proof)
 
 
 /- Derived Level 1 operations for matrices -/
@@ -359,26 +362,26 @@ def diagStorage (strg : Storage) (n : Nat) : DenseVector.Storage :=
   | .submatrix offset lda => .subvector (offset := offset) (inc := lda+1)
 
 def row (A : K^[m,n]) (i : Fin m) : DenseVector Array (rowStorage ord mstrg i n) n K :=
-  ⟨A.data, by sorry⟩
+  ⟨A.data, sorry_proof⟩
 
 def col (A : K^[m,n]) (j : Fin n) : DenseVector Array (colStorage ord mstrg m j) m K :=
-  ⟨A.data, by sorry⟩
+  ⟨A.data, sorry_proof⟩
 
 def row' (A : K^[m,n]) (i : Fin m) : DenseMatrix Array ord (rowStorage' ord mstrg i n) 1 n K :=
-  ⟨A.data, by sorry⟩
+  ⟨A.data, sorry_proof⟩
 
 def col' (A : K^[m,n]) (j : Fin n) : DenseMatrix Array ord (colStorage' ord mstrg m j) m 1 K :=
-  ⟨A.data, by sorry⟩
+  ⟨A.data, sorry_proof⟩
 
 def diag (v : K^[n]) : K^[n,n] :=
   let A : K^[n,n] := const n n mstrg 0
   ⟨LevelOneData.copy n v.data  vstrg.offset vstrg.inc A.data mstrg.offset ((mstrg.lda ord n n)+1),
-   by sorry⟩
+   sorry_proof⟩
 
 def diagonal (A : K^[n,n]) : K^[n] :=
   let vdata : Array := LevelOneDataExt.const n 0
   ⟨LevelOneData.copy n A.data mstrg.offset ((mstrg.lda ord n n)+1) vdata vstrg.offset vstrg.inc,
-   by sorry⟩
+   sorry_proof⟩
 
 
 /-  Level 2 operations -/
@@ -386,27 +389,27 @@ def diagonal (A : K^[n,n]) : K^[n] :=
 variable  [LevelTwoData R K Array]
 
 def gemv (a : K) (A : K^[m,n]) (x : K^[n]) (b : K) (y : K^[m]) : K^[m] :=
-  ⟨LevelTwoData.gemv ord .NoTrans m n 1
+  ⟨LevelTwoData.gemv ord .NoTrans m n a
     A.data mstrg.offset (mstrg.lda ord m n)
     x.data vstrg.offset vstrg.inc b
-    y.data vstrg.offset vstrg.inc, sorry⟩
+    y.data vstrg.offset vstrg.inc, sorry_proof⟩
 
 def gemvT (a : K) (A : K^[m,n]) (x : K^[m]) (b : K) (y : K^[n]) : K^[n] :=
-  ⟨LevelTwoData.gemv ord .Trans m n 1
+  ⟨LevelTwoData.gemv ord .Trans m n a
     A.data mstrg.offset (mstrg.lda ord m n)
     x.data vstrg.offset vstrg.inc b
-    y.data vstrg.offset vstrg.inc, sorry⟩
+    y.data vstrg.offset vstrg.inc, sorry_proof⟩
 
 def gemvH (a : K) (A : K^[m,n]) (x : K^[m]) (b : K) (y : K^[n]) : K^[n] :=
-  ⟨LevelTwoData.gemv ord .ConjTrans m n 1
+  ⟨LevelTwoData.gemv ord .ConjTrans m n a
     A.data mstrg.offset (mstrg.lda ord m n)
     x.data vstrg.offset vstrg.inc b
-    y.data vstrg.offset vstrg.inc, sorry⟩
+    y.data vstrg.offset vstrg.inc, sorry_proof⟩
 
 def ger (a : K) (x : K^[m]) (y : K^[n]) (A : K^[m,n]) : K^[m,n] :=
   ⟨LevelTwoData.ger ord m n a
     x.data vstrg.offset vstrg.inc
     y.data vstrg.offset vstrg.inc
-    A.data mstrg.offset (mstrg.lda ord m n), sorry⟩
+    A.data mstrg.offset (mstrg.lda ord m n), sorry_proof⟩
 
 end DenseMatrix
