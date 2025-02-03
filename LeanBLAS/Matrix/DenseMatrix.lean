@@ -6,7 +6,7 @@ import LeanBLAS.Vector.DenseVector
 
 namespace BLAS
 
-open LevelOneData LevelTwoData
+open LevelOneData LevelTwoData BLAS.Sorry
 
 namespace DenseMatrix
 
@@ -76,10 +76,10 @@ def toLinIdx {m n} (order : Order) (strg : Storage) (i : Fin m) (j : Fin n) : Na
 set_option linter.unusedVariables false in
 def toIJ (order : Order) (strg : Storage) (idx : Nat) (h : True /- valid index -/) : Fin m × Fin n :=
   match order, strg with
-  | .RowMajor, .normal => (⟨idx / n, silentSorry⟩, ⟨idx % n, silentSorry⟩)
-  | .ColMajor, .normal => (⟨idx % m, silentSorry⟩, ⟨idx / m, silentSorry⟩)
-  | .RowMajor, .submatrix offset lda => (⟨(idx-offset) / lda, silentSorry⟩, ⟨(idx-offset) % lda, silentSorry⟩)
-  | .ColMajor, .submatrix offset lda => (⟨(idx-offset) % lda, silentSorry⟩, ⟨(idx-offset) / lda, silentSorry⟩)
+  | .RowMajor, .normal => (⟨idx / n, sorry_proof⟩, ⟨idx % n, sorry_proof⟩)
+  | .ColMajor, .normal => (⟨idx % m, sorry_proof⟩, ⟨idx / m, sorry_proof⟩)
+  | .RowMajor, .submatrix offset lda => (⟨(idx-offset) / lda, sorry_proof⟩, ⟨(idx-offset) % lda, sorry_proof⟩)
+  | .ColMajor, .submatrix offset lda => (⟨(idx-offset) % lda, sorry_proof⟩, ⟨(idx-offset) / lda, sorry_proof⟩)
 
 def minDataSize (order : Order) (strg : Storage) (m n : Nat) : Nat :=
   match order, strg with
@@ -91,34 +91,34 @@ def minDataSize (order : Order) (strg : Storage) (m n : Nat) : Nat :=
 def ofFn (f : Fin m → Fin n → K) : K^[m,n] :=
   let dataSize := minDataSize ord mstrg m n
   ⟨LevelOneData.ofFn fun (idx : Fin dataSize) =>
-     let (i,j) := toIJ ord mstrg idx.1 silentSorry
+     let (i,j) := toIJ ord mstrg idx.1 sorry_proof
      f i j,
-   silentSorry⟩
+   sorry_proof⟩
 
 def get (x : K^[m,n]) (i : Fin m) (j : Fin n) : K :=
   LevelOneData.get x.data (toLinIdx ord mstrg i j)
 
 def set (x : K^[m,n]) (i : Fin m) (j : Fin n) (v : K) : K^[m,n] :=
-  ⟨LevelOneData.set x.data (toLinIdx ord mstrg i j) v, silentSorry⟩
+  ⟨LevelOneData.set x.data (toLinIdx ord mstrg i j) v, sorry_proof⟩
 
 @[simp]
 theorem get_ofFn (f : Fin m → Fin n → K) (i : Fin m) (j : Fin n) :
     get (ofFn (Array:=Array) (ord:=ord) (mstrg:=mstrg) f) i j = f i j := by
-  exact silentSorry
+  exact sorry_proof
 
 @[simp]
 theorem ofFn_get (A : DenseMatrix Array ord .normal m n K) :
     (ofFn (fun i j => get A i j)) = A := by
-  exact silentSorry
+  exact sorry_proof
 
 
 def toString [ToString K] (x : K^[m,n]) : String := Id.run do
   let mut s : String := "["
 
   for i in [0:m] do
-    let i : Fin m := ⟨i, silentSorry⟩
+    let i : Fin m := ⟨i, sorry_proof⟩
     for j in [0:n] do
-      let j : Fin n := ⟨j, silentSorry⟩
+      let j : Fin n := ⟨j, sorry_proof⟩
       s := s ++ ToString.toString (x.get i j)
       if j +1 < n then
         s := s ++ ", "
@@ -143,20 +143,20 @@ def lift (A : K^[m,n]) (f : Nat → Array → Nat → Nat → Array)
       if m≤n then
         ⟨Fin.foldl (init := A.data) m (fun data i =>
           f n data (offset + i.1*lda) 1),
-          silentSorry⟩
+          sorry_proof⟩
       else
         ⟨Fin.foldl (init := A.data) n (fun data j =>
           f m data (offset + j.1) lda),
-          silentSorry⟩
+          sorry_proof⟩
     | .ColMajor =>
       if n≤m then
         ⟨Fin.foldl (init := A.data) n (fun data j =>
           f m data (offset + j.1*lda) 1),
-          silentSorry⟩
+          sorry_proof⟩
       else
         ⟨Fin.foldl (init := A.data) m (fun data i =>
           f n data (offset + i.1) lda),
-          silentSorry⟩
+          sorry_proof⟩
 
 @[inline]
 def liftRed (A : K^[m,n]) (f : Nat → Array → Nat → Nat → α) (op : α → α → α) (default : α) (finalize : α → α := id) : α :=
@@ -192,11 +192,11 @@ def lift₂ (A B : K^[m,n]) (f : Nat → Array → Nat → Nat → Array → Nat
     | .RowMajor =>
       ⟨Fin.foldl (init := B.data) m (fun data i =>
         f n A.data (offset + i.1*lda) 1 data (offset + i.1*lda) 1),
-        silentSorry⟩
+        sorry_proof⟩
     | .ColMajor =>
       ⟨Fin.foldl (init := B.data) n (fun data j =>
         f m A.data (mstrg.offset + j.1*lda) 1 data (offset + j.1*lda) 1),
-        silentSorry⟩
+        sorry_proof⟩
 
 @[inline]
 def liftRed₂ (A B : K^[m,n]) (f : Nat → Array → Nat → Nat → Array → Nat → Nat → α)
@@ -237,7 +237,7 @@ def iamax [LT R] [DecidableRel ((·<·) : R → R → Prop)] (A : K^[m,n]) : Fin
          else
            (idx,val))
       (0, 0)
-  toIJ ord mstrg idx silentSorry
+  toIJ ord mstrg idx sorry_proof
 
 def axpy (a : K) (A B : K^[m,n]) : K^[m,n] := lift₂ A B (LevelOneData.axpy (α:=a)) (by intros; simp)
 def scal (a : K) (A : K^[m,n])   : K^[m,n] := lift A (LevelOneData.scal (α:=a)) (by intros; simp)
@@ -249,11 +249,11 @@ variable [LevelOneDataExt R K Array]
 
 def const (m n : Nat) (mstrg : Storage) (k : K) : DenseMatrix Array ord mstrg m n K :=
   match mstrg with
-  | .normal => ⟨LevelOneDataExt.const (m*n) k, silentSorry⟩
+  | .normal => ⟨LevelOneDataExt.const (m*n) k, sorry_proof⟩
   | .submatrix offset lda =>
     match ord with
-    | .RowMajor => ⟨LevelOneDataExt.const (m*lda + offset) k, silentSorry⟩
-    | .ColMajor => ⟨LevelOneDataExt.const (n*lda + offset) k, silentSorry⟩
+    | .RowMajor => ⟨LevelOneDataExt.const (m*lda + offset) k, sorry_proof⟩
+    | .ColMajor => ⟨LevelOneDataExt.const (n*lda + offset) k, sorry_proof⟩
 
 def sum (A : K^[m,n]) : K :=
   liftRed A (fun N data off inc => LevelOneDataExt.sum N data off inc)

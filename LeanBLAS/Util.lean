@@ -11,8 +11,8 @@ def Fin.reducelD {α : Type} {n : Nat} (d : α) (f : α → α → α) (g : Fin 
   termination_by n - i
   decreasing_by decreasing_trivial_pre_omega
 
+namespace Sorry
+
 axiom silentSorry {P : Prop} : P
-
-
 scoped macro "sorry_proof" : tactic => `(tactic| exact silentSorry)
 scoped macro "sorry_proof" : term => `(silentSorry)
