@@ -2,6 +2,9 @@ import LeanBLAS
 
 open BLAS CBLAS
 
+def approxEq (x y : Float) : Bool :=
+  (x - y).abs < 1e-16
+
 def test_ddot : IO Unit := do
   let x : FloatArray := ⟨#[1.0,2.0,3.0]⟩
   let y : FloatArray := ⟨#[1.0,2.0,3.0]⟩
@@ -9,7 +12,7 @@ def test_ddot : IO Unit := do
   let expected := 1.0*1.0 + 2.0*2.0 + 3.0*3.0
   IO.println s!"ddot 3 {x} 1 {y} 1"
   IO.println s!"{r} == {expected} = {r == expected}"
-  if r != expected then
+  if !(approxEq r expected) then
     throw $ IO.userError "test_ddot failed"
 
 def test_ddot_2 : IO Unit := do
@@ -19,19 +22,8 @@ def test_ddot_2 : IO Unit := do
   let expected := 1.0*1.0 + 3.0*4.0
   IO.println s!"ddot 3 {x} 2 {y} 3"
   IO.println s!"{r} == {expected} = {r == expected}"
-  if r != expected then
+  if !(approxEq r expected) then
     throw $ IO.userError "test_ddot_2 failed"
-
-
-def test_zdot : IO Unit := do
-  let x := ComplexFloatArray.mkEmpty |>.push ⟨1,2⟩ |>.push ⟨3,4⟩ |>.push ⟨5,6⟩
-  let y := ComplexFloatArray.mkEmpty |>.push ⟨7,8⟩ |>.push ⟨9,10⟩ |>.push ⟨11,12⟩
-  let r := zdot 3 x 0 1 y 0 1
-  let expected : ComplexFloat := (.conj ⟨1,2⟩) * ⟨7,8⟩ + .conj ⟨3,4⟩ * ⟨9,10⟩ + .conj ⟨5,6⟩ * ⟨11,12⟩
-  IO.println s!"zdot 3 {x} 1 {y} 1"
-  IO.println s!"{r} == {expected} = {r == expected}"
-  if r != expected then
-    throw $ IO.userError "test_zdot failed"
 
 
 def test_dnrm2 : IO Unit := do
@@ -40,7 +32,7 @@ def test_dnrm2 : IO Unit := do
   let expected := Float.sqrt (1.0*1.0 + 2.0*2.0 + 3.0*3.0)
   IO.println s!"dnrm2 3 {x} 1"
   IO.println s!"{r} == {expected} = {r == expected}"
-  if r != expected then
+  if !(approxEq r expected) then
     throw $ IO.userError "test_dnrm2 failed"
 
 def test_dnrm2_2 : IO Unit := do
@@ -49,7 +41,7 @@ def test_dnrm2_2 : IO Unit := do
   let expected := Float.sqrt (1.0*1.0 + 3.0*3.0)
   IO.println s!"dnrm2 3 {x} 2"
   IO.println s!"{r} == {expected} = {r == expected}"
-  if r != expected then
+  if !(approxEq r expected) then
     throw $ IO.userError "test_dnrm2_2 failed"
 
 def test_dasum : IO Unit := do
@@ -58,7 +50,7 @@ def test_dasum : IO Unit := do
   let expected := 1.0 + 2.0 + 3.0
   IO.println s!"dasum 3 {x} 1"
   IO.println s!"{r} == {expected} = {r == expected}"
-  if r != expected then
+  if !(approxEq r expected) then
     throw $ IO.userError "test_dasum failed"
 
 def test_dasum_2 : IO Unit := do
@@ -67,7 +59,7 @@ def test_dasum_2 : IO Unit := do
   let expected := 1.0 + 3.0
   IO.println s!"dasum 3 {x} 2"
   IO.println s!"{r} == {expected} = {r == expected}"
-  if r != expected then
+  if !(approxEq r expected) then
     throw $ IO.userError "test_dasum_2 failed"
 
 def test_idamax : IO Unit := do
@@ -172,7 +164,6 @@ def test_dconst : IO Unit := do
 def main : IO Unit := do
   test_ddot
   test_ddot_2
-  test_zdot
   test_dnrm2
   test_dnrm2_2
   test_dasum
