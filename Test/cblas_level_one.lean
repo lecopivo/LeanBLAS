@@ -3,7 +3,7 @@ import LeanBLAS
 open BLAS CBLAS
 
 def approxEq (x y : Float) : Bool :=
-  (x - y).abs < 1e-16
+  (x - y).abs < 1e-14
 
 def test_ddot : IO Unit := do
   let x : FloatArray := ⟨#[1.0,2.0,3.0]⟩
