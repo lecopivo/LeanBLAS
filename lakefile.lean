@@ -1,8 +1,20 @@
 import Lake
 open System Lake DSL
 
-def linkArgs := #["-L/usr/lib/x86_64-linux-gnu/", "-lblas"]
-def inclArgs : Array String := #[]
+def linkArgs :=
+  if System.Platform.isWindows then
+    #[]
+  else if System.Platform.isOSX then
+    #["-L/opt/homebrew/opt/openblas/lib", "-lblas"]
+  else -- assuming linux
+    #["-L/usr/lib/x86_64-linux-gnu/", "-lblas"]
+def inclArgs :=
+  if System.Platform.isWindows then
+    #[]
+  else if System.Platform.isOSX then
+    #["-I/opt/homebrew/opt/openblas/include"]
+  else -- assuming linux
+    #[]
 
 package leanblas {
   precompileModules := true
