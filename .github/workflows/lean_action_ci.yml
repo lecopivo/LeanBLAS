@@ -36,7 +36,8 @@ jobs:
 
       - name: Install BLAS
         run: |
-          pacman -S mingw-w64-x86_64-openblas
+          choco install msys2
+          msys2 -c "pacman -Sy --noconfirm mingw-w64-x86_64-openblas"
 
       - name: Set up Lean
         uses: leanprover/lean-action@v1
