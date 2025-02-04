@@ -8,7 +8,7 @@ def inclArgs := #["-I/opt/homebrew/opt/openblas/include"]
 
 package leanblas {
   precompileModules := true
-  moreLinkArgs := linkArgs
+  weakLinkArgs := linkArgs
   moreLeancArgs := inclArgs
 }
 
