@@ -3,7 +3,7 @@ open System Lake DSL
 
 def linkArgs := #["-L/opt/homebrew/opt/openblas/lib",
                   "-L/usr/lib/x86_64-linux-gnu/blas",
-                  "-L/usr/lib/","-L/usr/local/lib/","-lblas"]
+                  "-lblas"]
 def inclArgs := #["-I/opt/homebrew/opt/openblas/include"]
 
 package leanblas {

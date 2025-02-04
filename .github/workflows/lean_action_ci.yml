@@ -16,8 +16,7 @@ jobs:
       - name: Install BLAS
         run: |
           sudo apt-get update
-          sudo apt-get install -y libblas-dev
-          lake update
+          sudo apt-get install -y libopenblas-dev
 
       - name: Set up Lean
         uses: leanprover/lean-action@v1
