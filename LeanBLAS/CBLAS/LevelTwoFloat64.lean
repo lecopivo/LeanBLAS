@@ -224,9 +224,9 @@ outputs: A with the outer product of X and Y
 -/
 @[extern "leanblas_cblas_dger"]
 opaque dger (order : Order) (M : USize) (N : USize) (alpha : Float)
-    (X : FloatArray) (offX incX : USize)
-    (Y : FloatArray) (offY incY : USize)
-    (A : @& FloatArray) (offA : USize) (lda : USize) : FloatArray
+    (X : @& FloatArray) (offX incX : USize)
+    (Y : @& FloatArray) (offY incY : USize)
+    (A : FloatArray) (offA : USize) (lda : USize) : FloatArray
 
 
 /-- syr
@@ -247,8 +247,8 @@ outputs: A with the symmetric rank-1 update
 -/
 @[extern "leanblas_cblas_dsyr"]
 opaque dsyr (order : Order) (uplo : UpLo) (N : USize) (alpha : Float)
-    (X : FloatArray) (offX incX : USize)
-    (A : @& FloatArray) (offA : USize) (lda : USize) : FloatArray
+    (X : @& FloatArray) (offX incX : USize)
+    (A : FloatArray) (offA : USize) (lda : USize) : FloatArray
 
 
 /-- syr2
