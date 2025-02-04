@@ -159,11 +159,12 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dtbmv(const uint8_t order, const uint8_t
  * @return X with the matrix-vector product added to it
  */
 LEAN_EXPORT lean_obj_res leanblas_cblas_dtpmv(const uint8_t order, const uint8_t uplo, const uint8_t transA, const uint8_t diag,
-                                const size_t N, const b_lean_obj_arg A, lean_obj_arg X, const size_t offX, const size_t incX){
+                                              const size_t N, const b_lean_obj_arg A, const size_t offA, lean_obj_arg X, const size_t offX,
+                                              const size_t incX){
   ensure_exclusive_float_array(&X);
 
   cblas_dtpmv(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo), leanblas_cblas_transpose(transA), leanblas_cblas_diag(diag),
-              (int)N, lean_float_array_cptr(A), lean_float_array_cptr(X) + offX, (int)incX);
+              (int)N, lean_float_array_cptr(A) + offA, lean_float_array_cptr(X) + offX, (int)incX);
 
   return X;
 }

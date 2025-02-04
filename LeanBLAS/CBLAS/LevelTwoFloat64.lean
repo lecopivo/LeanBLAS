@@ -277,6 +277,33 @@ opaque dsyr2 (order : Order) (uplo : UpLo) (N : USize) (alpha : Float)
     (A : FloatArray) (offA : USize) (lda : USize) : FloatArray
 
 
+/-- gpr
+
+summary: General rank-1 update of triangular matrix
+  Similar to `ger` but only updates the upper or lower triangle of the matrix
+
+inputs:
+- N: the number of rows in the matrix
+- alpha: the scalar
+- X: the first vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+- Y: the second vector
+- offY: starting offset of elements of Y
+- incY: the increment for the elements of Y
+- A: triangular matrix in packed format i.e. vector of size N*(N+1)/2
+- offA: starting offset of elements of A
+
+outputs: A := A + alpha * X * Y^T
+-/
+@[extern "leanblas_cblas_dgpr"]
+opaque dgpr (order : Order) (uplo : UpLo) (N : USize) (alpha : Float)
+    (X : @& FloatArray) (offX incX : USize)
+    (Y : @& FloatArray) (offY incY : USize)
+    (A : FloatArray) (offA : USize) : FloatArray
+
+
+
 instance : LevelTwoData Float Float FloatArray where
 
   gemv order trans M N a A offA ldaA X offX incX b Y offY incY :=

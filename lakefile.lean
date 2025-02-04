@@ -38,8 +38,12 @@ lean_exe DenseVectorTest where
   root := `Test.dense_vector
   -- moreLinkArgs := linkArgs
 
+lean_exe TriangularTest where
+  root := `Test.packed_triangular
+
+
 extern_lib libleanblasc pkg := do
-  let mut oFiles : Array (BuildJob FilePath) := #[]
+  let mut oFiles : Array (Job FilePath) := #[]
   for file in (← (pkg.dir / "c").readDir) do
     if file.path.extension == some "c" then
       let oFile := pkg.buildDir / "c" / (file.fileName.stripSuffix ".c" ++ ".o")

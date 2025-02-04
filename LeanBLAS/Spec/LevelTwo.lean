@@ -29,6 +29,11 @@ inductive Diag where
 
 class LevelTwoData (R K : outParam Type) (Array : Type) [Scalar R K] where
 
+  /-- General matrix-vector multiplication
+  ```
+  Y := alpha * A * X + beta * Y
+  ```
+  --/
   gemv (order : Order) (transA : Transpose) (M : Nat) (N : Nat) (alpha : K)
     (A : Array) (offA : Nat) (lda : Nat)
     (X : Array) (offX incX : Nat) (beta : K)
@@ -82,3 +87,16 @@ class LevelTwoData (R K : outParam Type) (Array : Type) [Scalar R K] where
     (X : Array) (offX incX : Nat)
     (Y : Array) (offY incY : Nat)
     (A : Array) (offA : Nat) (lda : Nat) : Array
+
+
+class LevelTwoDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where
+
+  /-- General packed rand-1 update
+  ```
+    A := alpha * m(x * y^H) + A
+  ```
+  -/
+  gpr (order : Order) (uplo : UpLo) (N : Nat) (alpha : K)
+    (X : Array) (offX incX : Nat)
+    (Y : Array) (offY incY : Nat)
+    (A : Array) (offA : Nat) : array
