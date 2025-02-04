@@ -174,7 +174,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_daxpy(const size_t N, const double alpha
   cblas_daxpy((int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX, lean_float_array_cptr(Y) + offY, (int)incY);
   return Y;
 }
- 
+
 
 
 /** drotg
@@ -326,11 +326,18 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dsum(const size_t N, const b_lean_obj_ar
 }
 
 
-LEAN_EXPORT lean_obj_res leanblas_cblas_daxpby(const size_t N, const double alpha, const b_lean_obj_arg X, const size_t offX, const size_t incX,
-                                                               const double beta,          lean_obj_arg Y, const size_t offY, const size_t incY){
-  ensure_exclusive_float_array(&Y);
-  cblas_daxpby((int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX, beta, lean_float_array_cptr(Y) + offY, (int)incY);
-  return Y;
+LEAN_EXPORT lean_obj_res leanblas_cblas_daxpby(const size_t N, const double alpha, lean_obj_arg X, const size_t offX, const size_t incX,
+                                                               const double beta,  lean_obj_arg Y, const size_t offY, const size_t incY){
+  if (lean_is_exclusive(X) && !lean_is_exclusive(Y)){
+    cblas_daxpby((int)N, beta, lean_float_array_cptr(Y) + offY, (int)incY, alpha, lean_float_array_cptr(X) + offX, (int)incX);
+    lean_dec(Y);
+    return X;
+  } else {
+    ensure_exclusive_float_array(&Y);
+    cblas_daxpby((int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX, beta, lean_float_array_cptr(Y) + offY, (int)incY);
+    lean_dec(X);
+    return Y;
+  }
 }
 
 
@@ -374,27 +381,50 @@ LEAN_EXPORT size_t leanblas_cblas_dimin_re(const size_t N, const b_lean_obj_arg 
 
 
 
-LEAN_EXPORT lean_obj_res leanblas_cblas_dmul(const size_t N,         lean_obj_arg X, const size_t offX, const size_t incX,
-                                                             const b_lean_obj_arg Y, const size_t offY, const size_t incY){
-  ensure_exclusive_float_array(&X);
-  double * xptr = lean_float_array_cptr(X);
-  double * yptr = lean_float_array_cptr(Y);
-  for (size_t i = 0; i < N; i++){
-    xptr[offX + i*incX] *= yptr[offY + i*incY];
+LEAN_EXPORT lean_obj_res leanblas_cblas_dmul(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX,
+                                                             lean_obj_arg Y, const size_t offY, const size_t incY){
+
+  if (lean_is_exclusive(X) && !lean_is_exclusive(Y)){
+    double * xptr = lean_float_array_cptr(X);
+    double * yptr = lean_float_array_cptr(Y);
+    for (size_t i = 0; i < N; i++){
+      xptr[offX + i*incX] *= yptr[offY + i*incY];
+    }
+    lean_dec(Y);
+    return X;
+  } else {
+    ensure_exclusive_float_array(&Y);
+    double * xptr = lean_float_array_cptr(X);
+    double * yptr = lean_float_array_cptr(Y);
+    for (size_t i = 0; i < N; i++){
+      yptr[offY + i*incY] *= xptr[offX + i*incX];
+    }
+    lean_dec(X);
+    return Y;
   }
-  return Y;
 }
 
 
-LEAN_EXPORT lean_obj_res leanblas_cblas_ddiv(const size_t N,         lean_obj_arg X, const size_t offX, const size_t incX,
-                                                             const b_lean_obj_arg Y, const size_t offY, const size_t incY){
-  ensure_exclusive_float_array(&X);
-  double * xptr = lean_float_array_cptr(X);
-  double * yptr = lean_float_array_cptr(Y);
-  for (size_t i = 0; i < N; i++){
-    xptr[offX + i*incX] /= yptr[offY + i*incY];
+LEAN_EXPORT lean_obj_res leanblas_cblas_ddiv(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX,
+                                                             lean_obj_arg Y, const size_t offY, const size_t incY){
+  if (lean_is_exclusive(X) && !lean_is_exclusive(Y)){
+    double * xptr = lean_float_array_cptr(X);
+    double * yptr = lean_float_array_cptr(Y);
+    for (size_t i = 0; i < N; i++){
+      xptr[offX + i*incX] /= yptr[offY + i*incY];
+    }
+    lean_dec(Y);
+    return X;
+  } else {
+    ensure_exclusive_float_array(&Y);
+    double * xptr = lean_float_array_cptr(X);
+    double * yptr = lean_float_array_cptr(Y);
+    for (size_t i = 0; i < N; i++){
+      yptr[offY + i*incY] = xptr[offX + i*incX] / yptr[offY + i*incY];
+    }
+    lean_dec(X);
+    return Y;
   }
-  return Y;
 }
 
 

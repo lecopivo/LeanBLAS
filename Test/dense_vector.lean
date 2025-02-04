@@ -1,6 +1,6 @@
 import LeanBLAS
 
-open BLAS
+open BLAS Sorry
 
 def u : DenseVector FloatArray (.subvector (offset := 4) (inc := 3)) 10 Float :=
   DenseVector.ofFn (fun i => i.1.toFloat)
@@ -8,7 +8,7 @@ def u : DenseVector FloatArray (.subvector (offset := 4) (inc := 3)) 10 Float :=
 def A : DenseMatrix FloatArray .RowMajor .normal 3 3 Float :=
   DenseMatrix.ofFn (fun i j => i.1.toFloat + 100 * j.1.toFloat)
 
-def main : IO Unit := do
+unsafe def main : IO Unit := do
 
   IO.println s!"u = {u}"
 
@@ -27,3 +27,15 @@ def main : IO Unit := do
   IO.println s!""
   IO.println s!"{A.col' 2}"
   IO.println s!"{(A.col' 2).sum}"
+
+
+  let a : DenseVector FloatArray .normal 3 Float := ⟨⟨#[1,2,(← IO.rand 0 100).toFloat]⟩,sorry_proof⟩
+  let b : DenseVector FloatArray .normal 3 Float := ⟨⟨#[4,5,(← IO.rand 0 100).toFloat]⟩,sorry_proof⟩
+
+  IO.println s!"a address: {ptrAddrUnsafe a}"
+  IO.println s!"b address: {ptrAddrUnsafe b}"
+
+  let c := DenseVector.mul a b
+  IO.println s!"c address: {ptrAddrUnsafe c}"
+  -- IO.println s!"a = {a}"
+  IO.println s!"b = {b}"

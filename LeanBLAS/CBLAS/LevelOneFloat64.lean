@@ -365,8 +365,8 @@ inputs:
 outputs: `alpha*X + beta*Y` at appropriate indices
 -/
 @[extern "leanblas_cblas_daxpby"]
-opaque daxpby (N : USize) (alpha : Float) (X : @&FloatArray) (offX : USize) (incX : USize)
-                          (beta : Float)  (Y :   FloatArray) (offY : USize) (incY : USize) : FloatArray
+opaque daxpby (N : USize) (alpha : Float) (X : FloatArray) (offX : USize) (incX : USize)
+                          (beta : Float)  (Y : FloatArray) (offY : USize) (incY : USize) : FloatArray
 
 /-- scaladd
 
@@ -437,7 +437,7 @@ outputs: the element-wise product of X and Y
 
 -/
 @[extern "leanblas_cblas_dmul"]
-opaque dmul (N : USize) (X : FloatArray) (offX : USize) (incX : USize) (Y : @&FloatArray) (offY : USize) (incY : USize) : FloatArray
+opaque dmul (N : USize) (X : FloatArray) (offX : USize) (incX : USize) (Y : FloatArray) (offY : USize) (incY : USize) : FloatArray
 
 
 /-- ddiv
@@ -456,7 +456,7 @@ outputs: the element-wise division of X and Y
 
 -/
 @[extern "leanblas_cblas_ddiv"]
-opaque ddiv (N : USize) (X : FloatArray) (offX : USize) (incX : USize) (Y : @&FloatArray) (offY : USize) (incY : USize) : FloatArray
+opaque ddiv (N : USize) (X : FloatArray) (offX : USize) (incX : USize) (Y : FloatArray) (offY : USize) (incY : USize) : FloatArray
 
 
 /-- dinv
