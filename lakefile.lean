@@ -1,8 +1,7 @@
 import Lake
 open System Lake DSL
 
-def linkArgs := #["-L/usr/lib/x86_64-linux-gnu/blas",
-                  "-L/usr/lib/","-L/usr/local/lib","-lblas"]
+def linkArgs := #["-L/usr/lib/x86_64-linux-gnu/", "-lblas"]
 def inclArgs : Array String := #[]
 
 package leanblas {
