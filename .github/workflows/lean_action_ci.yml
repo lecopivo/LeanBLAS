@@ -36,7 +36,7 @@ jobs:
 
       - name: Install BLAS
         run: |
-          choco install openblas
+          pacman -S mingw-w64-x86_64-openblas
 
       - name: Set up Lean
         uses: leanprover/lean-action@v1
