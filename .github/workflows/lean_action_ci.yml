@@ -34,10 +34,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install BLAS
+      - name: Install MSYS2
         run: |
           choco install msys2
-          msys2 -c "pacman -Sy --noconfirm mingw-w64-x86_64-openblas"
+          refreshenv
+
+      - name: Install BLAS
+        run: |
+          msys2 -c "pacman -Sy --noconfirm"
+          msys2 -c "pacman -S --noconfirm mingw-w64-x86_64-openblas"
 
       - name: Set up Lean
         uses: leanprover/lean-action@v1
