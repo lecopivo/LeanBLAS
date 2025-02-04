@@ -37,7 +37,9 @@ jobs:
       - name: Install MSYS2
         run: |
           choco install msys2
-          refreshenv
+
+      - name: Refresh environment variables
+        run: cmd.exe /C "refreshenv"
 
       - name: Install BLAS
         run: |
