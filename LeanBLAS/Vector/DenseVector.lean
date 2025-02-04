@@ -123,6 +123,15 @@ def const (n : Nat) (vstrg : Storage) (k : K) : DenseVector Array vstrg n K :=
 def sum (x : K^[n]) : K :=
   LevelOneDataExt.sum n x.data vstrg.offset vstrg.inc
 
+unsafe def axpbyUnsafe (a : K) (x : K^[n]) (b : K) (y : K^[n]) : K^[n] :=
+  -- In case the when `x` is exclusive and `y` is not we swap the order
+  -- otherwise we assume that `y` is exclusive or we are forced to make a copy
+  if isExclusiveUnsafe x && !(isExclusiveUnsafe y) then
+    ⟨LevelOneDataExt.axpby n a y.data vstrg.offset vstrg.inc b x.data vstrg.offset vstrg.inc, sorry_proof⟩
+  else
+    ⟨LevelOneDataExt.axpby n a x.data vstrg.offset vstrg.inc b y.data vstrg.offset vstrg.inc, sorry_proof⟩
+
+@[implemented_by axpbyUnsafe]
 def axpby (a : K) (x : K^[n]) (b : K) (y : K^[n]) : K^[n] :=
   ⟨LevelOneDataExt.axpby n a x.data vstrg.offset vstrg.inc b y.data vstrg.offset vstrg.inc, sorry_proof⟩
 
@@ -139,6 +148,13 @@ def iminRe (x : K^[n]) (h : n ≠ 0) : Fin n :=
 
 def iminIm (_x : K^[n]) (h : n ≠ 0) : Fin n := ⟨0, by omega⟩
 
+unsafe def mulUnsafe (x y : K^[n]) : K^[n] :=
+  if !(isExclusiveUnsafe x) && (isExclusiveUnsafe y) then
+    ⟨LevelOneDataExt.mul n y.data vstrg.offset vstrg.inc x.data vstrg.offset vstrg.inc, sorry_proof⟩
+  else
+    ⟨LevelOneDataExt.mul n x.data vstrg.offset vstrg.inc y.data vstrg.offset vstrg.inc, sorry_proof⟩
+
+@[implemented_by mulUnsafe]
 def mul (x y : K^[n]) : K^[n] :=
   ⟨LevelOneDataExt.mul n x.data vstrg.offset vstrg.inc y.data vstrg.offset vstrg.inc, sorry_proof⟩
 
