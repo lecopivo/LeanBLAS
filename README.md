@@ -8,11 +8,19 @@ The goal of the specification is to formalize mathematics of BLAS rather than wh
 
 ### Prerequisites
 
-Ensure you have the development files for C BLAS installed. On Ubuntu, you can install them with:
+Ensure you have the development files for C BLAS installed.
+
+On Ubuntu, you can install them with:
 
 ```bash
 sudo apt-get install libblas-dev
 ```
+On Mac, you can install them with:
+```bash
+brew install openblas
+```
+
+Currently we do not know of an easy way to build on Windows.
 
 ### Building the Library
 
