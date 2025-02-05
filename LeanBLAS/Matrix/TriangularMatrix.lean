@@ -53,6 +53,7 @@ def toLinIdx {n} (ord : Order) (uplo : UpLo) (i j : Fin n) (h : IsValidIJ uplo i
   | .RowMajor, .Lower =>
     ⟨j.1 + (i.1*(i.1+1))/2, sorry_proof⟩
 
+set_option linter.unusedVariables false in
 def toIJ {n} (ord : Order) (uplo : UpLo) (idx : Fin ((n*(n+1))/2)) : Fin n × Fin n :=
   have : Inhabited (Fin n) := ⟨⟨0, sorry_proof⟩⟩
   panic! "toIJ not implemented"
