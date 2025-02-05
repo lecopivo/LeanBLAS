@@ -66,16 +66,16 @@ def test_idamax : IO Unit := do
   let x : FloatArray := ⟨#[1.0,-2.0,3.0,-10.0]⟩
   let r := idamax 4 x 0 1
   let expected := 3
-  IO.println s!"idamax 4 {x} 1"
+  IO.println s!"idamax 4 {x} 0 1"
   IO.println s!"{r} == {expected} = {r == expected}"
   if r != expected then
     throw $ IO.userError "test_idamax failed"
 
 def test_idamax_2 : IO Unit := do
   let x : FloatArray := ⟨#[1.0,-2.0,3.0,-10.0]⟩
-  let r := idamax 4 x 0 2
-  let expected := 2
-  IO.println s!"idamax 4 {x} 2"
+  let r := idamax 2 x 0 2
+  let expected := 1
+  IO.println s!"idamax 2 {x} 1 2"
   IO.println s!"{r} == {expected} = {r == expected}"
   if r != expected then
     throw $ IO.userError "test_idamax_2 failed"
