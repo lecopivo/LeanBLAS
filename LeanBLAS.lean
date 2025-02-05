@@ -5,3 +5,4 @@ import LeanBLAS.Scalar
 import LeanBLAS.ComplexFloat
 import LeanBLAS.Vector.DenseVector
 import LeanBLAS.Matrix.DenseMatrix
+import LeanBLAS.Matrix.TriangularMatrix

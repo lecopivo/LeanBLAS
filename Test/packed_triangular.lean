@@ -59,3 +59,13 @@ def main : IO Unit := do
 
   let A' := BLAS.CBLAS.dgpr .ColMajor .Lower 3 1.0 v 0 1 u 0 1 A 0
   IO.println A'
+
+  let B := CBLAS.dpackedToDense 3 .Lower .RowMajor A .ColMajor ⟨Array.mkArray 9 0⟩ 0 3
+  IO.println B
+
+  let B := CBLAS.dpackedToDense 3 .Lower .ColMajor A .ColMajor ⟨Array.mkArray 16 0⟩ 1 4
+  IO.println B
+
+  let C : FloatArray := ⟨#[1,2,3,4,5,6,7,8,9]⟩
+  let Cp := CBLAS.ddenseToPacked 3 .Lower .RowMajor C 0 3 .ColMajor ⟨Array.mkArray 6 0⟩
+  IO.println Cp

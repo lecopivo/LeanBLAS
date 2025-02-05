@@ -361,15 +361,19 @@ def diagStorage (strg : Storage) (n : Nat) : DenseVector.Storage :=
   | .normal => .subvector (offset := 0) (inc := n+1)
   | .submatrix offset lda => .subvector (offset := offset) (inc := lda+1)
 
+-- row as `n` vector
 def row (A : K^[m,n]) (i : Fin m) : DenseVector Array (rowStorage ord mstrg i n) n K :=
   ⟨A.data, sorry_proof⟩
 
+-- col as `m` vector
 def col (A : K^[m,n]) (j : Fin n) : DenseVector Array (colStorage ord mstrg m j) m K :=
   ⟨A.data, sorry_proof⟩
 
+-- row as `1×n` matrix
 def row' (A : K^[m,n]) (i : Fin m) : DenseMatrix Array ord (rowStorage' ord mstrg i n) 1 n K :=
   ⟨A.data, sorry_proof⟩
 
+-- col as `m×1` matrix
 def col' (A : K^[m,n]) (j : Fin n) : DenseMatrix Array ord (colStorage' ord mstrg m j) m 1 K :=
   ⟨A.data, sorry_proof⟩
 

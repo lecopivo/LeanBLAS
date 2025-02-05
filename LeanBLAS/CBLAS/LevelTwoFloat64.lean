@@ -276,34 +276,6 @@ opaque dsyr2 (order : Order) (uplo : UpLo) (N : USize) (alpha : Float)
     (Y : @& FloatArray) (offY incY : USize)
     (A : FloatArray) (offA : USize) (lda : USize) : FloatArray
 
-
-/-- gpr
-
-summary: General rank-1 update of triangular matrix
-  Similar to `ger` but only updates the upper or lower triangle of the matrix
-
-inputs:
-- N: the number of rows in the matrix
-- alpha: the scalar
-- X: the first vector
-- offX: starting offset of elements of X
-- incX: the increment for the elements of X
-- Y: the second vector
-- offY: starting offset of elements of Y
-- incY: the increment for the elements of Y
-- A: triangular matrix in packed format i.e. vector of size N*(N+1)/2
-- offA: starting offset of elements of A
-
-outputs: A := A + alpha * X * Y^T
--/
-@[extern "leanblas_cblas_dgpr"]
-opaque dgpr (order : Order) (uplo : UpLo) (N : USize) (alpha : Float)
-    (X : @& FloatArray) (offX incX : USize)
-    (Y : @& FloatArray) (offY incY : USize)
-    (A : FloatArray) (offA : USize) : FloatArray
-
-
-
 instance : LevelTwoData Float Float FloatArray where
 
   gemv order trans M N a A offA ldaA X offX incX b Y offY incY :=
@@ -340,3 +312,73 @@ instance : LevelTwoData Float Float FloatArray where
 
   her2 order uplo N alpha X offX incX Y offY incY A offA lda :=
     dsyr2 order uplo N.toUSize alpha X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize A offA.toUSize lda.toUSize
+
+
+
+----------------------------------------------------------------------------------------------------
+-- Level 2 BLAS extensions -------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+
+
+/-- dpackedToDense
+
+summary: Converts a packed matrix to a dense matrix
+
+inputs:
+- N: the number of rows in the matrix
+- uplo: whether the matrix is upper or lower triangular
+- orderAp: the order of the packed matrix
+- Ap: the packed matrix
+- orderA: the order of the dense matrix
+- A: the dense matrix
+- offA: starting offset of elements of A
+- lds: the leading dimension of the dense matrix
+-/
+@[extern "leanblas_cblas_dpacked_to_dense"]
+opaque dpackedToDense (N : USize) (uplo : UpLo)
+  (orderAp : Order) (Ap : @& FloatArray)
+  (orderA : Order) (A : FloatArray) (offA : USize) (lds : USize) : FloatArray
+
+/-- ddenseToPacked
+
+summary: Converts a dense matrix to a packed matrix
+
+inputs:
+- N: the number of rows in the matrix
+- uplo: whether the matrix is upper or lower triangular
+- orderA: the order of the dense matrix
+- A: the dense matrix
+- offA: starting offset of elements of A
+- lda: the leading dimension of the dense matrix
+- orderAp: the order of the packed matrix
+- Ap: the packed matrix
+-/
+@[extern "leanblas_cblas_ddense_to_packed"]
+opaque ddenseToPacked (N : USize) (uplo : UpLo)
+  (orderA : Order) (A : @& FloatArray) (offA : USize) (lda : USize)
+  (orderAp : Order) (Ap : FloatArray) : FloatArray
+
+/-- gpr
+
+summary: General rank-1 update of triangular matrix
+  Similar to `ger` but only updates the upper or lower triangle of the matrix
+
+inputs:
+- N: the number of rows in the matrix
+- alpha: the scalar
+- X: the first vector
+- offX: starting offset of elements of X
+- incX: the increment for the elements of X
+- Y: the second vector
+- offY: starting offset of elements of Y
+- incY: the increment for the elements of Y
+- A: triangular matrix in packed format i.e. vector of size N*(N+1)/2
+- offA: starting offset of elements of A
+
+outputs: A := A + alpha * X * Y^T
+-/
+@[extern "leanblas_cblas_dgpr"]
+opaque dgpr (order : Order) (uplo : UpLo) (N : USize) (alpha : Float)
+    (X : @& FloatArray) (offX incX : USize)
+    (Y : @& FloatArray) (offY incY : USize)
+    (Ap : FloatArray) (offA : USize) : FloatArray

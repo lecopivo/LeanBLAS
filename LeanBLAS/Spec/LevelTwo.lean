@@ -89,7 +89,18 @@ class LevelTwoData (R K : outParam Type) (Array : Type) [Scalar R K] where
     (A : Array) (offA : Nat) (lda : Nat) : Array
 
 
+/-- Level 2 BLAS function that seems to be missing from the BLAS standard. -/
 class LevelTwoDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where
+
+  /-- Copies packed matrix `X` to dense matrix `A`.
+  It will zero out elements that are above/bellow the main diagonal. -/
+  packedToDense (N : Nat) (uplo : UpLo)
+    (orderAp : Order) (Ap : Array) (orderA : Order) (A : Array) (offA : Nat) (lda : Nat) : Array
+
+  /-- Extract uppler/lower triangular part of A and stores it in packed format. -/
+  denseToPacked (N : Nat) (uplo : UpLo)
+    (orderA : Order) (A : Array) (offA : Nat) (lda : Nat)
+    (orderAp : Order) (Ap : Array) : Array
 
   /-- General packed rand-1 update
   ```
