@@ -178,3 +178,41 @@ def toNormal (x : K^[n]) : DenseVector Array .normal n K :=
 /-- Set `x` to `y`, modifies `x` inplace if possible -/
 def setArray (x : K^[n]) (y : K^[n]') : K^[n] :=
   ⟨LevelOneData.copy n y.data vstrg'.offset vstrg'.inc x.data vstrg.offset vstrg.inc, sorry_proof⟩
+
+
+----------------------------------------------------------------------------------------------------
+variable [LevelTwoData R K Array]
+
+/-- Multiply vector `x` by lower/upper triangular matrix `Ap` in packed storage format. -/
+def triangularMul {n : Nat} (Ap : DenseVector Array .normal (n*(n+1)/2) K) (x : K^[n])
+    (ord : Order := .ColMajor) (uplo : UpLo := .Lower)
+    (trans : Transpose := .NoTrans) (diag : Diag) : K^[n] :=
+  ⟨LevelTwoData.tpmv ord uplo trans (diag==.Unit) n Ap.data 0 x.data vstrg.offset vstrg.inc, sorry_proof⟩
+
+/-- Multiply vector `x` by strict lower/upper triangular matrix `Ap` in packed storage format.
+
+Currently this is not the most efficient implementation. -/
+def strictTriangularMul {n : Nat} (Ap : DenseVector Array .normal (n*(n-1)/2) K) (x : K^[n])
+    (ord : Order := .ColMajor) (uplo : UpLo := .Lower) (trans : Transpose := .NoTrans) : K^[n] :=
+
+  match uplo, trans with
+  | .Lower, .NoTrans
+  | .Upper, .Trans
+  | .Upper, .ConjTrans =>
+    let data := LevelTwoData.tpmv ord uplo trans false (n-1) Ap.data 0 x.data vstrg.offset vstrg.inc
+    -- shift the values by one
+    -- warning: this will make a copy of `data` which is not ideal
+    let data := LevelOneData.copy (n-1) data vstrg.offset vstrg.inc data (vstrg.offset+vstrg.inc) vstrg.inc
+    -- reset the first element to zero
+    let data := LevelOneData.set data vstrg.offset 0
+    ⟨data, sorry_proof⟩
+  | .Upper, .NoTrans
+  | .Lower, .Trans
+  | .Lower, .ConjTrans =>
+    let data := LevelTwoData.tpmv ord uplo trans false (n-1) Ap.data 0 x.data (vstrg.offset+vstrg.inc) vstrg.inc
+    -- shift the values by minus one
+    -- warning: this will make a copy of `data` which is not ideal
+    let data := LevelOneData.copy (n-1) data (vstrg.offset+vstrg.inc) vstrg.inc data vstrg.offset vstrg.inc
+    -- reset the last element to zero
+    let data := LevelOneData.set data (vstrg.offset + (n-1)*vstrg.inc) 0
+    ⟨data, sorry_proof⟩

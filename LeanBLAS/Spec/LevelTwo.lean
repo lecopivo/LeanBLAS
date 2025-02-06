@@ -6,12 +6,14 @@ namespace BLAS
 inductive Order where
   | RowMajor
   | ColMajor
+deriving BEq, DecidableEq
 
 -- move this to Spec directory
 inductive Transpose where
   | NoTrans
   | Trans
   | ConjTrans
+deriving BEq, DecidableEq
 
 -- move this to Spec directory
 inductive UpLo where
@@ -19,13 +21,14 @@ inductive UpLo where
   | Upper
   /-- Lower triangular matrix --/
   | Lower
+deriving BEq, DecidableEq
 
 inductive Diag where
   /-- Non-unit triangular matrix --/
   | NonUnit
   /-- Unit triangular matrix --/
   | Unit
-
+deriving BEq, DecidableEq
 
 class LevelTwoData (R K : outParam Type) (Array : Type) [Scalar R K] where
 

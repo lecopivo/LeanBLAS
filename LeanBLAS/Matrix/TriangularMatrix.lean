@@ -13,8 +13,12 @@ open LevelOneData LevelTwoData BLAS.Sorry
 structure TriangularMatrix (Array : Type) (order : Order) (uplo : UpLo) (n : Nat)
     {R : Type} (K : Type) [Scalar R K] [LevelOneData R K Array]
   where
-  data : Array
-  valid_storage : size data = (n*(n+1))/2
+  data : DenseVector Array .normal ((n*(n+1))/2) K
+
+ -- TriangularMatrix (Array : Type) (order : Order) (uplo : UpLo) (n : Nat)
+ --    {R : Type} (K : Type) [Scalar R K] [LevelOneData R K Array]
+ --  where
+ --  data : DenseVector Array .normal ((n*(n+1))/2) K
 
 
 namespace TriangularMatrix
@@ -90,20 +94,20 @@ theorem toIJ_toLinIdx {n} (ord : Order) (uplo : UpLo) (i j : Fin n) (h : IsValid
   (i,j) := sorry_proof
 
 def get' (T : 𝒯[K;n]) (i j : Fin n) (h : IsValidIJ uplo i j) : K :=
-  LevelOneData.get T.data (toLinIdx ord uplo i j h)
+  T.data.get (toLinIdx ord uplo i j h)
 
 def get (T : 𝒯[K;n]) (i j : Fin n) : K :=
   if h : IsValidIJ uplo i j then
-    LevelOneData.get T.data (toLinIdx ord uplo i j h)
+    T.data.get (toLinIdx ord uplo i j h)
   else
     0
 
 def set' (T : 𝒯[K;n]) (i j : Fin n) (v : K) (h : IsValidIJ uplo i j) : 𝒯[K;n] :=
-  ⟨LevelOneData.set T.data (toLinIdx ord uplo i j h) v, sorry_proof⟩
+  ⟨T.data.set (toLinIdx ord uplo i j h) v⟩
 
 def set (T : 𝒯[K;n]) (i j : Fin n) (v : K) : 𝒯[K;n] :=
   if h : IsValidIJ uplo i j then
-    ⟨LevelOneData.set T.data (toLinIdx ord uplo i j h) v, sorry_proof⟩
+    ⟨T.data.set (toLinIdx ord uplo i j h) v⟩
   else
     T
 
@@ -125,37 +129,44 @@ instance {n} [ToString K] : ToString (𝒯[K;n]) := ⟨toString⟩
 
 /-  Level 1 operations -/
 
-def dot (A B : 𝒯[K;n]) : K :=
-  LevelOneData.dot (size A.data) A.data 0 1 B.data 0 1
-
-def nrm2 (A : 𝒯[K;n]) : R :=
-  LevelOneData.nrm2 (size A.data) A.data 0 1
-
-def asum (A : 𝒯[K;n]) : R :=
-  LevelOneData.asum (size A.data) A.data 0 1
-
+def dot (A B : 𝒯[K;n]) : K := A.data.dot B.data
+def nrm2 (A : 𝒯[K;n]) : R := A.data.nrm2
+def asum (A : 𝒯[K;n]) : R := A.data.asum
 def iamax [LT R] [DecidableRel ((·<·) : R → R → Prop)] (A : 𝒯[K;n]) : Fin n × Fin n :=
-  let idx : Fin ((n*(n+1))/2) := ⟨LevelOneData.iamax (size A.data) A.data 0 1, sorry_proof⟩
+  let idx : Fin ((n*(n+1))/2) := A.data.iamax
   toIJ ord uplo idx
 
 def axpy (a : K) (A B : 𝒯[K;n]) : 𝒯[K;n] :=
-  ⟨LevelOneData.axpy (size A.data) a A.data 0 1 B.data 0 1, sorry_proof⟩
+  ⟨DenseVector.axpy a A.data B.data⟩
 
 def scal (a : K) (A : 𝒯[K;n]) : 𝒯[K;n] :=
-  ⟨LevelOneData.scal (size A.data) a A.data 0 1, sorry_proof⟩
-
+  ⟨A.data.scal a⟩
 
 -- def row (T : 𝒯[K;n]) (i : Fin n) : K^[n] := sorry
 -- def col (T : 𝒯[K;n]) (i : Fin n) : K^[n] := sorry
 -- def diag (v : K^[n]) : 𝒯[K;n] := sorry
 -- def diagonal (T : 𝒯[K;n]) : K^[n] := sorry
 
+/- Level 1 extensions -/
+variable [LevelOneDataExt R K Array]
+
+def zero : 𝒯[K;n] := ⟨DenseVector.const _ _ 0⟩
+def mul (A B : 𝒯[K;n]) : 𝒯[K;n] := ⟨A.data.mul B.data⟩
+def imaxRe (A : 𝒯[K;n]) (_h : n ≠ 0) : Fin n × Fin n :=
+  let idx := A.data.imaxRe sorry_proof
+  toIJ ord uplo idx
+
+def iminRe (A : 𝒯[K;n]) (_h : n ≠ 0) : Fin n × Fin n :=
+  let idx := A.data.iminRe sorry_proof
+  toIJ ord uplo idx
+
+
 /- Level 2 operations -/
 
 variable [LevelTwoData R K Array]
 
 def tpmv (T : 𝒯[K;n]) (trans : Transpose) (x : K^[n]) : K^[n] :=
-  ⟨LevelTwoData.tpmv ord uplo trans false n T.data 0 x.data vstrg.offset vstrg.inc, sorry_proof⟩
+  ⟨LevelTwoData.tpmv ord uplo trans false n T.data.data 0 x.data vstrg.offset vstrg.inc, sorry_proof⟩
 
 /-  Conversion to/from dense -/
 variable [LevelOneDataExt R K Array] [LevelTwoDataExt R K Array]
@@ -167,7 +178,7 @@ local notation K "^[" m "," n "]" => DenseMatrix Array mord mstrg m n K
 /-- Converts tringular matrix to dense matrix -/
 def toDense (T : 𝒯[K;n]) : K^[n,n] :=
   let Adata := LevelOneDataExt.const (n*n) 0
-  ⟨LevelTwoDataExt.packedToDense n uplo ord T.data mord Adata mstrg.offset (mstrg.lda mord n n),
+  ⟨LevelTwoDataExt.packedToDense n uplo ord T.data.data mord Adata mstrg.offset (mstrg.lda mord n n),
   sorry_proof⟩
 
 /-- Extracts triangular part of dense matrix. -/
