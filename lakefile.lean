@@ -89,6 +89,7 @@ target libopenblas pkg : FilePath := do
       return dst
 
     else
+      logInfo s!"something failed"
       addTrace <| ← computeTrace dst
       return dst
 
