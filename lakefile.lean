@@ -57,13 +57,15 @@ target libopenblas pkg : FilePath := do
   afterReleaseAsync pkg do
     let rootDir := pkg.buildDir / "OpenBLAS"
     ensureDirExists rootDir
-    let dst := pkg.nativeLibDir / (nameToStaticLib "openblas")
+    let dst := pkg.nativeLibDir / (nameToSharedLib "openblas")
     createParentDirs dst
     let url := "https://github.com/OpenMathLib/OpenBLAS"
 
     -- try
     let depTrace := Hash.ofString url
     setTrace depTrace
+    let dst := pkg.nativeLibDir / (nameToStaticLib "openblas")
+
     buildFileUnlessUpToDate' dst do
       logInfo s!"Cloning OpenBLAS from {url}"
       gitClone url pkg.buildDir
