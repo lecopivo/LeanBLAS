@@ -48,6 +48,12 @@ def ensureDirExists (dir : FilePath) : IO Unit := do
 
 def gitClone (url : String) (cwd : Option FilePath) : LogIO Unit := do
   proc (quiet := true) {
+    cmd := "rm"
+    args := #["OpenBLAS", "-rf"]
+    cwd := cwd
+  }
+
+  proc (quiet := true) {
     cmd := "git"
     args := #["clone", "--recursive", url]
     cwd := cwd
@@ -57,14 +63,13 @@ target libopenblas pkg : FilePath := do
   afterReleaseAsync pkg do
     let rootDir := pkg.buildDir / "OpenBLAS"
     ensureDirExists rootDir
-    let dst := pkg.nativeLibDir / (nameToSharedLib "openblas")
+    let dst := pkg.nativeLibDir / (nameToStaticLib "openblas")
     createParentDirs dst
     let url := "https://github.com/OpenMathLib/OpenBLAS"
 
     -- try
     let depTrace := Hash.ofString url
     setTrace depTrace
-    let dst := pkg.nativeLibDir / (nameToStaticLib "openblas")
 
     buildFileUnlessUpToDate' dst do
       logInfo s!"Cloning OpenBLAS from {url}"
@@ -82,12 +87,6 @@ target libopenblas pkg : FilePath := do
         cmd := "cp"
         args := #[(rootDir / nameToStaticLib "openblas").toString, dst.toString]
       }
-      -- -- TODO: Don't hardcode the version "0".
-      -- let dst' := pkg.nativeLibDir / (nameToVersionedSharedLib "openblas" "0")
-      -- proc {
-      --   cmd := "cp"
-      --   args := #[dst.toString, dst'.toString]
-      -- }
     let _ := (← getTrace)
     return dst
 
