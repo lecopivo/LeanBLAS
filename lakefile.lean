@@ -2,33 +2,24 @@ import Lake
 
 open Lake DSL System Lean Elab
 
-def linkArgs := #["-L.lake/build/lib", "-lopenblas"]
-def inclArgs := #["-I.lake/build/OpenBLAS/"]
-
 package leanblas {
   precompileModules := true
-  moreLinkArgs := linkArgs
 }
 
 @[default_target]
 lean_lib LeanBLAS where
   defaultFacets := #[LeanLib.sharedFacet,LeanLib.staticFacet]
-  -- moreLinkArgs := linkArgs
   roots := #[`LeanBLAS]
-
 
 @[test_driver]
 lean_exe CBLASLevelOneTest where
   root := `Test.cblas_level_one
-  moreLinkArgs := linkArgs
 
 lean_exe DenseVectorTest where
   root := `Test.dense_vector
-  -- moreLinkArgs := linkArgs
 
 lean_exe TriangularTest where
   root := `Test.packed_triangular
-
 
 ----------------------------------------------------------------------------------------------------
 -- Download and build OpenBLAS ---------------------------------------------------------------------
@@ -107,6 +98,9 @@ target libopenblas pkg : FilePath := do
 -- Build Lean ↔ BLAS bindings ---------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------
 
+def linkArgs := #["-L.lake/build/lib", "-lopenblas"]
+def inclArgs := #["-I.lake/build/OpenBLAS/"]
+
 extern_lib libleanblasc pkg := do
   let openblas ← libopenblas.fetch
   let _ ← openblas.await
@@ -120,4 +114,4 @@ extern_lib libleanblasc pkg := do
       oFiles := oFiles.push (← buildO oFile srcJob weakArgs (#["-DNDEBUG", "-O3", "-fPIC"] ++ inclArgs) "gcc" getLeanTrace)
   let name := nameToStaticLib "leanblasc"
 
-  buildLeanSharedLib (pkg.nativeLibDir / name) oFiles
+  buildLeanSharedLib (pkg.nativeLibDir / name) (oFiles.push openblas)
