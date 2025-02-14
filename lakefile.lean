@@ -58,7 +58,7 @@ target libopenblas pkg : FilePath := do
   -- afterReleaseAsync pkg do
 
     let rootDir := pkg.buildDir / "OpenBLAS"
-    ensureDirExists rootDir
+    ensureDirExists pkg.buildDir
     let dst := pkg.nativeLibDir / (nameToStaticLib "openblas")
     createParentDirs dst
 
