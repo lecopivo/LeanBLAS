@@ -57,41 +57,41 @@ target libopenblas pkg : FilePath := do
   afterReleaseAsync pkg do
     let rootDir := pkg.buildDir / "OpenBLAS"
     ensureDirExists rootDir
-    let dst := pkg.nativeLibDir / (nameToSharedLib "openblas")
+    let dst := pkg.nativeLibDir / (nameToStaticLib "openblas")
     createParentDirs dst
     let url := "https://github.com/OpenMathLib/OpenBLAS"
 
-    try
-      let depTrace := Hash.ofString url
-      setTrace depTrace
-      buildFileUnlessUpToDate' dst do
-        logInfo s!"Cloning OpenBLAS from {url}"
-        gitClone url pkg.buildDir
+    -- try
+    let depTrace := Hash.ofString url
+    setTrace depTrace
+    buildFileUnlessUpToDate' dst do
+      logInfo s!"Cloning OpenBLAS from {url}"
+      gitClone url pkg.buildDir
 
-        let numThreads := max 4 $ min 32 (← nproc)
-        let flags := #["NO_LAPACK=1", "NO_FORTRAN=1", s!"-j{numThreads}"]
-        logInfo s!"Building OpenBLAS with `make{flags.foldl (· ++ " " ++ ·) ""}`"
-        proc (quiet := true) {
-          cmd := "make"
-          args := flags
-          cwd := rootDir
-        }
-        proc {
-          cmd := "cp"
-          args := #[(rootDir / nameToSharedLib "openblas").toString, dst.toString]
-        }
-        -- TODO: Don't hardcode the version "0".
-        let dst' := pkg.nativeLibDir / (nameToVersionedSharedLib "openblas" "0")
-        proc {
-          cmd := "cp"
-          args := #[dst.toString, dst'.toString]
-        }
-      let _ := (← getTrace)
-      return dst
+      let numThreads := max 4 $ min 32 (← nproc)
+      let flags := #["NO_LAPACK=1", "NO_FORTRAN=1", s!"-j{numThreads}"]
+      logInfo s!"Building OpenBLAS with `make{flags.foldl (· ++ " " ++ ·) ""}`"
+      proc (quiet := true) {
+        cmd := "make"
+        args := flags
+        cwd := rootDir
+      }
+      proc {
+        cmd := "cp"
+        args := #[(rootDir / nameToStaticLib "openblas").toString, dst.toString]
+      }
+      -- -- TODO: Don't hardcode the version "0".
+      -- let dst' := pkg.nativeLibDir / (nameToVersionedSharedLib "openblas" "0")
+      -- proc {
+      --   cmd := "cp"
+      --   args := #[dst.toString, dst'.toString]
+      -- }
+    let _ := (← getTrace)
+    return dst
 
-    else
-      addTrace <| ← computeTrace dst
-      return dst
+    -- else
+    --   addTrace <| ← computeTrace dst
+    --   return dst
 
 ----------------------------------------------------------------------------------------------------
 -- Build Lean ↔ BLAS bindings ---------------------------------------------------------------------
