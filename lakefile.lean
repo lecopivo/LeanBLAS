@@ -111,4 +111,4 @@ extern_lib libleanblasc pkg := do
       oFiles := oFiles.push (← buildO oFile srcJob weakArgs (#["-DNDEBUG", "-O3", "-fPIC"] ++ inclArgs) "gcc" getLeanTrace)
   let name := nameToSharedLib "leanblasc"
 
-  buildLeanSharedLib (pkg.nativeLibDir / name) (#[])
+  buildLeanSharedLib (pkg.nativeLibDir / name) (#[← libopenblas.fetch])
