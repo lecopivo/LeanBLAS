@@ -68,8 +68,9 @@ target libopenblas pkg : FilePath := do
       let depTrace := Hash.ofString url
       setTrace depTrace
       buildFileUnlessUpToDate' dst do
-        logInfo s!"Cloning OpenBLAS from {url}"
+        logInfo s!"Cloning OpenBLAS from {url} to {pkg.buildDir}"
         gitClone url pkg.buildDir
+        logInfo s!"Cloning done"
 
         let numThreads := max 4 $ min 32 (← nproc)
         let flags := #["NO_LAPACK=1", "NO_FORTRAN=1", s!"-j{numThreads}"]
