@@ -54,13 +54,16 @@ def gitClone (url : String) (cwd : Option FilePath) : LogIO Unit := do
   }
 
 target libopenblas pkg : FilePath := do
-  afterReleaseAsync pkg do
+  Job.async do
+  -- afterReleaseAsync pkg do
+
     let rootDir := pkg.buildDir / "OpenBLAS"
     ensureDirExists rootDir
     let dst := pkg.nativeLibDir / (nameToStaticLib "openblas")
     createParentDirs dst
-    let url := "https://github.com/OpenMathLib/OpenBLAS"
 
+
+    let url := "https://github.com/OpenMathLib/OpenBLAS"
     try
       let depTrace := Hash.ofString url
       setTrace depTrace
@@ -71,6 +74,7 @@ target libopenblas pkg : FilePath := do
         let numThreads := max 4 $ min 32 (← nproc)
         let flags := #["NO_LAPACK=1", "NO_FORTRAN=1", s!"-j{numThreads}"]
         logInfo s!"Building OpenBLAS with `make{flags.foldl (· ++ " " ++ ·) ""}`"
+
         proc (quiet := true) {
           cmd := "make"
           args := flags
@@ -94,7 +98,7 @@ target libopenblas pkg : FilePath := do
 
 extern_lib libleanblasc pkg := do
   let openblas ← libopenblas.fetch
-  let _ ← openblas.await
+  -- let _ ← openblas.await
   let inclArgs := #[s!"-I{pkg.lakeDir / "build" / "OpenBLAS"}"]
 
   let mut oFiles : Array (Job FilePath) := #[]
@@ -106,4 +110,4 @@ extern_lib libleanblasc pkg := do
       oFiles := oFiles.push (← buildO oFile srcJob weakArgs (#["-DNDEBUG", "-O3", "-fPIC"] ++ inclArgs) "gcc" getLeanTrace)
   let name := nameToStaticLib "leanblasc"
 
-  buildLeanSharedLib (pkg.nativeLibDir / name) (oFiles.push openblas)
+  buildLeanSharedLib (pkg.nativeLibDir / name) (#[openblas] ++ oFiles)
