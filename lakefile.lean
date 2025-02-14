@@ -62,36 +62,34 @@ target libopenblas pkg : FilePath := do
     let dst := pkg.nativeLibDir / (nameToStaticLib "openblas")
     createParentDirs dst
 
-
     let url := "https://github.com/OpenMathLib/OpenBLAS"
-    try
-      let depTrace := Hash.ofString url
-      setTrace depTrace
-      buildFileUnlessUpToDate' dst do
-        logInfo s!"Cloning OpenBLAS from {url} to {pkg.buildDir}"
-        gitClone url pkg.buildDir
-        logInfo s!"Cloning done"
+    -- try
+    let depTrace := Hash.ofString url
+    setTrace depTrace
+    buildFileUnlessUpToDate' dst do
+      logInfo s!"Cloning OpenBLAS from {url} to {pkg.buildDir}"
+      gitClone url pkg.buildDir
 
-        let numThreads := max 4 $ min 32 (← nproc)
-        let flags := #["NO_LAPACK=1", "NO_FORTRAN=1", s!"-j{numThreads}"]
-        logInfo s!"Building OpenBLAS with `make{flags.foldl (· ++ " " ++ ·) ""}`"
+      let numThreads := max 4 $ min 32 (← nproc)
+      let flags := #["NO_LAPACK=1", "NO_FORTRAN=1", s!"-j{numThreads}"]
+      logInfo s!"Building OpenBLAS with `make{flags.foldl (· ++ " " ++ ·) ""}`"
 
-        proc (quiet := true) {
-          cmd := "make"
-          args := flags
-          cwd := rootDir
-        }
-        proc {
-          cmd := "cp"
-          args := #[(rootDir / nameToStaticLib "openblas").toString, dst.toString]
-        }
-      let _ := (← getTrace)
-      return dst
+      proc (quiet := true) {
+        cmd := "make"
+        args := flags
+        cwd := rootDir
+      }
+      proc {
+        cmd := "cp"
+        args := #[(rootDir / nameToStaticLib "openblas").toString, dst.toString]
+      }
+    let _ := (← getTrace)
+    return dst
 
-    else
-      logInfo s!"something failed"
-      addTrace <| ← computeTrace dst
-      return dst
+    -- catch e =>
+    --   logInfo s!"something failed"
+    --   addTrace <| ← computeTrace dst
+    --   return dst
 
 
 ----------------------------------------------------------------------------------------------------
@@ -112,4 +110,4 @@ extern_lib libleanblasc pkg := do
       oFiles := oFiles.push (← buildO oFile srcJob weakArgs (#["-DNDEBUG", "-O3", "-fPIC"] ++ inclArgs) "gcc" getLeanTrace)
   let name := nameToSharedLib "leanblasc"
 
-  buildLeanSharedLib (pkg.nativeLibDir / name) (#[← libopenblas.fetch])
+  buildLeanSharedLib (pkg.nativeLibDir / name) (#[← libopenblas.fetch] ++ oFiles)
