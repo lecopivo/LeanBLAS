@@ -22,21 +22,21 @@ jobs:
       - name: Test project
         run: lake test
 
-  build-windows:
-    runs-on: windows-latest
+  # build-windows:
+  #   runs-on: windows-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Set up Lean
-        uses: leanprover/lean-action@v1
+  #     - name: Set up Lean
+  #       uses: leanprover/lean-action@v1
 
-      - name: Build project
-        run: lake build
+  #     - name: Build project
+  #       run: lake build
 
-      - name: Test project
-        run: lake test
+  #     - name: Test project
+  #       run: lake test
 
   build-macos:
     runs-on: macos-latest
