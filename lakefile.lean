@@ -57,7 +57,7 @@ target libopenblas pkg : FilePath := do
   afterReleaseAsync pkg do
     let rootDir := pkg.buildDir / "OpenBLAS"
     ensureDirExists rootDir
-    let dst := pkg.nativeLibDir / (nameToSharedLib "openblas")
+    let dst := pkg.nativeLibDir / (nameToStaticLib "openblas")
     createParentDirs dst
     let url := "https://github.com/OpenMathLib/OpenBLAS"
 
@@ -78,13 +78,7 @@ target libopenblas pkg : FilePath := do
         }
         proc {
           cmd := "cp"
-          args := #[(rootDir / nameToSharedLib "openblas").toString, dst.toString]
-        }
-        -- TODO: Don't hardcode the version "0".
-        let dst' := pkg.nativeLibDir / (nameToVersionedSharedLib "openblas" "0")
-        proc {
-          cmd := "cp"
-          args := #[dst.toString, dst'.toString]
+          args := #[(rootDir / nameToStaticLib "openblas").toString, dst.toString]
         }
       let _ := (← getTrace)
       return dst
@@ -100,7 +94,7 @@ target libopenblas pkg : FilePath := do
 
 extern_lib libleanblasc pkg := do
   let openblas ← libopenblas.fetch
-  let _ ← openblas.await
+  let a ← openblas.await
   let inclArgs := #[s!"-I{pkg.lakeDir / "build" / "OpenBLAS"}"]
 
   let mut oFiles : Array (Job FilePath) := #[]
