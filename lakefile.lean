@@ -100,7 +100,6 @@ target libopenblas pkg : FilePath := do
 
 extern_lib libleanblasc pkg := do
   let openblas ← libopenblas.fetch
-  let _ ← openblas.await
   let inclArgs := #[s!"-I{pkg.lakeDir / "build" / "OpenBLAS"}"]
 
   let mut oFiles : Array (Job FilePath) := #[]
@@ -112,4 +111,4 @@ extern_lib libleanblasc pkg := do
       oFiles := oFiles.push (← buildO oFile srcJob weakArgs (#["-DNDEBUG", "-O3", "-fPIC"] ++ inclArgs) "gcc" getLeanTrace)
   let name := nameToStaticLib "leanblasc"
 
-  buildLeanSharedLib (pkg.nativeLibDir / name) (oFiles.push openblas)
+  buildLeanSharedLib (pkg.nativeLibDir / name) (#[openblas] ++ oFiles)
