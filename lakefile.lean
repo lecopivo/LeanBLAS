@@ -98,12 +98,10 @@ target libopenblas pkg : FilePath := do
 -- Build Lean ↔ BLAS bindings ---------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------
 
-def linkArgs := #["-L.lake/build/lib", "-lopenblas"]
-def inclArgs := #["-I.lake/build/OpenBLAS/"]
-
 extern_lib libleanblasc pkg := do
   let openblas ← libopenblas.fetch
   let _ ← openblas.await
+  let inclArgs := #[s!"-I{pkg.lakeDir / "build" / "OpenBLAS"}"]
 
   let mut oFiles : Array (Job FilePath) := #[]
   for file in (← (pkg.dir / "c").readDir) do
