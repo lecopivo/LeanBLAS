@@ -94,7 +94,7 @@ target libopenblas pkg : FilePath := do
 
 extern_lib libleanblasc pkg := do
   let openblas ← libopenblas.fetch
-  let a ← openblas.await
+  let _ ← openblas.await
   let inclArgs := #[s!"-I{pkg.lakeDir / "build" / "OpenBLAS"}"]
 
   let mut oFiles : Array (Job FilePath) := #[]
