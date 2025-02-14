@@ -48,11 +48,10 @@ def ensureDirExists (dir : FilePath) : IO Unit := do
 
 def gitClone (url : String) (cwd : Option FilePath) : LogIO Unit := do
   proc (quiet := true) {
-    cmd := "rm"
-    args := #["OpenBLAS", "-rf"]
+    cmd := "ls"
+    args := #["OpenBLAS"]
     cwd := cwd
   }
-
   proc (quiet := true) {
     cmd := "git"
     args := #["clone", "--recursive", url]
