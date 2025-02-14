@@ -47,11 +47,6 @@ def ensureDirExists (dir : FilePath) : IO Unit := do
     IO.FS.createDirAll dir
 
 def gitClone (url : String) (cwd : Option FilePath) : LogIO Unit := do
-  proc {
-    cmd := "ls"
-    args := #["OpenBLAS"]
-    cwd := cwd
-  }
   proc (quiet := true) {
     cmd := "git"
     args := #["clone", "--recursive", url]
@@ -66,32 +61,36 @@ target libopenblas pkg : FilePath := do
     createParentDirs dst
     let url := "https://github.com/OpenMathLib/OpenBLAS"
 
-    -- try
-    let depTrace := Hash.ofString url
-    setTrace depTrace
+    try
+      let depTrace := Hash.ofString url
+      setTrace depTrace
 
-    buildFileUnlessUpToDate' dst do
-      logInfo s!"Cloning OpenBLAS from {url}"
-      gitClone url pkg.buildDir
+      buildFileUnlessUpToDate' dst do
+        logInfo s!"Cloning OpenBLAS from {url}"
+        gitClone url pkg.buildDir
 
-      let numThreads := max 4 $ min 32 (← nproc)
-      let flags := #["NO_LAPACK=1", "NO_FORTRAN=1", s!"-j{numThreads}"]
-      logInfo s!"Building OpenBLAS with `make{flags.foldl (· ++ " " ++ ·) ""}`"
-      proc (quiet := true) {
-        cmd := "make"
-        args := flags
-        cwd := rootDir
-      }
+        let numThreads := max 4 $ min 32 (← nproc)
+        let flags := #["NO_LAPACK=1", "NO_FORTRAN=1", s!"-j{numThreads}"]
+        logInfo s!"Building OpenBLAS with `make{flags.foldl (· ++ " " ++ ·) ""}`"
+        proc (quiet := true) {
+          cmd := "make"
+          args := flags
+          cwd := rootDir
+        }
+        proc {
+          cmd := "cp"
+          args := #[(rootDir / nameToStaticLib "openblas").toString, dst.toString]
+        }
+      let _ := (← getTrace)
+      return dst
+
+    else
       proc {
         cmd := "cp"
         args := #[(rootDir / nameToStaticLib "openblas").toString, dst.toString]
       }
-    let _ := (← getTrace)
-    return dst
-
-    -- else
-    --   addTrace <| ← computeTrace dst
-    --   return dst
+      addTrace <| ← computeTrace dst
+      return dst
 
 ----------------------------------------------------------------------------------------------------
 -- Build Lean ↔ BLAS bindings ---------------------------------------------------------------------
