@@ -47,7 +47,7 @@ def ensureDirExists (dir : FilePath) : IO Unit := do
     IO.FS.createDirAll dir
 
 def gitClone (url : String) (cwd : Option FilePath) : LogIO Unit := do
-  proc (quiet := true) {
+  proc {
     cmd := "ls"
     args := #["OpenBLAS"]
     cwd := cwd
