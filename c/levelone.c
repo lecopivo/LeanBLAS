@@ -328,7 +328,10 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dsum(const size_t N, const b_lean_obj_ar
 
 LEAN_EXPORT lean_obj_res leanblas_cblas_daxpby(const size_t N, const double alpha, lean_obj_arg X, const size_t offX, const size_t incX,
                                                                const double beta,  lean_obj_arg Y, const size_t offY, const size_t incY){
-  if (lean_is_exclusive(X) && !lean_is_exclusive(Y)){
+  // modify `X` in place only iff we are supposed to modify *all* elements of `Y`
+  if (lean_is_exclusive(X) && !lean_is_exclusive(Y) &&
+      lean_sarray_size(X) == N && offX == 0 && incX == 1 &&
+      lean_sarray_size(Y) == N && offY == 0 && incY == 1){
     cblas_daxpby((int)N, beta, lean_float_array_cptr(Y) + offY, (int)incY, alpha, lean_float_array_cptr(X) + offX, (int)incX);
     lean_dec(Y);
     return X;
@@ -384,7 +387,10 @@ LEAN_EXPORT size_t leanblas_cblas_dimin_re(const size_t N, const b_lean_obj_arg 
 LEAN_EXPORT lean_obj_res leanblas_cblas_dmul(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX,
                                                              lean_obj_arg Y, const size_t offY, const size_t incY){
 
-  if (lean_is_exclusive(X) && !lean_is_exclusive(Y)){
+  // modify `X` in place only iff we are supposed to modify *all* elements of `Y`
+  if (lean_is_exclusive(X) && !lean_is_exclusive(Y) &&
+      lean_sarray_size(X) == N && offX == 0 && incX == 1 &&
+      lean_sarray_size(Y) == N && offY == 0 && incY == 1){
     double * xptr = lean_float_array_cptr(X);
     double * yptr = lean_float_array_cptr(Y);
     for (size_t i = 0; i < N; i++){
@@ -407,7 +413,10 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dmul(const size_t N, lean_obj_arg X, con
 
 LEAN_EXPORT lean_obj_res leanblas_cblas_ddiv(const size_t N, lean_obj_arg X, const size_t offX, const size_t incX,
                                                              lean_obj_arg Y, const size_t offY, const size_t incY){
-  if (lean_is_exclusive(X) && !lean_is_exclusive(Y)){
+  // modify `X` in place only iff we are supposed to modify *all* elements of `Y`
+  if (lean_is_exclusive(X) && !lean_is_exclusive(Y) &&
+      lean_sarray_size(X) == N && offX == 0 && incX == 1 &&
+      lean_sarray_size(Y) == N && offY == 0 && incY == 1){
     double * xptr = lean_float_array_cptr(X);
     double * yptr = lean_float_array_cptr(Y);
     for (size_t i = 0; i < N; i++){

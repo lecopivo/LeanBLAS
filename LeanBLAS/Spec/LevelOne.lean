@@ -40,6 +40,7 @@ class LevelOneData (R K : outParam Type) (Array : Type) [Scalar R K] where
 
       The result is the sum of the absolute values of the elements of the vector -/
   asum (N : Nat) (X : Array) (offX incX : Nat) : R
+
   /-- index of the element with maximum absolute value
       N : number of elements
       X : input vector
@@ -64,14 +65,17 @@ class LevelOneData (R K : outParam Type) (Array : Type) [Scalar R K] where
       The elements of Y are replaced by the elements of X -/
   copy (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array
 
-  /-- scale a vector by a constant
+  /-- add a multiple of a vector to another vector
       N : number of elements
       α : scalar
-      X : input/output vector
+      X : input vector
       offX : offset of the first element of X
       incX : stride of X
+      Y : output vector
+      offY : offset of the first element of Y
+      incY : stride of Y
 
-      The elements of X are replaced by α times the elements of X -/
+      The elements of Y are replaced by `Y + α•X`  -/
   axpy (N : Nat) (α : K) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array
 
   rotg (a b : K) : R × K × K × K
@@ -93,7 +97,9 @@ class LevelOneDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where
   iminIm (N : Nat) (X : Array) (offX incX : Nat) (h : N ≠ 0) : Nat
 
   /- Element wise operations -/
+  /-- Return `Y` with appropriate elements replaces with `xᵢ * yᵢ` -/
   mul (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array
+  /-- Return `Y` with appropriate elements replaces with `xᵢ / yᵢ` -/
   div (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) : Array
   inv (N : Nat) (X : Array) (offX incX : Nat) : Array
   abs (N : Nat) (X : Array) (offX incX : Nat) : Array
