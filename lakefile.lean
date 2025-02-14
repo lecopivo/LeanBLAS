@@ -29,7 +29,7 @@ lean_exe TriangularTest where
 
 def nproc : IO Nat := do
   let out ← IO.Process.output {cmd := "nproc", stdin := .null}
-  return out.stdout.trim.toNat!
+  return out.stdout.trim.toNat? |>.getD 1
 
 private def nameToVersionedSharedLib (name : String) (v : String) : String :=
   if Platform.isWindows then s!"{name}.dll"
