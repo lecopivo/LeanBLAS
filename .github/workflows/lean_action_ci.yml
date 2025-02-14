@@ -13,10 +13,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install BLAS
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libopenblas-dev
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
+
+      - name: Build project
+        run: lake build
+
+      - name: Test project
+        run: lake test
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Lean
         uses: leanprover/lean-action@v1
@@ -27,44 +38,12 @@ jobs:
       - name: Test project
         run: lake test
 
-  # build-windows:
-  #   runs-on: windows-latest
-
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Install MSYS2
-  #       run: |
-  #         choco install msys2
-
-  #     - name: Refresh environment variables
-  #       run: cmd.exe /C "refreshenv"
-
-  #     - name: Install BLAS
-  #       run: |
-  #         msys2 -c "pacman -Sy --noconfirm"
-  #         msys2 -c "pacman -S --noconfirm mingw-w64-x86_64-openblas"
-
-  #     - name: Set up Lean
-  #       uses: leanprover/lean-action@v1
-
-  #     - name: Build project
-  #       run: lake build
-
-  #     - name: Test project
-  #       run: lake test
-
   build-macos:
     runs-on: macos-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install BLAS
-        run: |
-          brew install openblas
 
       - name: Set up Lean
         uses: leanprover/lean-action@v1
