@@ -68,11 +68,6 @@ target libopenblas pkg : FilePath := do
     setTrace depTrace
     buildFileUnlessUpToDate' dst do
       logInfo s!"Cloning OpenBLAS from {url} to {pkg.buildDir}"
-      proc (quiet := true) {
-        cmd := "ls"
-        args := #[rootDir.toString]
-        cwd := rootDir
-      }
 
       gitClone url pkg.buildDir
 
