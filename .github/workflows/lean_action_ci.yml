@@ -13,6 +13,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install BLAS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libopenblas-dev
+
       - name: Set up Lean
         uses: leanprover/lean-action@v1
 
@@ -51,6 +56,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Install BLAS
+        run: |
+          brew install openblas
 
       - name: Set up Lean
         uses: leanprover/lean-action@v1
