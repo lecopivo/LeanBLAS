@@ -42,7 +42,7 @@ end DenseMatrix
 
 /-- Dense matrix with `m` rows and `n` columns.  -/
 structure DenseMatrix (Array : Type) (order : Order) (strg : DenseMatrix.Storage) (m n : Nat)
-    {R : Type} (K : Type) [Scalar R K] [LevelOneData R K Array]
+    {R : Type} (K : Type) [RCLike R] [RCLike K] [LevelOneData Array R K]
   where
   data : Array
   valid_storage : strg.IsValid order (size data) m n
@@ -51,9 +51,9 @@ structure DenseMatrix (Array : Type) (order : Order) (strg : DenseMatrix.Storage
 namespace DenseMatrix
 
 variable
-  {Array : Type} {R K : Type} {n m : Nat} {ord : Order} {mstrg : Storage} [Scalar R R] [Scalar R K]
+  {Array : Type} {R K : Type} {n m : Nat} {ord : Order} {mstrg : Storage} [RCLike R] [RCLike K]
   {vstrg : DenseVector.Storage}
-  [LevelOne R K Array]
+  [LevelOne Array R K]
 
 
 local notation K "^[" m ", " n "]" => DenseMatrix Array ord mstrg m n K

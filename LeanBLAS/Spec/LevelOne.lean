@@ -1,10 +1,13 @@
-import LeanBLAS.Scalar
+import LeanBLAS.Spec.Scalar
+import Mathlib.Analysis.SpecialFunctions.Sqrt
+import Mathlib.Analysis.NormedSpace.RCLike
+
 
 namespace BLAS
 
 def sum {X} [OfNat X 0] [Add X] (f : Fin n → X) : X := Fin.foldl (init:=(0:X)) n (fun s i => s + f i)
 
-class LevelOneData (R K : outParam Type) (Array : Type) [Scalar R K] where
+class LevelOneData (Array : Type*) (R K : outParam Type*) where
 
   size (X : Array) : Nat
   get (X : Array) (i : Nat) : K
@@ -84,7 +87,7 @@ class LevelOneData (R K : outParam Type) (Array : Type) [Scalar R K] where
 
   scal (N : Nat) (α : K) (X : Array) (offX incX : Nat) : Array
 
-class LevelOneDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where
+class LevelOneDataExt (Array : Type*) (R K : outParam Type*) where
   const (N : Nat) (a : K) : Array
   sum (N : Nat) (X : Array) (offX incX : Nat) : K
   axpby (N : Nat) (a : K) (X : Array) (offX incX : Nat) (b : K)  (Y : Array) (offY incY : Nat) : Array
@@ -116,7 +119,7 @@ export LevelOneData (get dot nrm2 asum iamax swap copy axpy rotg rotmg rot scal)
 
 section
 
-variable {R C : Type} {Array : Type} [Scalar R R] [Scalar R C] [BLAS.LevelOneData R C Array]
+variable {R C : Type*} {Array : Type*} [RCLike R] [RCLike K] [BLAS.LevelOneData Array R C]
 
 open BLAS.LevelOneData
 
@@ -127,8 +130,8 @@ structure InBounds (X : Array) (offX incX) (i : Nat) where
 
 end
 
-open BLAS.LevelOneData Scalar in
-class LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [BLAS.LevelOneData R C Array] : Prop  where
+open BLAS.LevelOneData ComplexConjugate in
+class LevelOneSpec (Array : Type*) (R C : outParam Type*) [RCLike R] [RCLike C] [LevelOneData Array R C] : Prop  where
 
   ofFn_size (f : Fin n → C) :
     size (ofFn (Array:=Array) f) = n
@@ -140,7 +143,7 @@ class LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [BLAS.L
     →
     (dot N X offX incX Y offY incY)
     =
-    (sum (fun i : Fin N => conj (get X (offX + i.1*incX)) * get Y (offY + i.1*incY)))
+    ∑ (i : Fin N), conj (get X (offX + i.1*incX)) * get Y (offY + i.1*incY)
 
 
   norm2_spc (N : Nat) (X : Array) (offX incX : Nat) :
@@ -148,7 +151,7 @@ class LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [BLAS.L
     →
     (nrm2 N X offX incX)
     =
-    (real (sqrt (sum (fun i : Fin N => let x := get X (offX + i.1*incX); x * conj x))))
+    Real.sqrt (∑ i : Fin N, (toComplex (get X (offX + i.1*incX))).normSq)
 
 
   asum_spec (N : Nat) (X : Array) (offX incX : Nat) :
@@ -156,7 +159,7 @@ class LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [BLAS.L
     →
     (asum N X offX incX)
     =
-    (sum (fun i : Fin N => abs (get X (offX + i.1*incX))))
+    (∑ (i : Fin N), let x := (toComplex (get X (offX + i.1*incX))); |x.re| + |x.im|)
 
   -- iamax_spec
 
@@ -248,6 +251,5 @@ attribute [simp]
   LevelOneSpec.scal_size
 
 
-
-class LevelOne (R K : Type) (Array : Type) [Scalar R R] [Scalar R K]
-    extends BLAS.LevelOneData R K Array, BLAS.LevelOneSpec R K Array
+class LevelOne (Array : Type*) (R K : outParam Type*) [RCLike R] [RCLike K]
+    extends BLAS.LevelOneData Array R K, BLAS.LevelOneSpec Array R K

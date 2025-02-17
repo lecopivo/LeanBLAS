@@ -30,7 +30,7 @@ inductive Diag where
   | Unit
 deriving BEq, DecidableEq
 
-class LevelTwoData (R K : outParam Type) (Array : Type) [Scalar R K] where
+class LevelTwoData (Array : Type*) (R K : outParam Type*) where
 
   /-- General matrix-vector multiplication
   ```
@@ -93,7 +93,7 @@ class LevelTwoData (R K : outParam Type) (Array : Type) [Scalar R K] where
 
 
 /-- Level 2 BLAS function that seems to be missing from the BLAS standard. -/
-class LevelTwoDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where
+class LevelTwoDataExt (Array : Type*) (R K : outParam Type*) where
 
   /-- Copies packed matrix `X` to dense matrix `A`.
   It will zero out elements that are above/bellow the main diagonal. -/
@@ -114,3 +114,6 @@ class LevelTwoDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where
     (X : Array) (offX incX : Nat)
     (Y : Array) (offY incY : Nat)
     (A : Array) (offA : Nat) : array
+
+
+-- todo: add spec!!!

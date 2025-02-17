@@ -35,7 +35,7 @@ end DenseVector
 
 /-- Dense vector -/
 structure DenseVector (Array : Type) (strg : DenseVector.Storage) (n : Nat)
-      {R : Type} (K : Type) [Scalar R K] [LevelOneData R K Array]
+      {R : Type} (K : Type) [RCLike R] [RCLike K] [LevelOneData Array R K]
     where
   data : Array
   valid_storage : strg.IsValid (size data) n
@@ -43,8 +43,8 @@ structure DenseVector (Array : Type) (strg : DenseVector.Storage) (n : Nat)
 
 namespace DenseVector
 
-variable {R K Array : Type} [Scalar R R] [Scalar R K] [LevelOne R K Array]
-  [LevelOneDataExt R K Array]
+variable {R K Array : Type} [RCLike R] [RCLike K] [LevelOne Array R K]
+  [LevelOneDataExt Array R K]
   {n m : Nat} {vstrg vstrg' : Storage}
 
 local notation K "^[" n "]"  => DenseVector Array vstrg n K
@@ -70,14 +70,14 @@ def set (x : K^[n]) (i : Fin n) (v : K) : K^[n] :=
   | .normal => ⟨LevelOneData.set x.data i v, sorry_proof⟩
   | .subvector offset inc => ⟨LevelOneData.set x.data (offset + i.1*inc) v, sorry_proof⟩
 
-omit [LevelOneDataExt R K Array] in
+omit [LevelOneDataExt Array R K] in
 @[simp]
 theorem get_ofFn (f : Fin n → K) (i : Fin n) :
     get (ofFn (Array:=Array) (vstrg:=vstrg) f) i = f i := by
   simp [ofFn, get, LevelOneData.get]
   exact sorry_proof
 
-omit [LevelOneDataExt R K Array] in
+omit [LevelOneDataExt Array R K] in
 @[simp]
 theorem ofFn_get (x : DenseVector Array .normal n K) :
     ofFn (fun i' => get x i') = x := by
@@ -181,7 +181,7 @@ def setArray (x : K^[n]) (y : K^[n]') : K^[n] :=
 
 
 ----------------------------------------------------------------------------------------------------
-variable [LevelTwoData R K Array]
+variable [LevelTwoData Array R K]
 
 /-- Multiply vector `x` by lower/upper triangular matrix `Ap` in packed storage format. -/
 def triangularMul {n : Nat} (Ap : DenseVector Array .normal (n*(n+1)/2) K) (x : K^[n])

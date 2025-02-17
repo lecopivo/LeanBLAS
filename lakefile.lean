@@ -3,7 +3,7 @@ import Lake
 open Lake DSL System Lean Elab
 
 package leanblas {
-  precompileModules := true
+  -- precompileModules := true
 }
 
 @[default_target]
@@ -112,3 +112,6 @@ extern_lib libleanblasc pkg := do
   let name := nameToStaticLib "leanblasc"
 
   buildLeanSharedLib (pkg.nativeLibDir / name) (#[openblas] ++ oFiles)
+
+
+require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.16.0"
