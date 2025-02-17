@@ -2,14 +2,38 @@ import Lake
 
 open Lake DSL System Lean Elab
 
+require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.16.0"
+
+def linkArgs :=
+  if System.Platform.isWindows then
+    #[]
+  else if System.Platform.isOSX then
+    #["-L/opt/homebrew/opt/openblas/lib", "-lblas"]
+  else -- assuming linux
+    #["-L/usr/lib/x86_64-linux-gnu/", "-lblas"]
+def inclArgs :=
+  if System.Platform.isWindows then
+    #[]
+  else if System.Platform.isOSX then
+    #["-I/opt/homebrew/opt/openblas/include"]
+  else -- assuming linux
+    #[]
+
+
 package leanblas {
   precompileModules := true
+  moreLinkArgs := linkArgs
+  moreLeancArgs := inclArgs
 }
 
 @[default_target]
 lean_lib LeanBLAS where
   defaultFacets := #[LeanLib.sharedFacet,LeanLib.staticFacet]
   roots := #[`LeanBLAS]
+
+-- lean_lib LeanBLASCompiled where
+--   roots := #[`LeanBLAS.CBLAS.LevelOneFloat64]
+--   precompileModules := true
 
 @[test_driver]
 lean_exe CBLASLevelOneTest where
@@ -23,13 +47,13 @@ lean_exe TriangularTest where
 
 ----------------------------------------------------------------------------------------------------
 -- Download and build OpenBLAS ---------------------------------------------------------------------
--- --------------------------------------------------------------------------------------------------
+-- -------------------------------------------------------------------------------------------------
 -- This code was taken from: https://github.com/lean-dojo/LeanCopilot/blob/92a5ab6b58d06df8fd60d98dc38b1f674706eaad/lakefile.lean
 ----------------------------------------------------------------------------------------------------
 
 def nproc : IO Nat := do
   let out ← IO.Process.output {cmd := "nproc", stdin := .null}
-  return out.stdout.trim.toNat? |>.getD 1
+  return min 1 ((out.stdout.trim.toNat? |>.getD 1) - 4)
 
 private def nameToVersionedSharedLib (name : String) (v : String) : String :=
   if Platform.isWindows then s!"{name}.dll"
@@ -99,8 +123,9 @@ target libopenblas pkg : FilePath := do
 ----------------------------------------------------------------------------------------------------
 
 extern_lib libleanblasc pkg := do
-  let openblas ← libopenblas.fetch
-  let _ ← openblas.await -- hack :(
+  -- let openblas ← libopenblas.fetch
+  -- -- hack :( this will cause `lake build` to freeze on `⣿ [?/?] Computing build jobs` for some time
+  -- let _ ← openblas.await
   let inclArgs := #[s!"-I{pkg.lakeDir / "build" / "OpenBLAS"}"]
 
   let mut oFiles : Array (Job FilePath) := #[]
@@ -112,7 +137,5 @@ extern_lib libleanblasc pkg := do
       oFiles := oFiles.push (← buildO oFile srcJob weakArgs (#["-DNDEBUG", "-O3", "-fPIC"] ++ inclArgs) "gcc" getLeanTrace)
   let name := nameToStaticLib "leanblasc"
 
-  buildLeanSharedLib (pkg.nativeLibDir / name) (#[openblas] ++ oFiles)
-
-
-require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.16.0"
+  -- buildLeanSharedLib (pkg.nativeLibDir / name) (#[openblas] ++ oFiles)
+  buildLeanSharedLib (pkg.nativeLibDir / name) (oFiles)

@@ -9,11 +9,13 @@ open Sorry RCLike
 
 local notation "𝓚" => algebraMap ℝ _
 
+noncomputable
 def toReal {𝕜} [RCLike 𝕜] (x : 𝕜) : ℝ := re x
 
 noncomputable
 def fromReal (𝕜 : Type*) [RCLike 𝕜] (x : ℝ) : 𝕜 := 𝓚 (re x)
 
+noncomputable
 def toComplex {𝕜} [RCLike 𝕜] (x : 𝕜) : ℂ := ⟨re x, im x⟩
 
 noncomputable
