@@ -3,7 +3,7 @@ import Lake
 open Lake DSL System Lean Elab
 
 package leanblas {
-  -- precompileModules := true
+  precompileModules := true
 }
 
 @[default_target]
