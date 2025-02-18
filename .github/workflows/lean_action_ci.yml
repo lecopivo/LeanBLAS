@@ -4,75 +4,61 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
 
 jobs:
-  build-ubuntu:
-    runs-on: ubuntu-latest
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+        - name: Linux-x86_64
+          os: ubuntu-latest
+        - name: macOS-aarch64
+          os: macos-latest
+        - name: macOS-x86_64
+          os: macos-13
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Install BLAS
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libopenblas-dev
+    - name: Install BLAS/Linux
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libopenblas-dev
 
-      - name: Set up Lean
-        uses: leanprover/lean-action@v1
+    - name: Install BLAS/MacOS
+      if: runner.os == 'macOS'
+      run: |
+        brew install openblas
 
-      - name: Build project
-        run: lake build
+    - name: Set up Lean
+      uses: leanprover/lean-action@v1
+      with:
+        auto-config: false
+        use-github-cache: false
+        
+    - name: Build project
+      run: lake build
 
-      - name: Test project
-        run: lake test
+    - name: Test project
+      run: lake test
 
-      - name: Upload Release Artifact
-        if: github.event_name == 'release'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.event.release.tag_name }}
-        run: lake upload $TAG
+    - name: Purge Disk Cache # https://github.com/actions/runner-images/issues/2619
+      if: github.event_name == 'release' && runner.os == 'macOS'
+      run: sudo /usr/sbin/purge
 
-  # build-windows:
-  #   runs-on: windows-latest
+    - name: Upload Release Artifact
+      if: github.event_name == 'release'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TAG: ${{ github.event.release.tag_name }}
+      run: lake upload $TAG
 
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Set up Lean
-  #       uses: leanprover/lean-action@v1
-
-  #     - name: Build project
-  #       run: lake build
-
-  #     - name: Test project
-  #       run: lake test
-
-  build-macos:
-    runs-on: macos-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install BLAS
-        run: |
-          brew install openblas
-
-      - name: Set up Lean
-        uses: leanprover/lean-action@v1
-
-      - name: Build project
-        run: lake build
-
-      - name: Test project
-        run: lake test
-
-      - name: Upload Release Artifact
-        if: github.event_name == 'release'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.event.release.tag_name }}
-        run: lake upload $TAG

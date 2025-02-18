@@ -8,7 +8,7 @@ namespace BLAS
 This class is used to define function either for real or complex numbers.
 
  -/
-class Scalar (R : outParam Type) (K : Type) extends Add K, Sub K, Mul K, Div K, Neg K where
+class Scalar (R : outParam (Type _)) (K : Type _) extends Add K, Sub K, Mul K, Div K, Neg K where
   intro ::
 
   mk : R → R→ K

@@ -10,8 +10,8 @@ namespace BLAS
 open LevelOneData LevelTwoData BLAS.Sorry
 
 /-- Triangular matrix storing data in packed format i.e. array with `(n*(n+1))/2` elements.  -/
-structure TriangularMatrix (Array : Type) (order : Order) (uplo : UpLo) (n : Nat)
-    {R : Type} (K : Type) [Scalar R K] [LevelOneData R K Array]
+structure TriangularMatrix (Array : Type _) (order : Order) (uplo : UpLo) (n : Nat)
+    {R : Type} (K : Type) [Scalar R K] [LevelOneData Array R K]
   where
   data : DenseVector Array .normal ((n*(n+1))/2) K
 
@@ -27,7 +27,7 @@ variable
   {Array : Type}  {m n : Nat} {ord : Order} {uplo : UpLo}
   {R K : Type} [Scalar R R] [Scalar R K]
   {vstrg : DenseVector.Storage}
-  [LevelOne R K Array]
+  [LevelOne Array R K]
 
 /-- Triangular `n×n` matrix -/
 local notation "𝒯[" K ";" n "]" => TriangularMatrix Array ord uplo n K
@@ -148,7 +148,7 @@ def scal (a : K) (A : 𝒯[K;n]) : 𝒯[K;n] :=
 -- def diagonal (T : 𝒯[K;n]) : K^[n] := sorry
 
 /- Level 1 extensions -/
-variable [LevelOneDataExt R K Array]
+variable [LevelOneDataExt Array R K]
 
 def zero : 𝒯[K;n] := ⟨DenseVector.const _ _ 0⟩
 def mul (A B : 𝒯[K;n]) : 𝒯[K;n] := ⟨A.data.mul B.data⟩
@@ -163,13 +163,13 @@ def iminRe (A : 𝒯[K;n]) (_h : n ≠ 0) : Fin n × Fin n :=
 
 /- Level 2 operations -/
 
-variable [LevelTwoData R K Array]
+variable [LevelTwoData Array R K]
 
 def tpmv (T : 𝒯[K;n]) (trans : Transpose) (x : K^[n]) : K^[n] :=
   ⟨LevelTwoData.tpmv ord uplo trans false n T.data.data 0 x.data vstrg.offset vstrg.inc, sorry_proof⟩
 
 /-  Conversion to/from dense -/
-variable [LevelOneDataExt R K Array] [LevelTwoDataExt R K Array]
+variable [LevelOneDataExt Array R K] [LevelTwoDataExt Array R K]
 
 variable  {mstrg : DenseMatrix.Storage} {mord : Order}
 

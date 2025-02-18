@@ -245,7 +245,7 @@ def scal (a : K) (A : K^[m,n])   : K^[m,n] := lift A (LevelOneData.scal (α:=a))
 
 /- Level 1 operations extension -/
 
-variable [LevelOneDataExt R K Array]
+variable [LevelOneDataExt Array R K]
 
 def const (m n : Nat) (mstrg : Storage) (k : K) : DenseMatrix Array ord mstrg m n K :=
   match mstrg with
@@ -390,7 +390,7 @@ def diagonal (A : K^[n,n]) : K^[n] :=
 
 /-  Level 2 operations -/
 
-variable  [LevelTwoData R K Array]
+variable  [LevelTwoData Array R K]
 
 def gemv (a : K) (A : K^[m,n]) (x : K^[n]) (b : K) (y : K^[m]) : K^[m] :=
   ⟨LevelTwoData.gemv ord .NoTrans m n a
