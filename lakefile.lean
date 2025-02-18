@@ -91,6 +91,10 @@ target libopenblas pkg : FilePath := do
       return dst
 
     else
+      proc {
+        cmd := "cp"
+        args := #[(rootDir / nameToSharedLib "openblas").toString, dst.toString]
+      }
       addTrace <| ← computeTrace dst
       return dst
 
