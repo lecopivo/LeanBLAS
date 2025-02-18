@@ -32,7 +32,7 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y libblas-dev
+        sudo apt-get install -y libopenblas-dev
 
     - name: Install BLAS/MacOS
       if: runner.os == 'macOS'
