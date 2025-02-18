@@ -13,7 +13,7 @@ def inclArgs :=
   if System.Platform.isWindows then
     #[]
   else if System.Platform.isOSX then
-    #["-I/opt/homebrew/opt/openblas/include"]
+    #["-I/opt/homebrew/opt/openblas/include","-I/usr/local/opt/openblas"]
   else -- assuming linux
     #[]
 
