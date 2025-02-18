@@ -17,7 +17,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libopenblas-dev
-          sudo ln -s /usr/lib/x86_64-linux-gnu/libopenblas.so /usr/lib/x86_64-linux-gnu/libblas.so
           lake update
 
       - name: Set up Lean
