@@ -3,16 +3,16 @@ import Lake
 open Lake DSL System Lean Elab
 
 -- pkg-config --libs --cflags openblas
-def linkArgs := (#["-L.lake/build/lib", "-lopenblas"] : Array String)
+-- def linkArgs := (#["-L.lake/build/lib", "-lopenblas"] : Array String)
 
--- def linkArgs := (#[] : Array String)
-  -- if System.Platform.isWindows then
-  --   #[]
-  -- else if System.Platform.isOSX then
-  --   #["-L/opt/homebrew/opt/openblas/lib",
-  --     "-L/usr/local/opt/openblas/lib", "-lblas"]
-  -- else -- assuming linux
-  --   #["-L/usr/lib/x86_64-linux-gnu/", "-lblas"]
+def linkArgs := -- (#[] : Array String)
+  if System.Platform.isWindows then
+    #[]
+  else if System.Platform.isOSX then
+    #["-L/opt/homebrew/opt/openblas/lib",
+      "-L/usr/local/opt/openblas/lib", "-lblas"]
+  else -- assuming linux
+    #["-L/usr/lib/x86_64-linux-gnu/", "-lblas"]
 def inclArgs :=
   if System.Platform.isWindows then
     #[]
@@ -36,7 +36,7 @@ lean_lib LeanBLASCompiled where
   roots := #[`LeanBLAS.CBLAS.LevelOneFloat64, `LeanBLAS.CBLAS.LevelTwoFloat64]
   precompileModules := true
 
-require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.16.0"
+require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "master"
 
 @[test_driver]
 lean_exe CBLASLevelOneTest where
@@ -135,9 +135,10 @@ target libopenblas pkg : FilePath := do
 ----------------------------------------------------------------------------------------------------
 
 extern_lib libleanblasc pkg := do
-  let openblas ← libopenblas.fetch
+  -- let openblas ← libopenblas.fetch
+  -- pkg.afterBuildCacheAsync <| openblas.bindM fun d => do
 
-  pkg.afterBuildCacheAsync <| openblas.bindM fun d => do
+  pkg.afterBuildCacheAsync do
     let mut oFiles : Array (Job FilePath) := #[]
     for file in (← (pkg.dir / "c").readDir) do
       if file.path.extension == some "c" then
