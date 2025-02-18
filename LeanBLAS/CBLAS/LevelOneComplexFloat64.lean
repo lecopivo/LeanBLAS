@@ -1,8 +1,6 @@
 import LeanBLAS.ComplexFloat
-import LeanBLAS.Spec.LevelOne
 
-namespace BLAS
-
+namespace BLAS.CBLAS
 
 /-- zdot (complex dot product)
 

@@ -1,11 +1,9 @@
-import LeanBLAS.Spec.Scalar
 import Mathlib.Analysis.SpecialFunctions.Sqrt
 import Mathlib.Analysis.NormedSpace.RCLike
 
+import LeanBLAS.Spec.Scalar
 
 namespace BLAS
-
-def sum {X} [OfNat X 0] [Add X] (f : Fin n → X) : X := Fin.foldl (init:=(0:X)) n (fun s i => s + f i)
 
 class LevelOneData (Array : Type*) (R K : outParam Type*) where
 

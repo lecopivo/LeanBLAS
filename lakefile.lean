@@ -20,19 +20,20 @@ def inclArgs :=
     #[]
 
 package leanblas {
-  precompileModules := true
   moreLinkArgs := linkArgs
   preferReleaseBuild := true
 }
 
 @[default_target]
 lean_lib LeanBLAS where
-  defaultFacets := #[LeanLib.sharedFacet,LeanLib.staticFacet]
+  -- defaultFacets := #[LeanLib.sharedFacet,LeanLib.staticFacet]
   roots := #[`LeanBLAS]
 
--- lean_lib LeanBLASCompiled where
---   roots := #[`LeanBLAS.CBLAS.LevelOneFloat64]
---   precompileModules := true
+lean_lib LeanBLASCompiled where
+  roots := #[`LeanBLAS.CBLAS.LevelOneFloat64, `LeanBLAS.CBLAS.LevelTwoFloat64]
+  precompileModules := true
+
+require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.16.0"
 
 @[test_driver]
 lean_exe CBLASLevelOneTest where
