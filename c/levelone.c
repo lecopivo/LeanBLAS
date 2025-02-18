@@ -251,7 +251,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_drot(const size_t N, lean_obj_arg X, con
   ensure_exclusive_float_array(&X);
   ensure_exclusive_float_array(&Y);
   cblas_drot((int)N, lean_float_array_cptr(X) + offX, (int)incX, lean_float_array_cptr(Y) + offY, (int)incY, c, s);
-
+ 
   lean_obj_res res = lean_alloc_ctor(0, 2, 0);
   lean_ctor_set(res, 0, X);
   lean_ctor_set(res, 1, Y);
