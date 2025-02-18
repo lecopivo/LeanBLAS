@@ -4,6 +4,7 @@ open Lake DSL System Lean Elab
 
 package leanblas {
   precompileModules := true
+  preferReleaseBuild := true
 }
 
 @[default_target]
