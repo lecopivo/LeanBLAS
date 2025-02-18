@@ -125,7 +125,7 @@ target libopenblas pkg : FilePath := do
 ----------------------------------------------------------------------------------------------------
 
 extern_lib libleanblasc pkg := do
-  pkg.afterBuildCacheAsync do
+  -- pkg.afterBuildCacheAsync do
   -- let openblas ← libopenblas.fetch
   let mut oFiles : Array (Job FilePath) := #[]
   for file in (← (pkg.dir / "c").readDir) do
