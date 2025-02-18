@@ -15,7 +15,7 @@
  */
 void cblas_dgpr(const enum CBLAS_ORDER order,
                 const enum CBLAS_UPLO Uplo,
-                const blasint N,
+                const int N,
                 const double alpha,
                 const double *X, int incX,
                 const double *Y, int incY,
