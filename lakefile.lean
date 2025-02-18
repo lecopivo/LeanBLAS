@@ -95,6 +95,11 @@ target libopenblas pkg : FilePath := do
         cmd := "cp"
         args := #[(rootDir / nameToSharedLib "openblas").toString, dst.toString]
       }
+      let dst' := pkg.nativeLibDir / (nameToVersionedSharedLib "openblas" "0")
+      proc {
+        cmd := "cp"
+        args := #[dst.toString, dst'.toString]
+      }
       addTrace <| ← computeTrace dst
       return dst
 
