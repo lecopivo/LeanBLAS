@@ -13,6 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install BLAS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libopenblas-dev
+          sudo ln -s /usr/lib/x86_64-linux-gnu/libopenblas.so /usr/lib/x86_64-linux-gnu/libblas.so
+          lake update
+
       - name: Set up Lean
         uses: leanprover/lean-action@v1
 
@@ -23,7 +30,7 @@ jobs:
         run: lake test
 
       - name: Upload Release Artifact
-        # if: github.event_name == 'release'
+        if: github.event_name == 'release'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ github.event.release.tag_name }}
@@ -52,6 +59,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install BLAS
+        run: |
+          brew install openblas
+
       - name: Set up Lean
         uses: leanprover/lean-action@v1
 
@@ -62,7 +73,7 @@ jobs:
         run: lake test
 
       - name: Upload Release Artifact
-        # if: github.event_name == 'release'
+        if: github.event_name == 'release'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ github.event.release.tag_name }}

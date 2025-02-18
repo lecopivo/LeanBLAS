@@ -2,8 +2,24 @@ import Lake
 
 open Lake DSL System Lean Elab
 
+def linkArgs :=
+  if System.Platform.isWindows then
+    #[]
+  else if System.Platform.isOSX then
+    #["-L/opt/homebrew/opt/openblas/lib", "-lblas"]
+  else -- assuming linux
+    #["-L/usr/lib/x86_64-linux-gnu/", "-lblas"]
+def inclArgs :=
+  if System.Platform.isWindows then
+    #[]
+  else if System.Platform.isOSX then
+    #["-I/opt/homebrew/opt/openblas/include"]
+  else -- assuming linux
+    #[]
+
 package leanblas {
   precompileModules := true
+  moreLinkArgs := linkArgs
   preferReleaseBuild := true
 }
 
@@ -109,9 +125,7 @@ target libopenblas pkg : FilePath := do
 ----------------------------------------------------------------------------------------------------
 
 extern_lib libleanblasc pkg := do
-  let openblas ← libopenblas.fetch
-  let inclArgs := #[s!"-I{pkg.lakeDir / "build" / "OpenBLAS"}"]
-
+  -- let openblas ← libopenblas.fetch
   let mut oFiles : Array (Job FilePath) := #[]
   for file in (← (pkg.dir / "c").readDir) do
     if file.path.extension == some "c" then
@@ -121,4 +135,5 @@ extern_lib libleanblasc pkg := do
       oFiles := oFiles.push (← buildO oFile srcJob weakArgs (#["-DNDEBUG", "-O3", "-fPIC"] ++ inclArgs) "gcc" getLeanTrace)
   let name := nameToStaticLib "leanblasc"
 
-  buildLeanSharedLib (pkg.nativeLibDir / name) (#[openblas] ++ oFiles)
+  -- buildLeanSharedLib (pkg.nativeLibDir / name) (#[openblas] ++ oFiles)
+  buildLeanSharedLib (pkg.nativeLibDir / name) (oFiles)
