@@ -276,7 +276,7 @@ opaque dsyr2 (order : Order) (uplo : UpLo) (N : USize) (alpha : Float)
     (Y : @& FloatArray) (offY incY : USize)
     (A : FloatArray) (offA : USize) (lda : USize) : FloatArray
 
-instance : LevelTwoData Float Float FloatArray where
+instance : LevelTwoData FloatArray Float Float where
 
   gemv order trans M N a A offA ldaA X offX incX b Y offY incY :=
     dgemv order trans M.toUSize N.toUSize a

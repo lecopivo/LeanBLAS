@@ -4,7 +4,7 @@ namespace BLAS
 
 def sum {X} [OfNat X 0] [Add X] (f : Fin n → X) : X := Fin.foldl (init:=(0:X)) n (fun s i => s + f i)
 
-class LevelOneData (R K : outParam Type) (Array : Type) [Scalar R K] where
+class LevelOneData (Array : Type _) (R K : outParam (Type _)) [Scalar R K] where
 
   size (X : Array) : Nat
   get (X : Array) (i : Nat) : K
@@ -84,7 +84,7 @@ class LevelOneData (R K : outParam Type) (Array : Type) [Scalar R K] where
 
   scal (N : Nat) (α : K) (X : Array) (offX incX : Nat) : Array
 
-class LevelOneDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where
+class LevelOneDataExt (Array : Type _) (R K : outParam (Type _)) [Scalar R K] where
   const (N : Nat) (a : K) : Array
   sum (N : Nat) (X : Array) (offX incX : Nat) : K
   axpby (N : Nat) (a : K) (X : Array) (offX incX : Nat) (b : K)  (Y : Array) (offY incY : Nat) : Array
@@ -116,7 +116,7 @@ export LevelOneData (get dot nrm2 asum iamax swap copy axpy rotg rotmg rot scal)
 
 section
 
-variable {R C : Type} {Array : Type} [Scalar R R] [Scalar R C] [BLAS.LevelOneData R C Array]
+variable {R C : Type _} {Array : Type _} [Scalar R R] [Scalar R C] [BLAS.LevelOneData Array R C]
 
 open BLAS.LevelOneData
 
@@ -128,7 +128,7 @@ structure InBounds (X : Array) (offX incX) (i : Nat) where
 end
 
 open BLAS.LevelOneData Scalar in
-class LevelOneSpec (R C : Type) (Array : Type) [Scalar R R] [Scalar R C] [BLAS.LevelOneData R C Array] : Prop  where
+class LevelOneSpec (Array : Type _) (R C : Type _) [Scalar R R] [Scalar R C] [BLAS.LevelOneData Array R C] : Prop  where
 
   ofFn_size (f : Fin n → C) :
     size (ofFn (Array:=Array) f) = n
@@ -249,5 +249,5 @@ attribute [simp]
 
 
 
-class LevelOne (R K : Type) (Array : Type) [Scalar R R] [Scalar R K]
-    extends BLAS.LevelOneData R K Array, BLAS.LevelOneSpec R K Array
+class LevelOne (Array : Type _) (R K : outParam (Type _)) [Scalar R R] [Scalar R K]
+    extends BLAS.LevelOneData Array R K, BLAS.LevelOneSpec Array R K

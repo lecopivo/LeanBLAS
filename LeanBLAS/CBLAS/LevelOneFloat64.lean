@@ -264,7 +264,7 @@ opaque dscal (N : USize) (a : Float) (X : FloatArray) (offX incX : USize) : Floa
 
 
 
-instance : LevelOneData Float Float FloatArray where
+instance : LevelOneData  FloatArray Float Float where
   size x := x.size
   get x i := x.get! i
   set x i v := x.set! i v
@@ -288,9 +288,9 @@ instance : LevelOneData Float Float FloatArray where
 
 
 @[instance]
-axiom cblasLevelOneDoubleAxiom : BLAS.LevelOneSpec Float Float FloatArray
+axiom cblasLevelOneDoubleAxiom : BLAS.LevelOneSpec FloatArray Float Float
 
-instance : BLAS.LevelOne Float Float FloatArray := ⟨⟩
+instance : BLAS.LevelOne FloatArray Float Float := ⟨⟩
 
 
 -- class LevelOneDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where
@@ -579,7 +579,7 @@ opaque dcos (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatAr
 
 
 set_option linter.unusedVariables false in
-instance : LevelOneDataExt Float Float FloatArray where
+instance : LevelOneDataExt FloatArray Float Float where
   const N a := dconst N.toUSize a
   sum N X offX incX := dsum N.toUSize X offX.toUSize incX.toUSize
   axpby N a X offX incX b Y offY incY := daxpby N.toUSize a X offX.toUSize incX.toUSize b Y offY.toUSize incY.toUSize

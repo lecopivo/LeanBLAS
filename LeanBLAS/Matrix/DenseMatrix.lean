@@ -41,8 +41,8 @@ end DenseMatrix
 
 
 /-- Dense matrix with `m` rows and `n` columns.  -/
-structure DenseMatrix (Array : Type) (order : Order) (strg : DenseMatrix.Storage) (m n : Nat)
-    {R : Type} (K : Type) [Scalar R K] [LevelOneData R K Array]
+structure DenseMatrix (Array : Type _) (order : Order) (strg : DenseMatrix.Storage) (m n : Nat)
+    {R : Type _} (K : Type _) [Scalar R K] [LevelOneData Array R K]
   where
   data : Array
   valid_storage : strg.IsValid order (size data) m n
@@ -51,9 +51,9 @@ structure DenseMatrix (Array : Type) (order : Order) (strg : DenseMatrix.Storage
 namespace DenseMatrix
 
 variable
-  {Array : Type} {R K : Type} {n m : Nat} {ord : Order} {mstrg : Storage} [Scalar R R] [Scalar R K]
+  {Array : Type _} {R K : Type _} {n m : Nat} {ord : Order} {mstrg : Storage} [Scalar R R] [Scalar R K]
   {vstrg : DenseVector.Storage}
-  [LevelOne R K Array]
+  [LevelOne Array R K]
 
 
 local notation K "^[" m ", " n "]" => DenseMatrix Array ord mstrg m n K
@@ -245,7 +245,7 @@ def scal (a : K) (A : K^[m,n])   : K^[m,n] := lift A (LevelOneData.scal (α:=a))
 
 /- Level 1 operations extension -/
 
-variable [LevelOneDataExt R K Array]
+variable [LevelOneDataExt Array R K]
 
 def const (m n : Nat) (mstrg : Storage) (k : K) : DenseMatrix Array ord mstrg m n K :=
   match mstrg with
@@ -390,7 +390,7 @@ def diagonal (A : K^[n,n]) : K^[n] :=
 
 /-  Level 2 operations -/
 
-variable  [LevelTwoData R K Array]
+variable  [LevelTwoData Array R K]
 
 def gemv (a : K) (A : K^[m,n]) (x : K^[n]) (b : K) (y : K^[m]) : K^[m] :=
   ⟨LevelTwoData.gemv ord .NoTrans m n a
