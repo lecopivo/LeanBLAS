@@ -2,31 +2,22 @@ import Lake
 
 open Lake DSL System Lean Elab
 
--- this uses unsafe
-def linkArgs : Array String :=
-  let go : IO (Array String) := do
-    let .some args ← captureProc {
-          cmd := "pkg-config"
-          args := #["--libs", "blas"]
-        } |>.toBaseIO
-      | throw (.userError "unable to find BLAS")
-    pure args.splitOn.toArray
-  match go () /- unsafeIO go -/ with
-  | .ok a _ => a
-  | .error .. => panic! "failed to find BLAS"
-
-def inclArgs : Array String :=
-  let go : IO (Array String) := do
-    let .some args ← captureProc {
-          cmd := "pkg-config"
-          args := #["--cflags", "blas"]
-        } |>.toBaseIO
-      | throw (.userError "unable to find BLAS")
-    pure args.splitOn.toArray
-  match go () /- unsafeIO go -/ with
-  | .ok a _ => a
-  | .error .. => panic! "failed to find BLAS"
-
+def linkArgs := -- (#[] : Array String)
+  if System.Platform.isWindows then
+    #[]
+  else if System.Platform.isOSX then
+    #["-L/opt/homebrew/opt/openblas/lib",
+      "-L/usr/local/opt/openblas/lib", "-lblas"]
+  else -- assuming linux
+    #["-L/usr/lib/x86_64-linux-gnu/", "-lblas"]
+def inclArgs :=
+  if System.Platform.isWindows then
+    #[]
+  else if System.Platform.isOSX then
+    #["-I/opt/homebrew/opt/openblas/include",
+      "-I/usr/local/opt/openblas/include"]
+  else -- assuming linux
+    #[]
 
 package leanblas {
   moreLinkArgs := linkArgs
