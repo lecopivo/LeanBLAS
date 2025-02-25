@@ -506,4 +506,3 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dcos(const size_t N, lean_obj_arg X, con
   return X;
 }
 
-
