@@ -5,17 +5,15 @@ open BLAS CBLAS Sorry
 def approxEq (x y : Float) : Bool :=
   (x - y).abs < 1e-14
 
-instance : Coe FloatArray Float64Float := ⟨fun x => cast sorry_proof x⟩
-instance : Coe Float64Array FloatArray := ⟨fun x => cast sorry_proof x⟩
 
-instance : ToString Float64Array := ⟨fun x => toString (x : FloatArray)⟩
-
-instance : BEq Float64Array := ⟨fun x y => ((x:FloatArray).1.zip (y:FloatArray).1).all (fun (a,b) => approxEq a b)⟩
+instance : ToString Float64Array := ⟨fun x => toString (x.toFloatArray)⟩
+instance : BEq Float64Array :=
+  ⟨fun x y => ((x.toFloatArray).1.zip (y.toFloatArray).1).all (fun (a,b) => a == b)⟩
 
 
 def test_ddot : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,2.0,3.0]⟩
-  let y : FloatArray := ⟨#[1.0,2.0,3.0]⟩
+  let x := #f64[1.0,2.0,3.0]
+  let y := #f64[1.0,2.0,3.0]
   let r := ddot 3 x 0 1 y 0 1
   let expected := 1.0*1.0 + 2.0*2.0 + 3.0*3.0
   IO.println s!"ddot 3 {x} 1 {y} 1"
@@ -24,8 +22,8 @@ def test_ddot : IO Unit := do
     throw $ IO.userError "test_ddot failed"
 
 def test_ddot_2 : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,2.0,3.0,4.0]⟩
-  let y : FloatArray := ⟨#[1.0,2.0,3.0,4.0]⟩
+  let x := #f64[1.0,2.0,3.0,4.0]
+  let y := #f64[1.0,2.0,3.0,4.0]
   let r := ddot 3 x 0 2 y 0 3
   let expected := 1.0*1.0 + 3.0*4.0
   IO.println s!"ddot 3 {x} 2 {y} 3"
@@ -35,7 +33,7 @@ def test_ddot_2 : IO Unit := do
 
 
 def test_dnrm2 : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,2.0,3.0]⟩
+  let x := #f64[1.0,2.0,3.0]
   let r := dnrm2 3 x 0 1
   let expected := Float.sqrt (1.0*1.0 + 2.0*2.0 + 3.0*3.0)
   IO.println s!"dnrm2 3 {x} 1"
@@ -44,7 +42,7 @@ def test_dnrm2 : IO Unit := do
     throw $ IO.userError "test_dnrm2 failed"
 
 def test_dnrm2_2 : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,2.0,3.0]⟩
+  let x := #f64[1.0,2.0,3.0]
   let r := dnrm2 3 x 0 2
   let expected := Float.sqrt (1.0*1.0 + 3.0*3.0)
   IO.println s!"dnrm2 3 {x} 2"
@@ -53,7 +51,7 @@ def test_dnrm2_2 : IO Unit := do
     throw $ IO.userError "test_dnrm2_2 failed"
 
 def test_dasum : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,-2.0,3.0]⟩
+  let x := #f64[1.0,-2.0,3.0]
   let r := dasum 3 x 0 1
   let expected := 1.0 + 2.0 + 3.0
   IO.println s!"dasum 3 {x} 1"
@@ -62,7 +60,7 @@ def test_dasum : IO Unit := do
     throw $ IO.userError "test_dasum failed"
 
 def test_dasum_2 : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,-2.0,3.0]⟩
+  let x := #f64[1.0,-2.0,3.0]
   let r := dasum 3 x 0 2
   let expected := 1.0 + 3.0
   IO.println s!"dasum 3 {x} 2"
@@ -71,7 +69,7 @@ def test_dasum_2 : IO Unit := do
     throw $ IO.userError "test_dasum_2 failed"
 
 def test_idamax : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,-2.0,3.0,-10.0]⟩
+  let x := #f64[1.0,-2.0,3.0,-10.0]
   let r := idamax 4 x 0 1
   let expected := 3
   IO.println s!"idamax 4 {x} 0 1"
@@ -80,7 +78,7 @@ def test_idamax : IO Unit := do
     throw $ IO.userError "test_idamax failed"
 
 def test_idamax_2 : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,-2.0,3.0,-10.0]⟩
+  let x := #f64[1.0,-2.0,3.0,-10.0]
   let r := idamax 2 x 0 2
   let expected := 1
   IO.println s!"idamax 2 {x} 1 2"
@@ -99,8 +97,8 @@ instance : BEq FloatArray := ⟨fun x y => Id.run do
   return true⟩
 
 def test_dswap : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,-2.0,3.0,4.0]⟩
-  let y : FloatArray := ⟨#[-1.0,2.0,-3.0,-4.0]⟩
+  let x := #f64[1.0,-2.0,3.0,4.0]
+  let y := #f64[-1.0,2.0,-3.0,-4.0]
   let (x',y') := dswap 4 x 0 1 y 0 1
   IO.println s!"dswap 3 {x} 1 {y} 1"
   IO.println s!"{x'} == {y} = {x' == y}"
@@ -109,11 +107,11 @@ def test_dswap : IO Unit := do
     throw $ IO.userError "test_dswap failed"
 
 def test_dswap_2 : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,2.0,3.0,4.0,5.0]⟩
-  let y : FloatArray := ⟨#[-1.0,-2.0,-3.0,-4.0,-5.0]⟩
+  let x := #f64[1.0,2.0,3.0,4.0,5.0]
+  let y := #f64[-1.0,-2.0,-3.0,-4.0,-5.0]
   let (x',y') := dswap 3 x 0 2 y 1 1
-  let x'_expected : FloatArray := ⟨#[-2,2,-3,4,-4]⟩
-  let y'_expected : FloatArray := ⟨#[-1,1,3,5,-5]⟩
+  let x'_expected := #f64[-2,2,-3,4,-4]
+  let y'_expected := #f64[-1,1,3,5,-5]
   IO.println s!"dswap 3 {x} 2 {y} 3"
   IO.println s!"{x'} == {x'_expected} = {x' == x'_expected}"
   IO.println s!"{y'} == {y'_expected} = {y' == y'_expected}"
@@ -121,8 +119,8 @@ def test_dswap_2 : IO Unit := do
     throw $ IO.userError "test_dswap_2 failed"
 
 def test_dcopy : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,-2.0,3.0,4.0]⟩
-  let y : FloatArray := ⟨#[0.0,0.0,0.0,0.0]⟩
+  let x := #f64[1.0,-2.0,3.0,4.0]
+  let y := #f64[0.0,0.0,0.0,0.0]
   let y' := dcopy 4 x 0 1 y 0 1
   IO.println s!"dcopy 4 {x} 0 1 {y} 0 1"
   IO.println s!"{y'} == {x} = {y' == x}"
@@ -130,30 +128,30 @@ def test_dcopy : IO Unit := do
     throw $ IO.userError "test_dcopy failed"
 
 def test_dcopy_2 : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,2.0,3.0,4.0,5.0]⟩
-  let y : FloatArray := ⟨#[0.0,0.0,0.0,0.0,0.0]⟩
+  let x := #f64[1.0,2.0,3.0,4.0,5.0]
+  let y := #f64[0.0,0.0,0.0,0.0,0.0]
   let y' := dcopy 3 x 0 2 y 1 1
-  let y_expected : FloatArray := ⟨#[0.0,1.0,3.0,5.0,0.0]⟩
+  let y_expected := #f64[0.0,1.0,3.0,5.0,0.0]
   IO.println s!"dcopy 3 {x} 0 2 {y} 1 1"
   IO.println s!"{y'} == {y_expected} = {y' == y_expected}"
   if y' != y_expected then
     throw $ IO.userError "test_dcopy_2 failed"
 
 def test_daxpy : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,-2.0,3.0,4.0]⟩
-  let y : FloatArray := ⟨#[-1.0,4.0,2.0,1.0]⟩
+  let x := #f64[1.0,-2.0,3.0,4.0]
+  let y := #f64[-1.0,4.0,2.0,1.0]
   let y' := daxpy 4 2.0 x 0 1 y 0 1
-  let y_expected : FloatArray := ⟨#[1.0,0.0,8.0,9.0]⟩
+  let y_expected := #f64[1.0,0.0,8.0,9.0]
   IO.println s!"daxpy 4 2.0 {x} 0 1 {y} 0 1"
   IO.println s!"{y'} == {y_expected} = {y' == y_expected}"
   if y' != y_expected then
     throw $ IO.userError "test_daxpy failed"
 
 def test_daxpy_2 : IO Unit := do
-  let x : FloatArray := ⟨#[1.0,2.0,3.0,4.0,5.0]⟩
-  let y : FloatArray := ⟨#[5.0,4.0,3.0,2.0,1.0]⟩
+  let x := #f64[1.0,2.0,3.0,4.0,5.0]
+  let y := #f64[5.0,4.0,3.0,2.0,1.0]
   let y' := daxpy 3 2.0 x 0 2 y 1 1
-  let y_expected : FloatArray := ⟨#[5.0,6.0,9.0,12.0,1.0]⟩
+  let y_expected := #f64[5.0,6.0,9.0,12.0,1.0]
   IO.println s!"daxpy 3 2.0 {x} 0 2 {y} 1 1"
   IO.println s!"{y'} == {y_expected} = {y' == y_expected}"
   if y' != y_expected then
@@ -162,7 +160,7 @@ def test_daxpy_2 : IO Unit := do
 
 def test_dconst : IO Unit := do
 
-  let x_expected : FloatArray := ⟨#[4.2,4.2,4.2]⟩
+  let x_expected := #f64[4.2,4.2,4.2]
   let x := dconst 3 4.2
 
   IO.println s!"dconst 3 4.2"

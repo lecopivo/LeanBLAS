@@ -305,7 +305,8 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dscal(const size_t N, const double alpha
 
 LEAN_EXPORT lean_obj_res leanblas_cblas_dconst(const size_t N, const double a){
 
-  lean_obj_res arr = lean_alloc_sarray(sizeof(double), N, N);
+  size_t s = sizeof(double)/sizeof(char);
+  lean_obj_res arr = lean_alloc_sarray(sizeof(char), s*N, s*N);
   double * ptr = lean_float_array_cptr(arr);
 
   for (size_t i = 0; i < N; i++){
