@@ -330,8 +330,8 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_daxpby(const size_t N, const double alph
                                                                const double beta,  lean_obj_arg Y, const size_t offY, const size_t incY){
   // modify `X` in place only iff we are supposed to modify *all* elements of `Y`
   if (lean_is_exclusive(X) && !lean_is_exclusive(Y) &&
-      lean_sarray_size(X) == N && offX == 0 && incX == 1 &&
-      lean_sarray_size(Y) == N && offY == 0 && incY == 1){
+      lean_sarray_size(X)*(sizeof double) == N && offX == 0 && incX == 1 &&
+      lean_sarray_size(Y)*(sizeof double) == N && offY == 0 && incY == 1){
     cblas_daxpby((int)N, beta, lean_float_array_cptr(Y) + offY, (int)incY, alpha, lean_float_array_cptr(X) + offX, (int)incX);
     lean_dec(Y);
     return X;
@@ -389,8 +389,8 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dmul(const size_t N, lean_obj_arg X, con
 
   // modify `X` in place only iff we are supposed to modify *all* elements of `Y`
   if (lean_is_exclusive(X) && !lean_is_exclusive(Y) &&
-      lean_sarray_size(X) == N && offX == 0 && incX == 1 &&
-      lean_sarray_size(Y) == N && offY == 0 && incY == 1){
+      lean_sarray_size(X)*(sizeof double) == N && offX == 0 && incX == 1 &&
+      lean_sarray_size(Y)*(sizeof double) == N && offY == 0 && incY == 1){
     double * xptr = lean_float_array_cptr(X);
     double * yptr = lean_float_array_cptr(Y);
     for (size_t i = 0; i < N; i++){
@@ -415,8 +415,8 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_ddiv(const size_t N, lean_obj_arg X, con
                                                              lean_obj_arg Y, const size_t offY, const size_t incY){
   // modify `X` in place only iff we are supposed to modify *all* elements of `Y`
   if (lean_is_exclusive(X) && !lean_is_exclusive(Y) &&
-      lean_sarray_size(X) == N && offX == 0 && incX == 1 &&
-      lean_sarray_size(Y) == N && offY == 0 && incY == 1){
+      lean_sarray_size(X)*(sizeof double) == N && offX == 0 && incX == 1 &&
+      lean_sarray_size(Y)*(sizeof double) == N && offY == 0 && incY == 1){
     double * xptr = lean_float_array_cptr(X);
     double * yptr = lean_float_array_cptr(Y);
     for (size_t i = 0; i < N; i++){
