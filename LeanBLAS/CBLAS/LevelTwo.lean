@@ -4,7 +4,7 @@ import LeanBLAS.Spec.LevelTwo
 namespace BLAS.CBLAS
 
 
-instance : LevelTwoData FloatArray Float Float where
+instance : LevelTwoData Float64Array Float Float where
 
   gemv order trans M N a A offA ldaA X offX incX b Y offY incY :=
     dgemv order trans M.toUSize N.toUSize a

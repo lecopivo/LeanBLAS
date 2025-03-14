@@ -1,3 +1,5 @@
+import LeanBLAS.Float32Array
+
 namespace BLAS.CBLAS
 
 
@@ -31,9 +33,9 @@ void cblas_dgemv(const enum CBLAS_ORDER Order, const enum C, const int M, const 
 -/
 @[extern "leanblas_cblas_dgemv"]
 opaque dgemv (order : Order) (transA : Transpose) (M : USize) (N : USize) (alpha : Float)
-    (A : @& FloatArray) (offA : USize) (lda : USize)
-    (X : @& FloatArray) (offX incX : USize) (beta : Float)
-    (Y : FloatArray) (offY incY : USize) : FloatArray
+    (A : @& Float64Array) (offA : USize) (lda : USize)
+    (X : @& Float64Array) (offX incX : USize) (beta : Float)
+    (Y : Float64Array) (offY incY : USize) : Float64Array
 
 
 
@@ -62,9 +64,9 @@ outputs: Y with the product of A and X
 -/
 @[extern "leanblas_cblas_dgbmv"]
 opaque dbmv (order : Order) (transA : Transpose) (N : USize) (M : USize) (KL KU : USize) (alpha : Float)
-    (A : @& FloatArray) (offA : USize) (lda : USize)
-    (X : @& FloatArray) (offX incX : USize) (beta : Float)
-    (Y : FloatArray) (offY incY : USize) : FloatArray
+    (A : @& Float64Array) (offA : USize) (lda : USize)
+    (X : @& Float64Array) (offX incX : USize) (beta : Float)
+    (Y : Float64Array) (offY incY : USize) : Float64Array
 
 
 /-- dtrmv
@@ -85,8 +87,8 @@ outputs: X with the product of A and X
 @[extern "leanblas_cblas_dtrmv"]
 opaque dtrmv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N : USize)
-    (A : @& FloatArray) (offA : USize) (lda : USize)
-    (X : FloatArray) (offX incX : USize) : FloatArray
+    (A : @& Float64Array) (offA : USize) (lda : USize)
+    (X : Float64Array) (offX incX : USize) : Float64Array
 
 
 /-- dtbmv
@@ -108,8 +110,8 @@ outputs: X with the product of A and X
 @[extern "leanblas_cblas_dtbmv"]
 opaque dtbmv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N K : USize)
-    (A : @& FloatArray) (offA : USize) (lda : USize)
-    (X : FloatArray) (offX incX : USize) : FloatArray
+    (A : @& Float64Array) (offA : USize) (lda : USize)
+    (X : Float64Array) (offX incX : USize) : Float64Array
 
 
 /-- dtpmv
@@ -129,8 +131,8 @@ outputs: X with the product of A and X
 @[extern "leanblas_cblas_dtpmv"]
 opaque dtpmv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N : USize)
-    (A : @& FloatArray) (offA : USize)
-    (X : FloatArray) (offX incX : USize) : FloatArray
+    (A : @& Float64Array) (offA : USize)
+    (X : Float64Array) (offX incX : USize) : Float64Array
 
 
 /-- dtrsv
@@ -151,8 +153,8 @@ outputs: X with the solution of the system
 @[extern "leanblas_cblas_dtrsv"]
 opaque dtrsv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N : USize)
-    (A : @& FloatArray) (offA : USize) (lda : USize)
-    (X : FloatArray) (offX incX : USize) : FloatArray
+    (A : @& Float64Array) (offA : USize) (lda : USize)
+    (X : Float64Array) (offX incX : USize) : Float64Array
 
 
 /-- dtbsv
@@ -174,8 +176,8 @@ outputs: X with the solution of the system
 @[extern "leanblas_cblas_dtbsv"]
 opaque dtbsv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N K : USize)
-    (A : @& FloatArray) (offA : USize) (lda : USize)
-    (X : FloatArray) (offX incX : USize) : FloatArray
+    (A : @& Float64Array) (offA : USize) (lda : USize)
+    (X : Float64Array) (offX incX : USize) : Float64Array
 
 
 /-- dtpsv
@@ -195,8 +197,8 @@ outputs: X with the solution of the system
 @[extern "leanblas_cblas_dtpsv"]
 opaque dtpsv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N : USize)
-    (A : @& FloatArray) (offA : USize)
-    (X : FloatArray) (offX incX : USize) : FloatArray
+    (A : @& Float64Array) (offA : USize)
+    (X : Float64Array) (offX incX : USize) : Float64Array
 
 
 
@@ -222,9 +224,9 @@ outputs: A with the outer product of X and Y
 -/
 @[extern "leanblas_cblas_dger"]
 opaque dger (order : Order) (M : USize) (N : USize) (alpha : Float)
-    (X : @& FloatArray) (offX incX : USize)
-    (Y : @& FloatArray) (offY incY : USize)
-    (A : FloatArray) (offA : USize) (lda : USize) : FloatArray
+    (X : @& Float64Array) (offX incX : USize)
+    (Y : @& Float64Array) (offY incY : USize)
+    (A : Float64Array) (offA : USize) (lda : USize) : Float64Array
 
 
 /-- syr
@@ -245,8 +247,8 @@ outputs: A with the symmetric rank-1 update
 -/
 @[extern "leanblas_cblas_dsyr"]
 opaque dsyr (order : Order) (uplo : UpLo) (N : USize) (alpha : Float)
-    (X : @& FloatArray) (offX incX : USize)
-    (A : FloatArray) (offA : USize) (lda : USize) : FloatArray
+    (X : @& Float64Array) (offX incX : USize)
+    (A : Float64Array) (offA : USize) (lda : USize) : Float64Array
 
 
 /-- syr2
@@ -270,9 +272,9 @@ outputs: A with the symmetric rank-2 update
 -/
 @[extern "leanblas_cblas_dsyr2"]
 opaque dsyr2 (order : Order) (uplo : UpLo) (N : USize) (alpha : Float)
-    (X : @& FloatArray) (offX incX : USize)
-    (Y : @& FloatArray) (offY incY : USize)
-    (A : FloatArray) (offA : USize) (lda : USize) : FloatArray
+    (X : @& Float64Array) (offX incX : USize)
+    (Y : @& Float64Array) (offY incY : USize)
+    (A : Float64Array) (offA : USize) (lda : USize) : Float64Array
 
 
 
@@ -297,8 +299,8 @@ inputs:
 -/
 @[extern "leanblas_cblas_dpacked_to_dense"]
 opaque dpackedToDense (N : USize) (uplo : UpLo)
-  (orderAp : Order) (Ap : @& FloatArray)
-  (orderA : Order) (A : FloatArray) (offA : USize) (lds : USize) : FloatArray
+  (orderAp : Order) (Ap : @& Float64Array)
+  (orderA : Order) (A : Float64Array) (offA : USize) (lds : USize) : Float64Array
 
 /-- ddenseToPacked
 
@@ -316,8 +318,8 @@ inputs:
 -/
 @[extern "leanblas_cblas_ddense_to_packed"]
 opaque ddenseToPacked (N : USize) (uplo : UpLo)
-  (orderA : Order) (A : @& FloatArray) (offA : USize) (lda : USize)
-  (orderAp : Order) (Ap : FloatArray) : FloatArray
+  (orderA : Order) (A : @& Float64Array) (offA : USize) (lda : USize)
+  (orderAp : Order) (Ap : Float64Array) : Float64Array
 
 /-- gpr
 
@@ -340,6 +342,6 @@ outputs: A := A + alpha * X * Y^T
 -/
 @[extern "leanblas_cblas_dgpr"]
 opaque dgpr (order : Order) (uplo : UpLo) (N : USize) (alpha : Float)
-    (X : @& FloatArray) (offX incX : USize)
-    (Y : @& FloatArray) (offY incY : USize)
-    (Ap : FloatArray) (offA : USize) : FloatArray
+    (X : @& Float64Array) (offX incX : USize)
+    (Y : @& Float64Array) (offY incY : USize)
+    (Ap : Float64Array) (offA : USize) : Float64Array

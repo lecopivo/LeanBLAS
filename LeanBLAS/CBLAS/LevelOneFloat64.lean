@@ -1,3 +1,5 @@
+import LeanBLAS.Float32Array
+
 namespace BLAS.CBLAS
 
 /-! Lean bindings to BLAS
@@ -22,7 +24,7 @@ outputs:
 
 -/
 @[extern "leanblas_cblas_ddot"]
-opaque ddot (N : USize) (X : @& FloatArray) (offX incX : USize) (Y : @& FloatArray) (offY incY : USize) : Float
+opaque ddot (N : USize) (X : @& Float64Array) (offX incX : USize) (Y : @& Float64Array) (offY incY : USize) : Float
 
 
 
@@ -45,7 +47,7 @@ double cblas_dnrm2(const int N, const double *X, const int incX);
 ```
 -/
 @[extern "leanblas_cblas_dnrm2"]
-opaque dnrm2 (N : USize) (X : @& FloatArray) (offX incX : USize) : Float
+opaque dnrm2 (N : USize) (X : @& Float64Array) (offX incX : USize) : Float
 
 
 /-- dasum
@@ -67,7 +69,7 @@ double cblas_dasum(const int N, const double *X, const int incX);
 ```
 -/
 @[extern "leanblas_cblas_dasum"]
-opaque dasum (N : USize) (X : @& FloatArray) (offX incX : USize) : Float
+opaque dasum (N : USize) (X : @& Float64Array) (offX incX : USize) : Float
 
 
 /-- idamax
@@ -89,7 +91,7 @@ int cblas_idamax(const int N, const double *X, const int incX);
 ```
 -/
 @[extern "leanblas_cblas_idamax"]
-opaque idamax (N : USize) (X : @& FloatArray) (offX incX : USize) : USize
+opaque idamax (N : USize) (X : @& Float64Array) (offX incX : USize) : USize
 
 
 /-- dswap
@@ -113,7 +115,7 @@ void cblas_dswap(const int N, double *X, const int incX, double *Y, const int in
 ```
 -/
 @[extern "leanblas_cblas_dswap"]
-opaque dswap (N : USize) (X : FloatArray) (offX incX : USize) (Y : FloatArray) (offY incY : USize) : FloatArray × FloatArray
+opaque dswap (N : USize) (X : Float64Array) (offX incX : USize) (Y : Float64Array) (offY incY : USize) : Float64Array × Float64Array
 
 
 /-- dcopy
@@ -137,7 +139,7 @@ void cblas_dcopy(const int N, const double *X, const int incX, double *Y, const 
 ```
 -/
 @[extern "leanblas_cblas_dcopy"]
-opaque dcopy (N : USize) (X : @& FloatArray) (offX incX : USize) (Y : FloatArray) (offY incY : USize) : FloatArray
+opaque dcopy (N : USize) (X : @& Float64Array) (offX incX : USize) (Y : Float64Array) (offY incY : USize) : Float64Array
 
 
 /-- daxpy
@@ -163,7 +165,7 @@ void cblas_daxpy(const int N, const double alpha, const double *X,
 ```
 -/
 @[extern "leanblas_cblas_daxpy"]
-opaque daxpy (N : USize) (a : Float) (X : @& FloatArray) (offX incX : USize) (Y : FloatArray) (offY incY : USize) : FloatArray
+opaque daxpy (N : USize) (a : Float) (X : @& Float64Array) (offX incX : USize) (Y : Float64Array) (offY incY : USize) : Float64Array
 
 
 /-- drotg
@@ -235,7 +237,7 @@ void cblas_drot(const int N, double *X, const int incX, double *Y, const int inc
 ```
 -/
 @[extern "leanblas_cblas_drot"]
-opaque drot (N : USize) (X : FloatArray) (offX incX : USize) (Y : FloatArray) (offY incY : USize) (c s : Float) : FloatArray × FloatArray
+opaque drot (N : USize) (X : Float64Array) (offX incX : USize) (Y : Float64Array) (offY incY : USize) (c s : Float) : Float64Array × Float64Array
 
 
 /-- dscal
@@ -257,14 +259,14 @@ void cblas_dscal(const int N, const double alpha, double *X, const int incX);
 ```
 -/
 @[extern "leanblas_cblas_dscal"]
-opaque dscal (N : USize) (a : Float) (X : FloatArray) (offX incX : USize) : FloatArray
+opaque dscal (N : USize) (a : Float) (X : Float64Array) (offX incX : USize) : Float64Array
 
 
 
 -- @[instance]
--- axiom cblasLevelOneDoubleAxiom : BLAS.LevelOneSpec FloatArray Float Float
+-- axiom cblasLevelOneDoubleAxiom : BLAS.LevelOneSpec Float64Array Float Float
 
--- instance : BLAS.LevelOne FloatArray Float Float := ⟨⟩
+-- instance : BLAS.LevelOne Float64Array Float Float := ⟨⟩
 
 
 -- class LevelOneDataExt (R K : outParam Type) (Array : Type) [Scalar R K] where
@@ -301,7 +303,7 @@ inputs:
 outputs: a vector with all elements equal to alpha
 -/
 @[extern "leanblas_cblas_dconst"]
-opaque dconst (N : USize) (alpha : Float) : FloatArray
+opaque dconst (N : USize) (alpha : Float) : Float64Array
 
 
 /-- dsum
@@ -318,7 +320,7 @@ outputs:
 - the sum of the elements of X
 -/
 @[extern "leanblas_cblas_dsum"]
-opaque dsum (N : USize) (X : @&FloatArray) (offX : USize) (incX : USize) : Float
+opaque dsum (N : USize) (X : @&Float64Array) (offX : USize) (incX : USize) : Float
 
 
 /-- daxpby
@@ -339,8 +341,8 @@ inputs:
 outputs: `alpha*X + beta*Y` at appropriate indices
 -/
 @[extern "leanblas_cblas_daxpby"]
-opaque daxpby (N : USize) (alpha : Float) (X : FloatArray) (offX : USize) (incX : USize)
-                          (beta : Float)  (Y : FloatArray) (offY : USize) (incY : USize) : FloatArray
+opaque daxpby (N : USize) (alpha : Float) (X : Float64Array) (offX : USize) (incX : USize)
+                          (beta : Float)  (Y : Float64Array) (offY : USize) (incY : USize) : Float64Array
 
 /-- scaladd
 
@@ -357,7 +359,7 @@ inputs:
 outputs: `alpha*X + beta` at appropriate indices
 -/
 @[extern "leanblas_cblas_dscaladd"]
-opaque dscaladd (N : USize) (alpha : Float) (X : FloatArray) (offX : USize) (incX : USize) (beta : Float) : FloatArray
+opaque dscaladd (N : USize) (alpha : Float) (X : Float64Array) (offX : USize) (incX : USize) (beta : Float) : Float64Array
 
 /-- dimaxRe
 
@@ -374,7 +376,7 @@ outputs:
 
 -/
 @[extern "leanblas_cblas_dimax_re"]
-opaque dimaxRe (N : USize) (X : @&FloatArray) (offX : USize) (incX : USize) : USize
+opaque dimaxRe (N : USize) (X : @&Float64Array) (offX : USize) (incX : USize) : USize
 
 
 /-- diminRe
@@ -391,7 +393,7 @@ outputs:
 - the index of the element with the smallest real part in X
 -/
 @[extern "leanblas_cblas_dimin_re"]
-opaque diminRe (N : USize) (X : @&FloatArray) (offX : USize) (incX : USize) : USize
+opaque diminRe (N : USize) (X : @&Float64Array) (offX : USize) (incX : USize) : USize
 
 
 /-- dmul
@@ -411,7 +413,7 @@ outputs: the element-wise product of X and Y
 
 -/
 @[extern "leanblas_cblas_dmul"]
-opaque dmul (N : USize) (X : FloatArray) (offX : USize) (incX : USize) (Y : FloatArray) (offY : USize) (incY : USize) : FloatArray
+opaque dmul (N : USize) (X : Float64Array) (offX : USize) (incX : USize) (Y : Float64Array) (offY : USize) (incY : USize) : Float64Array
 
 
 /-- ddiv
@@ -430,7 +432,7 @@ outputs: the element-wise division of X and Y
 
 -/
 @[extern "leanblas_cblas_ddiv"]
-opaque ddiv (N : USize) (X : FloatArray) (offX : USize) (incX : USize) (Y : FloatArray) (offY : USize) (incY : USize) : FloatArray
+opaque ddiv (N : USize) (X : Float64Array) (offX : USize) (incX : USize) (Y : Float64Array) (offY : USize) (incY : USize) : Float64Array
 
 
 /-- dinv
@@ -447,7 +449,7 @@ outputs: the element-wise inverse of X
 
 -/
 @[extern "leanblas_cblas_dinv"]
-opaque dinv (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+opaque dinv (N : USize) (X : Float64Array) (offX : USize) (incX : USize) : Float64Array
 
 
 /-- dabs
@@ -464,7 +466,7 @@ outputs: the element-wise absolute value of X
 
 -/
 @[extern "leanblas_cblas_dabs"]
-opaque dabs (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+opaque dabs (N : USize) (X : Float64Array) (offX : USize) (incX : USize) : Float64Array
 
 
 /-- dsqrt
@@ -481,7 +483,7 @@ outputs: the element-wise square root of X
 
 -/
 @[extern "leanblas_cblas_dsqrt"]
-opaque dsqrt (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+opaque dsqrt (N : USize) (X : Float64Array) (offX : USize) (incX : USize) : Float64Array
 
 
 /-- dexp
@@ -498,7 +500,7 @@ outputs: the element-wise exponential of X
 
 -/
 @[extern "leanblas_cblas_dexp"]
-opaque dexp (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+opaque dexp (N : USize) (X : Float64Array) (offX : USize) (incX : USize) : Float64Array
 
 
 /-- dlog
@@ -515,7 +517,7 @@ outputs: the element-wise natural logarithm of X
 
 -/
 @[extern "leanblas_cblas_dlog"]
-opaque dlog (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+opaque dlog (N : USize) (X : Float64Array) (offX : USize) (incX : USize) : Float64Array
 
 
 /-- dsin
@@ -532,7 +534,7 @@ outputs: the element-wise sine of X
 
 -/
 @[extern "leanblas_cblas_dsin"]
-opaque dsin (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+opaque dsin (N : USize) (X : Float64Array) (offX : USize) (incX : USize) : Float64Array
 
 
 /-- dcos
@@ -549,4 +551,4 @@ outputs: the element-wise cosine of X
 
 -/
 @[extern "leanblas_cblas_dcos"]
-opaque dcos (N : USize) (X : FloatArray) (offX : USize) (incX : USize) : FloatArray
+opaque dcos (N : USize) (X : Float64Array) (offX : USize) (incX : USize) : Float64Array

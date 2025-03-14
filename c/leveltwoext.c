@@ -108,7 +108,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dgpr(const uint8_t order, const uint8_t 
                                 const b_lean_obj_arg X, const size_t offX, const size_t incX,
                                 const b_lean_obj_arg Y, const size_t offY, const size_t incY,
                                 lean_obj_arg Ap, const size_t offAp){
-  ensure_exclusive_float_array(&Ap);
+  ensure_exclusive_byte_array(&Ap);
 
   cblas_dgpr(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo), (int)N, alpha,
              lean_float_array_cptr(X) + offX, (int)incX, lean_float_array_cptr(Y) + offY, (int)incY,
@@ -232,7 +232,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dpacked_to_dense(const size_t N,
                                                         const size_t offA,
                                                         const size_t lda){
 
-  ensure_exclusive_float_array(&A);
+  ensure_exclusive_byte_array(&A);
 
   cblas_dpacked_to_dense((int)N, leanblas_cblas_uplo(uplo),
                          leanblas_cblas_order(orderAp), lean_float_array_cptr(Ap),
@@ -340,7 +340,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_ddense_to_packed(const size_t N,
                                                          const uint8_t orderAp,
                                                          lean_obj_arg Ap){
 
-  ensure_exclusive_float_array(&Ap);
+  ensure_exclusive_byte_array(&Ap);
 
   cblas_ddense_to_packed((int)N, leanblas_cblas_uplo(uplo),
                          leanblas_cblas_order(orderA),  lean_float_array_cptr(A) + offA, (int)lda,

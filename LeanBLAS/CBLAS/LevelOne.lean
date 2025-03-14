@@ -5,16 +5,11 @@ import LeanBLAS.Spec.LevelOne
 
 namespace BLAS.CBLAS
 
-instance : LevelOneData FloatArray Float Float where
+open Sorry
+
+instance : LevelOneData Float64Array Float Float where
   size x := x.size
-  get x i := x.get! i
-  set x i v := x.set! i v
-  ofFn {n} f := Id.run do
-    let mut x : FloatArray := FloatArray.mkEmpty n
-    for h : i in [0:n] do
-      let i : Fin n := ⟨i, h.2.1⟩
-      x := x.push (f i)
-    x
+  get x i := (cast sorry_proof x : FloatArray).uget i.toUSize sorry_proof
   dot N X offX incX Y offY incY := ddot N.toUSize X offX.toUSize incX.toUSize Y offY.toUSize incY.toUSize
   nrm2 N X offX incX := dnrm2 N.toUSize X offX.toUSize incX.toUSize
   asum N X offX incX := dasum N.toUSize X offX.toUSize incX.toUSize
@@ -30,7 +25,7 @@ instance : LevelOneData FloatArray Float Float where
 
 
 set_option linter.unusedVariables false in
-instance : LevelOneDataExt FloatArray Float Float where
+instance : LevelOneDataExt Float64Array Float Float where
   const N a := dconst N.toUSize a
   sum N X offX incX := dsum N.toUSize X offX.toUSize incX.toUSize
   axpby N a X offX incX b Y offY incY := daxpby N.toUSize a X offX.toUSize incX.toUSize b Y offY.toUSize incY.toUSize

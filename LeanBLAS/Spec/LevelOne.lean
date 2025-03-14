@@ -9,8 +9,8 @@ class LevelOneData (Array : Type*) (R K : outParam Type*) where
 
   size (X : Array) : Nat
   get (X : Array) (i : Nat) : K
-  set (X : Array) (i : Nat) (v : K) : Array
-  ofFn (f : Fin n → K) : Array
+  -- set (X : Array) (i : Nat) (v : K) : Array
+  -- ofFn (f : Fin n → K) : Array
 
   /-- dot product of two vectors
       N : number of elements
@@ -131,8 +131,8 @@ end
 open BLAS.LevelOneData ComplexConjugate in
 class LevelOneSpec (Array : Type*) (R C : outParam Type*) [RCLike R] [RCLike C] [LevelOneData Array R C] : Prop  where
 
-  ofFn_size (f : Fin n → C) :
-    size (ofFn (Array:=Array) f) = n
+  -- ofFn_size (f : Fin n → C) :
+  --   size (ofFn (Array:=Array) f) = n
 
   dot_spec (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) :
     (∀ i : Fin N, InBounds X offX incX i)
@@ -241,7 +241,7 @@ class LevelOneSpec (Array : Type*) (R C : outParam Type*) [RCLike R] [RCLike C] 
     size X
 
 attribute [simp]
-  LevelOneSpec.ofFn_size
+  -- LevelOneSpec.ofFn_size
   LevelOneSpec.swap_size_x
   LevelOneSpec.swap_size_y
   LevelOneSpec.copy_size

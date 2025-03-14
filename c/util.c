@@ -10,6 +10,13 @@ void ensure_exclusive_float_array(lean_object ** X){
   }
 }
 
+void ensure_exclusive_byte_array(lean_object ** X){
+  if (!lean_is_exclusive(*X)) {
+    /* printf("warning: making array copy!\n"); */
+    *X = lean_copy_byte_array(*X);
+  }
+}
+
 
 CBLAS_ORDER leanblas_cblas_order(const uint8_t order) {
   if (order == 0) {

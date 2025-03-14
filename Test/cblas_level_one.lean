@@ -1,9 +1,17 @@
 import LeanBLAS
 
-open BLAS CBLAS
+open BLAS CBLAS Sorry
 
 def approxEq (x y : Float) : Bool :=
   (x - y).abs < 1e-14
+
+instance : Coe FloatArray Float64Float := ⟨fun x => cast sorry_proof x⟩
+instance : Coe Float64Array FloatArray := ⟨fun x => cast sorry_proof x⟩
+
+instance : ToString Float64Array := ⟨fun x => toString (x : FloatArray)⟩
+
+instance : BEq Float64Array := ⟨fun x y => ((x:FloatArray).1.zip (y:FloatArray).1).all (fun (a,b) => approxEq a b)⟩
+
 
 def test_ddot : IO Unit := do
   let x : FloatArray := ⟨#[1.0,2.0,3.0]⟩

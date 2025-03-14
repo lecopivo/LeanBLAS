@@ -30,7 +30,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dgemv(const uint8_t order, const uint8_t
                                 const b_lean_obj_arg A, const size_t offA, const size_t lda,
                                 const b_lean_obj_arg X, const size_t offX, const size_t incX,
                                 const double beta, lean_obj_arg Y, const size_t offY, const size_t incY){
-  ensure_exclusive_float_array(&Y);
+  ensure_exclusive_byte_array(&Y);
 
   cblas_dgemv(leanblas_cblas_order(order), leanblas_cblas_transpose(transA),
               (int)M, (int)N, alpha, lean_float_array_cptr(A) + offA, (int)lda,
@@ -70,7 +70,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dgbmv(const uint8_t order, const uint8_t
                                 const b_lean_obj_arg A, const size_t offA, const size_t lda,
                                 const b_lean_obj_arg X, const size_t offX, const size_t incX,
                                 const double beta, lean_obj_arg Y, const size_t offY, const size_t incY){
-  ensure_exclusive_float_array(&Y);
+  ensure_exclusive_byte_array(&Y);
 
   cblas_dgbmv(leanblas_cblas_order(order), leanblas_cblas_transpose(transA),
               (int)M, (int)N, (int)KL, (int)KU, alpha, lean_float_array_cptr(A) + offA, (int)lda,
@@ -102,7 +102,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dgbmv(const uint8_t order, const uint8_t
 LEAN_EXPORT lean_obj_res leanblas_cblas_dtrmv(const uint8_t order, const uint8_t uplo, const uint8_t transA, const uint8_t diag,
                                 const size_t N, const b_lean_obj_arg A, const size_t offA, const size_t lda,
                                 lean_obj_arg X, const size_t offX, const size_t incX){
-  ensure_exclusive_float_array(&X);
+  ensure_exclusive_byte_array(&X);
 
   cblas_dtrmv(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo), leanblas_cblas_transpose(transA), leanblas_cblas_diag(diag),
               (int)N, lean_float_array_cptr(A) + offA, (int)lda, lean_float_array_cptr(X) + offX, (int)incX);
@@ -133,7 +133,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dtrmv(const uint8_t order, const uint8_t
 LEAN_EXPORT lean_obj_res leanblas_cblas_dtbmv(const uint8_t order, const uint8_t uplo, const uint8_t transA, const uint8_t diag,
                                 const size_t N, const size_t K, const b_lean_obj_arg A, const size_t offA, const size_t lda,
                                 lean_obj_arg X, const size_t offX, const size_t incX){
-  ensure_exclusive_float_array(&X);
+  ensure_exclusive_byte_array(&X);
 
   cblas_dtbmv(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo), leanblas_cblas_transpose(transA), leanblas_cblas_diag(diag),
               (int)N, (int)K, lean_float_array_cptr(A) + offA, (int)lda, lean_float_array_cptr(X) + offX, (int)incX);
@@ -161,7 +161,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dtbmv(const uint8_t order, const uint8_t
 LEAN_EXPORT lean_obj_res leanblas_cblas_dtpmv(const uint8_t order, const uint8_t uplo, const uint8_t transA, const uint8_t diag,
                                               const size_t N, const b_lean_obj_arg A, const size_t offA, lean_obj_arg X, const size_t offX,
                                               const size_t incX){
-  ensure_exclusive_float_array(&X);
+  ensure_exclusive_byte_array(&X);
 
   cblas_dtpmv(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo), leanblas_cblas_transpose(transA), leanblas_cblas_diag(diag),
               (int)N, lean_float_array_cptr(A) + offA, lean_float_array_cptr(X) + offX, (int)incX);
@@ -191,7 +191,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dtpmv(const uint8_t order, const uint8_t
 LEAN_EXPORT lean_obj_res leanblas_cblas_dtrsv(const uint8_t order, const uint8_t uplo, const uint8_t transA, const uint8_t diag,
                                 const size_t N, const b_lean_obj_arg A, const size_t offA, const size_t lda,
                                 lean_obj_arg X, const size_t offX, const size_t incX){
-  ensure_exclusive_float_array(&X);
+  ensure_exclusive_byte_array(&X);
 
   cblas_dtrsv(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo), leanblas_cblas_transpose(transA), leanblas_cblas_diag(diag),
               (int)N, lean_float_array_cptr(A) + offA, (int)lda, lean_float_array_cptr(X) + offX, (int)incX);
@@ -222,7 +222,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dtrsv(const uint8_t order, const uint8_t
 LEAN_EXPORT lean_obj_res leanblas_cblas_dtbsv(const uint8_t order, const uint8_t uplo, const uint8_t transA, const uint8_t diag,
                                 const size_t N, const size_t K, const b_lean_obj_arg A, const size_t offA, const size_t lda,
                                 lean_obj_arg X, const size_t offX, const size_t incX){
-  ensure_exclusive_float_array(&X);
+  ensure_exclusive_byte_array(&X);
 
   cblas_dtbsv(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo), leanblas_cblas_transpose(transA), leanblas_cblas_diag(diag),
               (int)N, (int)K, lean_float_array_cptr(A) + offA, (int)lda, lean_float_array_cptr(X) + offX, (int)incX);
@@ -249,7 +249,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dtbsv(const uint8_t order, const uint8_t
  */
 LEAN_EXPORT lean_obj_res leanblas_cblas_dtpsv(const uint8_t order, const uint8_t uplo, const uint8_t transA, const uint8_t diag,
                                 const size_t N, const b_lean_obj_arg A, lean_obj_arg X, const size_t offX, const size_t incX){
-  ensure_exclusive_float_array(&X);
+  ensure_exclusive_byte_array(&X);
 
   cblas_dtpsv(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo), leanblas_cblas_transpose(transA), leanblas_cblas_diag(diag),
               (int)N, lean_float_array_cptr(A), lean_float_array_cptr(X) + offX, (int)incX);
@@ -282,7 +282,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dger(const uint8_t order, const size_t M
                                 const b_lean_obj_arg X, const size_t offX, const size_t incX,
                                 const b_lean_obj_arg Y, const size_t offY, const size_t incY,
                                 lean_obj_arg A, const size_t offA, const size_t lda){
-  ensure_exclusive_float_array(&A);
+  ensure_exclusive_byte_array(&A);
 
   cblas_dger(leanblas_cblas_order(order), (int)M, (int)N, alpha,
              lean_float_array_cptr(X) + offX, (int)incX, lean_float_array_cptr(Y) + offY, (int)incY,
@@ -314,7 +314,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dsyr(const uint8_t order, const uint8_t 
                               const size_t N, const double alpha,
                               const b_lean_obj_arg X, const size_t offX, const size_t incX,
                               lean_obj_arg A, const size_t offA, const size_t lda){
-  ensure_exclusive_float_array(&A);
+  ensure_exclusive_byte_array(&A);
 
   cblas_dsyr(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo),
              (int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX,
@@ -349,7 +349,7 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_dsyr2(const uint8_t order, const uint8_t
                                const b_lean_obj_arg X, const size_t offX, const size_t incX,
                                const b_lean_obj_arg Y, const size_t offY, const size_t incY,
                                lean_obj_arg A, const size_t offA, const size_t lda){
-  ensure_exclusive_float_array(&A);
+  ensure_exclusive_byte_array(&A);
 
   cblas_dsyr2(leanblas_cblas_order(order), leanblas_cblas_uplo(uplo),
               (int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX,

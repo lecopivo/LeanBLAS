@@ -4,6 +4,7 @@
 
 
 void ensure_exclusive_float_array(lean_object ** X);
+void ensure_exclusive_byte_array(lean_object ** X);
 
 CBLAS_ORDER leanblas_cblas_order(const uint8_t order);
 CBLAS_TRANSPOSE leanblas_cblas_transpose(const uint8_t trans);

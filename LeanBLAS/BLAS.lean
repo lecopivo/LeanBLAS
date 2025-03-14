@@ -26,7 +26,7 @@ class BLAS (Array : Type*) (R K : outParam Type*)
     LevelTwoData Array R K
   where
 
-instance : BLAS FloatArray Float Float where
+instance : BLAS Float64Array Float Float where
 
 
 /-- BLAS with `Array` are lawful i.e. they satisfy expected linear algebra properties.
