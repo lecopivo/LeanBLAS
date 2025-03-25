@@ -13,7 +13,7 @@ Ensure you have the development files for C BLAS installed.
 On Ubuntu, you can install them with:
 
 ```bash
-sudo apt-get install libblas-dev
+sudo apt-get install libopenblas-dev
 ```
 On Mac, you can install them with:
 ```bash
