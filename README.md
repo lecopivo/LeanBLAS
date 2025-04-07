@@ -37,3 +37,38 @@ To execute the test suite, run:
 ```bash
 lake test
 ```
+
+## Setting Up Your Project with LeanBLAS
+
+To use `LeanBLAS` in your project, you need to:
+
+- Add a `require` statement for `leanblas`.
+- Set the `moreLinkArgs` option to include the location of your `libblas.so` (or dynamic library).
+
+For example, a `lakefile.lean` for a project named `foo` might look like this:
+
+```lean
+import Lake
+open Lake DSL System
+
+def linkArgs :=
+  if System.Platform.isWindows then
+    panic! "Windows is not supported!"
+  else if System.Platform.isOSX then
+    #["-L/opt/homebrew/opt/openblas/lib", "-L/usr/local/opt/openblas/lib", "-lblas"]
+  else -- assuming Linux
+    #["-L/usr/lib/x86_64-linux-gnu/", "-lblas", "-lm"]
+
+package foo {
+  moreLinkArgs := linkArgs
+}
+
+require leanblas from git "https://github.com/lecopivo/LeanBLAS" @ "v4.18.0"
+
+@[default_target]
+lean_lib Foo {
+  roots := #[`Foo]
+}
+```
+> **Note:** If your project depends on `mathlib`, make sure the `leanblas` version is compatible with it.
+
