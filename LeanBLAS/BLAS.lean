@@ -33,8 +33,8 @@ instance : BLAS Float64Array Float Float where
 
 For floats this is not true, but sometimes we want to do source code transformations under the
 assumption `LawfulBLAS FloatArray Float Float`. -/
-class LawfulBLAS (Array : Type*) (R K : outParam Type*) [RCLike R] [RCLike K] [BLAS Array R K]
+class LawfulBLAS (Array : Type*) (R K : outParam Type*) [RCLike R] [RCLike K] [BLAS Array R K] : Prop
   extends
     LevelOneSpec Array R K
-  : Prop
+
   where

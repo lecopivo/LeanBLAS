@@ -33,7 +33,7 @@ lean_lib LeanBLASCompiled where
   roots := #[`LeanBLAS.CBLAS.LevelOneFloat64, `LeanBLAS.CBLAS.LevelTwoFloat64]
   precompileModules := true
 
-require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.16.0"
+require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.18.0"
 
 @[test_driver]
 lean_exe CBLASLevelOneTest where
