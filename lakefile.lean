@@ -24,16 +24,17 @@ package leanblas {
   preferReleaseBuild := true
 }
 
+lean_lib LeanBLASCompiled where
+  roots := #[`LeanBLAS.CBLAS.LevelOneFloat64, `LeanBLAS.CBLAS.LevelTwoFloat64]
+  precompileModules := true
+
 @[default_target]
 lean_lib LeanBLAS where
   -- defaultFacets := #[LeanLib.sharedFacet,LeanLib.staticFacet]
   roots := #[`LeanBLAS]
 
-lean_lib LeanBLASCompiled where
-  roots := #[`LeanBLAS.CBLAS.LevelOneFloat64, `LeanBLAS.CBLAS.LevelTwoFloat64]
-  precompileModules := true
 
-require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.18.0"
+require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.19.0-rc2"
 
 @[test_driver]
 lean_exe CBLASLevelOneTest where
@@ -81,7 +82,7 @@ target libopenblas pkg : FilePath := do
   afterReleaseAsync pkg do
     let rootDir := pkg.buildDir / "OpenBLAS"
     ensureDirExists rootDir
-    let dst := pkg.nativeLibDir / (nameToSharedLib "openblas")
+    let dst := pkg.sharedLibDir / (nameToSharedLib "openblas")
     createParentDirs dst
     let url := "https://github.com/OpenMathLib/OpenBLAS"
 
@@ -105,7 +106,7 @@ target libopenblas pkg : FilePath := do
           args := #[(rootDir / nameToSharedLib "openblas").toString, dst.toString]
         }
         -- TODO: Don't hardcode the version "0".
-        let dst' := pkg.nativeLibDir / (nameToVersionedSharedLib "openblas" "0")
+        let dst' := pkg.sharedLibDir / (nameToVersionedSharedLib "openblas" "0")
         proc {
           cmd := "cp"
           args := #[dst.toString, dst'.toString]
@@ -118,7 +119,7 @@ target libopenblas pkg : FilePath := do
         cmd := "cp"
         args := #[(rootDir / nameToSharedLib "openblas").toString, dst.toString]
       }
-      let dst' := pkg.nativeLibDir / (nameToVersionedSharedLib "openblas" "0")
+      let dst' := pkg.sharedLibDir / (nameToVersionedSharedLib "openblas" "0")
       proc {
         cmd := "cp"
         args := #[dst.toString, dst'.toString]
@@ -145,4 +146,4 @@ extern_lib libleanblasc pkg := do
         oFiles := oFiles.push (← buildO oFile srcJob weakArgs (#["-DNDEBUG", "-O3", "-fPIC"] ++ inclArgs) "gcc" getLeanTrace)
     let name := nameToStaticLib "leanblasc"
 
-    buildStaticLib (pkg.nativeLibDir / name) (oFiles)
+    buildStaticLib (pkg.sharedLibDir / name) (oFiles)
