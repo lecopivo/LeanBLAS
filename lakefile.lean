@@ -24,7 +24,7 @@ package leanblas {
   preferReleaseBuild := true
 }
 
-require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.19.0-rc2"
+require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.19.0"
 
 ----------------------------------------------------------------------------------------------------
 -- Build Lean ↔ BLAS bindings ---------------------------------------------------------------------
@@ -45,9 +45,7 @@ target libleanblasc pkg : FilePath := do
 
     buildStaticLib (pkg.sharedLibDir / name) (oFiles)
 
-
 ----------------------------------------------------------------------------------------------------
-
 
 @[default_target]
 lean_lib LeanBLAS where
