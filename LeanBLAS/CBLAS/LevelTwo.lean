@@ -1,4 +1,4 @@
-import LeanBLAS.CBLAS.LevelTwoFloat64
+import LeanBLAS.FFI.CBLASLevelTwoFloat64
 import LeanBLAS.Spec.LevelTwo
 
 namespace BLAS.CBLAS

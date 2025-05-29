@@ -1,4 +1,4 @@
-import LeanBLAS.FloatArray
+import LeanBLAS.FFI.FloatArray
 
 namespace BLAS.CBLAS
 

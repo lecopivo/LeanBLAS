@@ -1,8 +1,4 @@
-import LeanBLAS.Util
-
 namespace BLAS
-
-open Sorry
 
 set_option linter.unusedVariables false
 
