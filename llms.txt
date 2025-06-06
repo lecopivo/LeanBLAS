@@ -1,0 +1,182 @@
+# LeanBLAS AI Assistant Guide
+
+## Project Overview
+
+LeanBLAS is a Lean 4 library providing bindings and formal specifications for BLAS (Basic Linear Algebra Subprograms). The project aims to formalize the mathematics of BLAS operations using dependent types, working with `Nat` instead of `Int32/64` and `ℝ` instead of `Float` for mathematical clarity.
+
+## Current Project State (2024-12-23:14:30)
+
+### Implemented Components
+
+1. **Level 1 BLAS (Vector Operations)** ✓
+   - Full FFI bindings for Float64 operations
+   - Complete specifications in `LeanBLAS/Spec/LevelOne.lean`
+   - Implementations include: dot, nrm2, asum, iamax, swap, copy, axpy, rotg, rotmg, rot, scal
+   - Extended operations: const, sum, axpby, scaladd, mul, div, inv, abs, sqrt, exp, log, sin, cos
+   - Tests available in `Test/cblas_level_one.lean`
+
+2. **Level 2 BLAS (Matrix-Vector Operations)** ⚠️ Partial
+   - FFI bindings for Float64 operations exist
+   - Basic type definitions (Order, Transpose, UpLo, Diag)
+   - Interface defined but **specifications missing** (marked with TODO)
+   - Operations defined: gemv, bmv, trmv, tbmv, tpmv, trsv, tbsv, tpsv, ger, her, her2
+   - Extended operations: packedToDense, denseToPacked, gpr
+   - **No tests implemented**
+
+3. **Level 3 BLAS (Matrix-Matrix Operations)** ❌ Missing
+   - No Lean implementation
+   - Python test file exists (`test_level3.py`) showing expected behavior
+   - Shell script exists (`run_level3_tests.sh`) but references non-existent `c/levelthree.c`
+
+4. **Infrastructure**
+   - FFI setup through C bindings in `c/` directory
+   - Build system using Lake with OpenBLAS integration
+   - Support for macOS and Linux (Windows not supported)
+
+### Directory Structure
+```
+LeanBLAS/
+├── c/                     # C FFI implementations
+│   ├── levelone.c        # Level 1 BLAS C bindings
+│   ├── leveltwo.c        # Level 2 BLAS C bindings
+│   └── leveltwoext.c     # Extended Level 2 operations
+├── LeanBLAS/
+│   ├── CBLAS/            # CBLAS interface implementations
+│   ├── FFI/              # Foreign Function Interface definitions
+│   └── Spec/             # Mathematical specifications
+├── Test/                 # Test files
+└── lake files            # Build configuration
+```
+
+## Next Steps & TODO List
+
+### High Priority Tasks
+
+- [ ] **Implement Level 3 BLAS Operations**
+  - [ ] Create `c/levelthree.c` with FFI bindings for matrix-matrix operations
+  - [ ] Create `LeanBLAS/FFI/CBLASLevelThreeFloat64.lean` with Lean FFI declarations
+  - [ ] Create `LeanBLAS/CBLAS/LevelThree.lean` with instance implementations
+  - [ ] Create `LeanBLAS/Spec/LevelThree.lean` with mathematical specifications
+  - [ ] Key operations to implement: GEMM, SYMM, SYRK, SYR2K, TRMM, TRSM
+
+- [ ] **Complete Level 2 BLAS Specifications**
+  - [ ] Add mathematical specifications for all Level 2 operations in `LeanBLAS/Spec/LevelTwo.lean`
+  - [ ] Follow the pattern from Level 1 specifications
+  - [ ] Add properties for matrix structure preservation (triangular, symmetric, etc.)
+
+- [ ] **Comprehensive Testing**
+  - [ ] Create `Test/cblas_level_two.lean` for Level 2 operations
+  - [ ] Create `Test/cblas_level_three.lean` for Level 3 operations
+  - [ ] Add property-based tests using Lean's proof system
+  - [ ] Create regression tests for bug fixes
+
+### Medium Priority Tasks
+
+- [ ] **Documentation**
+  - [ ] Add comprehensive doc comments (`/-- -/`) to all public functions
+  - [ ] Create module-level documentation (`/-! -/`) explaining each component
+  - [ ] Update README.md with usage examples for all BLAS levels
+  - [ ] Create a CHANGELOG.md to track version history
+
+- [ ] **Complex Number Support**
+  - [ ] Extend FFI bindings to support complex float operations
+  - [ ] Implement `ComplexFloat32` and `ComplexFloat64` types properly
+  - [ ] Add tests for complex number operations
+
+- [ ] **Performance & Optimization**
+  - [ ] Profile the FFI overhead
+  - [ ] Consider using `@[extern]` attributes for direct C calls where appropriate
+  - [ ] Implement FBIP (Functional But In-Place) optimizations using `dbgTraceIfShared`
+
+### Low Priority / Future Enhancements
+
+- [ ] **Verified Implementations**
+  - [ ] Create pure Lean implementations of BLAS operations
+  - [ ] Prove correctness of C implementations against specifications
+  - [ ] Develop tactics for automated BLAS proof generation
+
+- [ ] **Extended API**
+  - [ ] Support for sparse matrices
+  - [ ] Batched BLAS operations
+  - [ ] GPU backend support (CUBLAS/ROCm)
+
+- [ ] **Tooling & Infrastructure**
+  - [ ] Set up CI/CD with GitHub Actions
+  - [ ] Configure bors for merge queue management
+  - [ ] Add benchmarking suite
+  - [ ] Create Justfile for common commands
+
+## Implementation Guidelines
+
+### For Level 3 BLAS Implementation
+
+1. **C FFI Layer** (`c/levelthree.c`)
+   ```c
+   // Follow pattern from levelone.c and leveltwo.c
+   // Wrap cblas_dgemm, cblas_dsymm, cblas_dtrsm, etc.
+   // Handle array offsets and strides properly
+   ```
+
+2. **Lean FFI Declarations** (`LeanBLAS/FFI/CBLASLevelThreeFloat64.lean`)
+   ```lean
+   @[extern "lean_cblas_dgemm"]
+   opaque dgemm : Order → Transpose → Transpose → USize → USize → USize → 
+                  Float → Float64Array → USize → USize → Float64Array → 
+                  USize → USize → Float → Float64Array → USize → USize → Unit
+   ```
+
+3. **Instance Implementation** (`LeanBLAS/CBLAS/LevelThree.lean`)
+   ```lean
+   instance : LevelThreeData Float64Array Float Float where
+     gemm := fun order transA transB M N K alpha A offA lda B offB ldb beta C offC ldc =>
+       -- Implementation using dgemm FFI
+   ```
+
+4. **Mathematical Specification** (`LeanBLAS/Spec/LevelThree.lean`)
+   ```lean
+   class LevelThreeSpec ... where
+     gemm_spec : ∀ (M N K : Nat) ...,
+       gemm order transA transB M N K alpha A offA lda B offB ldb beta C offC ldc
+       =
+       -- Mathematical definition of matrix multiplication
+   ```
+
+### Code Style Guidelines
+
+- Use Unicode symbols where readable (e.g., `α` instead of `alpha`, `•` for scalar multiplication)
+- Liberal use of `sorry` for incremental development
+- Name holes with `?holeName` for clarity
+- Use `dbg_trace` for debugging during development
+- Prefer `Array` over `List` for performance
+- Use `let mut` and `for` loops in `Id.run do` blocks for mutable-style code
+
+### Testing Strategy
+
+1. **Unit Tests**: Test individual BLAS operations with known inputs/outputs
+2. **Property Tests**: Verify mathematical properties (associativity, distributivity, etc.)
+3. **Regression Tests**: Add tests for any bugs discovered and fixed
+4. **Performance Tests**: Benchmark against reference implementations
+
+## Common Issues & Solutions
+
+1. **Build Errors**: Ensure OpenBLAS is installed (`brew install openblas` on macOS)
+2. **FFI Issues**: Check that C function signatures match Lean declarations exactly
+3. **Type Errors**: Remember that Lean uses `Nat` for dimensions but C uses `int`/`size_t`
+4. **Memory Safety**: Array bounds checking is critical - use `InBounds` predicates
+
+## Key Concepts
+
+- **Dependent Types**: Use Lean's type system to encode matrix dimensions
+- **Specifications vs Implementations**: Specs use mathematical types (`ℝ`), implementations use computational types (`Float`)
+- **FFI Safety**: All C calls must be wrapped with proper bounds checking
+- **Verification**: Long-term goal is to prove implementation correctness against specifications
+
+## Resources
+
+- BLAS Reference: http://www.netlib.org/blas/
+- Lean 4 Documentation: https://leanprover.github.io/lean4/doc/
+- OpenBLAS: https://www.openblas.net/
+- Project Repository: https://github.com/lecopivo/LeanBLAS
+
+---
+Last Updated: 2024-12-23:14:30 
