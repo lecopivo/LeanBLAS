@@ -25,7 +25,7 @@ package leanblas {
   preferReleaseBuild := true
 }
 
-require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.21.0-rc3"
+require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.20.1"
 
 ----------------------------------------------------------------------------------------------------
 -- Build Lean ↔ BLAS bindings ---------------------------------------------------------------------
