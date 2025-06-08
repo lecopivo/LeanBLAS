@@ -31,20 +31,16 @@ require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v
 -- Build Lean ↔ BLAS bindings ---------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------
 target libleanblasc pkg : FilePath := do
-  -- let openblas ← libopenblas.fetch
-  -- pkg.afterBuildCacheAsync <| openblas.bindM fun d => do
+  let mut oFiles : Array (Job FilePath) := #[]
+  for file in (← (pkg.dir / "c").readDir) do
+    if file.path.extension == some "c" then
+      let oFile := pkg.buildDir / "c" / (file.fileName.stripSuffix ".c" ++ ".o")
+      let srcJob ← inputTextFile file.path
+      let weakArgs := #["-I", (← getLeanIncludeDir).toString]
+      oFiles := oFiles.push (← buildO oFile srcJob weakArgs (#["-DNDEBUG", "-O3", "-fPIC"] ++ inclArgs) "gcc" getLeanTrace)
+  let name := nameToStaticLib "leanblasc"
 
-  pkg.afterBuildCacheAsync do
-    let mut oFiles : Array (Job FilePath) := #[]
-    for file in (← (pkg.dir / "c").readDir) do
-      if file.path.extension == some "c" then
-        let oFile := pkg.buildDir / "c" / (file.fileName.stripSuffix ".c" ++ ".o")
-        let srcJob ← inputTextFile file.path
-        let weakArgs := #["-I", (← getLeanIncludeDir).toString]
-        oFiles := oFiles.push (← buildO oFile srcJob weakArgs (#["-DNDEBUG", "-O3", "-fPIC"] ++ inclArgs) "gcc" getLeanTrace)
-    let name := nameToStaticLib "leanblasc"
-
-    buildStaticLib (pkg.sharedLibDir / name) (oFiles)
+  buildStaticLib (pkg.sharedLibDir / name) (oFiles)
 
 ----------------------------------------------------------------------------------------------------
 
