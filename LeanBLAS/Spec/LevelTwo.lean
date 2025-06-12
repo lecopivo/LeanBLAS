@@ -1,128 +1,417 @@
+/-
+Copyright (c) 2024 The LeanBLAS Authors. All rights reserved.
+Released under the Apache 2.0 license as described in the repository's LICENSE file.
+Authors: The LeanBLAS Development Team
+-/
+
 import LeanBLAS.Spec.LevelOne
 import Mathlib.Analysis.RCLike.Basic
 import Mathlib.Algebra.Star.Basic
 
+-- Enable missing documentation linter for this file
+set_option linter.missingDocs true
+
+/-!
+## Level 2 BLAS Operations
+
+This module defines the interface for Level 2 BLAS operations, which are matrix-vector operations.
+Level 2 BLAS includes operations like matrix-vector multiplication, triangular solves, and
+rank-1 and rank-2 updates.
+-/
+
 namespace BLAS
 
 
--- move this to Spec directory
+/--
+Matrix storage order.
+
+Specifies whether matrix elements are stored in row-major or column-major order.
+This affects how matrix elements are accessed in memory.
+-/
 inductive Order where
+  /-- Row-major order: elements of each row are contiguous in memory. -/
   | RowMajor
+  /-- Column-major order: elements of each column are contiguous in memory (Fortran-style). -/
   | ColMajor
 deriving BEq, DecidableEq
 
--- move this to Spec directory
+/--
+Matrix transpose operation.
+
+Specifies whether and how to transpose a matrix in an operation.
+-/
 inductive Transpose where
+  /-- Use the matrix as-is, no transposition. -/
   | NoTrans
+  /-- Transpose the matrix (swap rows and columns). -/
   | Trans
+  /-- Conjugate transpose (Hermitian transpose) - transpose and complex conjugate. -/
   | ConjTrans
 deriving BEq, DecidableEq
 
--- move this to Spec directory
+/--
+Triangular matrix type.
+
+Specifies whether to use the upper or lower triangular part of a matrix.
+-/
 inductive UpLo where
-  /-- Upper triangular matrix --/
+  /-- Upper triangular matrix: only elements on or above the diagonal are used. -/
   | Upper
-  /-- Lower triangular matrix --/
+  /-- Lower triangular matrix: only elements on or below the diagonal are used. -/
   | Lower
 deriving BEq, DecidableEq
 
+/--
+Diagonal type for triangular matrices.
+
+Specifies whether the diagonal elements of a triangular matrix are assumed to be one.
+-/
 inductive Diag where
-  /-- Non-unit triangular matrix --/
+  /-- Non-unit triangular: diagonal elements are stored and used from the matrix. -/
   | NonUnit
-  /-- Unit triangular matrix --/
+  /-- Unit triangular: diagonal elements are assumed to be 1 and not referenced. -/
   | Unit
 deriving BEq, DecidableEq
 
 /-- Determines whether a matrix appears on the left or right side of a product -/
 inductive Side where
+  /-- Matrix appears on the left side of the product. -/
   | Left
+  /-- Matrix appears on the right side of the product. -/
   | Right
 deriving BEq, DecidableEq
 
+/--
+Core Level 2 BLAS operations interface.
+
+This class defines matrix-vector operations that form the basis of Level 2 BLAS.
+These operations are fundamental for many linear algebra algorithms.
+
+## Type Parameters
+- `Array`: The array type that stores matrices and vectors
+- `R`: The real number type (for real-valued results)
+- `K`: The field type (can be real or complex)
+-/
 class LevelTwoData (Array : Type*) (R K : outParam Type*) where
 
-  /-- General matrix-vector multiplication
-  ```
-  Y := alpha * A * X + beta * Y
-  ```
-  --/
+  /-- 
+  General matrix-vector multiplication: `Y := alpha * A * X + beta * Y`
+  
+  ## Parameters
+  - `order`: Storage order of matrix A (row-major or column-major)
+  - `transA`: Whether to transpose A (NoTrans, Trans, or ConjTrans)
+  - `M`: Number of rows of matrix A (before transpose)
+  - `N`: Number of columns of matrix A (before transpose)
+  - `alpha`: Scalar multiplier for A*X
+  - `A`: The matrix
+  - `offA`: Offset to the first element of A
+  - `lda`: Leading dimension of A (distance between columns in column-major)
+  - `X`: Input vector
+  - `offX`: Offset to the first element of X
+  - `incX`: Stride between elements of X
+  - `beta`: Scalar multiplier for Y
+  - `Y`: Input/output vector
+  - `offY`: Offset to the first element of Y  
+  - `incY`: Stride between elements of Y
+  - Returns: Updated vector Y
+  -/
   gemv (order : Order) (transA : Transpose) (M : Nat) (N : Nat) (alpha : K)
     (A : Array) (offA : Nat) (lda : Nat)
     (X : Array) (offX incX : Nat) (beta : K)
     (Y : Array) (offY incY : Nat) : Array
 
+  /--
+  Banded matrix-vector multiplication: `Y := alpha * A * X + beta * Y`
+  
+  ## Parameters
+  - `order`: Storage order of matrix A
+  - `transA`: Whether to transpose A
+  - `M`: Number of rows of matrix A
+  - `N`: Number of columns of matrix A
+  - `KL`: Number of sub-diagonals
+  - `KU`: Number of super-diagonals
+  - `alpha`: Scalar multiplier for A*X
+  - `A`: The banded matrix in packed format
+  - `offA`: Offset to the first element of A
+  - `lda`: Leading dimension of A
+  - `X`: Input vector
+  - `offX`, `incX`: Offset and stride for X
+  - `beta`: Scalar multiplier for Y
+  - `Y`: Input/output vector  
+  - `offY`, `incY`: Offset and stride for Y
+  - Returns: Updated vector Y
+  -/
   bmv (order : Order) (transA : Transpose) (M : Nat) (N : Nat) (KL KU : Nat) (alpha : K)
     (A : Array) (offA : Nat) (lda : Nat)
     (X : Array) (offX incX : Nat) (beta : K)
     (Y : Array) (offY incY : Nat) : Array
 
+  /--
+  Triangular matrix-vector multiplication: `X := A * X` or `X := A^T * X`
+  
+  ## Parameters
+  - `order`: Storage order of matrix A
+  - `uplo`: Use upper or lower triangular part
+  - `transA`: Whether to transpose A
+  - `diag`: Whether A has unit diagonal (true) or not (false)
+  - `N`: Order of matrix A (N×N)
+  - `A`: The triangular matrix
+  - `offA`: Offset to the first element of A
+  - `lda`: Leading dimension of A
+  - `X`: Input/output vector
+  - `offX`, `incX`: Offset and stride for X
+  - Returns: Updated vector X
+  -/
   trmv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N : Nat)
     (A : Array) (offA : Nat) (lda : Nat)
     (X : Array) (offX incX : Nat) : Array
 
+  /--
+  Triangular banded matrix-vector multiplication: `X := A * X` or `X := A^T * X`
+  
+  ## Parameters
+  - `order`: Storage order of matrix A
+  - `uplo`: Use upper or lower triangular part
+  - `transA`: Whether to transpose A
+  - `diag`: Whether A has unit diagonal
+  - `N`: Order of matrix A
+  - `K`: Number of diagonals (sub-diagonals if lower, super-diagonals if upper)
+  - `A`: The triangular banded matrix in packed format
+  - `offA`: Offset to the first element of A
+  - `lda`: Leading dimension of A
+  - `X`: Input/output vector
+  - `offX`, `incX`: Offset and stride for X
+  - Returns: Updated vector X
+  -/
   tbmv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N K : Nat)
     (A : Array) (offA : Nat) (lda : Nat)
     (X : Array) (offX incX : Nat) : Array
 
+  /--
+  Triangular packed matrix-vector multiplication: `X := A * X` or `X := A^T * X`
+  
+  ## Parameters
+  - `order`: Storage order of matrix A
+  - `uplo`: Use upper or lower triangular part
+  - `transA`: Whether to transpose A
+  - `diag`: Whether A has unit diagonal
+  - `N`: Order of matrix A
+  - `A`: The triangular matrix in packed format (no wasted storage)
+  - `offA`: Offset to the first element of A
+  - `X`: Input/output vector
+  - `offX`, `incX`: Offset and stride for X
+  - Returns: Updated vector X
+  -/
   tpmv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N : Nat)
     (A : Array) (offA : Nat)
     (X : Array) (offX incX : Nat) : Array
 
+  /--
+  Triangular solve: solve `A * X = B` or `A^T * X = B` for X
+  
+  ## Parameters
+  - `order`: Storage order of matrix A
+  - `uplo`: Use upper or lower triangular part
+  - `transA`: Whether to transpose A
+  - `diag`: Whether A has unit diagonal
+  - `N`: Order of matrix A
+  - `A`: The triangular matrix
+  - `offA`: Offset to the first element of A
+  - `lda`: Leading dimension of A
+  - `X`: On entry, the right-hand side B; on exit, the solution X
+  - `offX`, `incX`: Offset and stride for X
+  - Returns: Solution vector X
+  -/
   trsv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N : Nat)
     (A : Array) (offA : Nat) (lda : Nat)
     (X : Array) (offX incX : Nat) : Array
 
+  /--
+  Triangular banded solve: solve `A * X = B` or `A^T * X = B` for X
+  
+  ## Parameters
+  - `order`: Storage order of matrix A
+  - `uplo`: Use upper or lower triangular part
+  - `transA`: Whether to transpose A
+  - `diag`: Whether A has unit diagonal
+  - `N`: Order of matrix A
+  - `K`: Number of diagonals
+  - `A`: The triangular banded matrix in packed format
+  - `offA`: Offset to the first element of A
+  - `lda`: Leading dimension of A
+  - `X`: On entry, the right-hand side B; on exit, the solution X
+  - `offX`, `incX`: Offset and stride for X
+  - Returns: Solution vector X
+  -/
   tbsv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N K : Nat)
     (A : Array) (offA : Nat) (lda : Nat)
     (X : Array) (offX incX : Nat) : Array
 
+  /--
+  Triangular packed solve: solve `A * X = B` or `A^T * X = B` for X
+  
+  ## Parameters
+  - `order`: Storage order of matrix A
+  - `uplo`: Use upper or lower triangular part
+  - `transA`: Whether to transpose A  
+  - `diag`: Whether A has unit diagonal
+  - `N`: Order of matrix A
+  - `A`: The triangular matrix in packed format
+  - `offA`: Offset to the first element of A
+  - `X`: On entry, the right-hand side B; on exit, the solution X
+  - `offX`, `incX`: Offset and stride for X
+  - Returns: Solution vector X
+  -/
   tpsv (order : Order) (uplo : UpLo)
     (transA : Transpose) (diag : Bool) (N : Nat)
     (A : Array) (offA : Nat)
     (X : Array) (offX incX : Nat) : Array
 
+  /--
+  General rank-1 update: `A := alpha * X * Y^T + A`
+  
+  ## Parameters
+  - `order`: Storage order of matrix A
+  - `M`: Number of rows of matrix A
+  - `N`: Number of columns of matrix A
+  - `alpha`: Scalar multiplier
+  - `X`: First vector (length M)
+  - `offX`, `incX`: Offset and stride for X
+  - `Y`: Second vector (length N)
+  - `offY`, `incY`: Offset and stride for Y
+  - `A`: Input/output matrix
+  - `offA`: Offset to the first element of A
+  - `lda`: Leading dimension of A
+  - Returns: Updated matrix A
+  -/
   ger (order : Order) (M : Nat) (N : Nat) (alpha : K)
     (X : Array) (offX incX : Nat)
     (Y : Array) (offY incY : Nat)
     (A : Array) (offA : Nat) (lda : Nat) : Array
 
+  /--
+  Hermitian rank-1 update: `A := alpha * X * X^H + A`
+  
+  ## Parameters
+  - `order`: Storage order of matrix A
+  - `uplo`: Use upper or lower triangular part
+  - `N`: Order of matrix A (N×N)
+  - `alpha`: Real scalar multiplier
+  - `X`: Vector (length N)
+  - `offX`, `incX`: Offset and stride for X
+  - `A`: Input/output Hermitian matrix
+  - `offA`: Offset to the first element of A
+  - `lda`: Leading dimension of A
+  - Returns: Updated Hermitian matrix A
+  -/
   her (order : Order) (uplo : UpLo) (N : Nat) (alpha : K)
     (X : Array) (offX incX : Nat)
     (A : Array) (offA : Nat) (lda : Nat) : Array
 
+  /--
+  Hermitian rank-2 update: `A := alpha * X * Y^H + conj(alpha) * Y * X^H + A`
+  
+  ## Parameters
+  - `order`: Storage order of matrix A
+  - `uplo`: Use upper or lower triangular part
+  - `N`: Order of matrix A (N×N)
+  - `alpha`: Scalar multiplier
+  - `X`: First vector (length N)
+  - `offX`, `incX`: Offset and stride for X
+  - `Y`: Second vector (length N)
+  - `offY`, `incY`: Offset and stride for Y
+  - `A`: Input/output Hermitian matrix
+  - `offA`: Offset to the first element of A
+  - `lda`: Leading dimension of A
+  - Returns: Updated Hermitian matrix A
+  -/
   her2 (order : Order) (uplo : UpLo) (N : Nat) (alpha : K)
     (X : Array) (offX incX : Nat)
     (Y : Array) (offY incY : Nat)
     (A : Array) (offA : Nat) (lda : Nat) : Array
 
 
-/-- Level 2 BLAS function that seems to be missing from the BLAS standard. -/
+/-- 
+Extended Level 2 BLAS operations.
+
+These operations extend the standard BLAS interface with additional functionality
+for packed matrix operations and other utilities.
+
+## Type Parameters
+- `Array`: The array type
+- `R`: Real number type
+- `K`: Field type (real or complex)
+-/
 class LevelTwoDataExt (Array : Type*) (R K : outParam Type*) where
 
-  /-- Copies packed matrix `X` to dense matrix `A`.
-  It will zero out elements that are above/bellow the main diagonal. -/
+  /-- 
+  Convert packed triangular matrix to dense format.
+  
+  Copies packed matrix `Ap` to dense matrix `A`, zeroing out elements
+  that are above/below the main diagonal depending on `uplo`.
+  
+  ## Parameters
+  - `N`: Order of the matrix
+  - `uplo`: Use upper or lower triangular part
+  - `orderAp`: Storage order of packed matrix
+  - `Ap`: Packed triangular matrix
+  - `orderA`: Storage order of dense matrix
+  - `A`: Output dense matrix
+  - `offA`: Offset to the first element of A
+  - `lda`: Leading dimension of A
+  - Returns: Dense matrix A
+  -/
   packedToDense (N : Nat) (uplo : UpLo)
     (orderAp : Order) (Ap : Array) (orderA : Order) (A : Array) (offA : Nat) (lda : Nat) : Array
 
-  /-- Extract uppler/lower triangular part of A and stores it in packed format. -/
+  /-- 
+  Convert dense matrix to packed triangular format.
+  
+  Extracts the upper/lower triangular part of dense matrix `A` 
+  and stores it in packed format in `Ap`.
+  
+  ## Parameters
+  - `N`: Order of the matrix
+  - `uplo`: Extract upper or lower triangular part
+  - `orderA`: Storage order of dense matrix
+  - `A`: Input dense matrix
+  - `offA`: Offset to the first element of A
+  - `lda`: Leading dimension of A
+  - `orderAp`: Storage order of packed matrix
+  - `Ap`: Output packed triangular matrix
+  - Returns: Packed matrix Ap
+  -/
   denseToPacked (N : Nat) (uplo : UpLo)
     (orderA : Order) (A : Array) (offA : Nat) (lda : Nat)
     (orderAp : Order) (Ap : Array) : Array
 
-  /-- General packed rand-1 update
-  ```
-    A := alpha * m(x * y^H) + A
-  ```
+  /-- 
+  General packed rank-1 update: `A := alpha * m(X * Y^H) + A`
+  
+  Here `m` denotes taking the upper or lower triangular part based on `uplo`.
+  
+  ## Parameters
+  - `order`: Storage order of packed matrix A
+  - `uplo`: Use upper or lower triangular part
+  - `N`: Order of matrix A
+  - `alpha`: Scalar multiplier
+  - `X`: First vector (length N)
+  - `offX`, `incX`: Offset and stride for X
+  - `Y`: Second vector (length N)
+  - `offY`, `incY`: Offset and stride for Y
+  - `A`: Input/output packed triangular matrix
+  - `offA`: Offset to the first element of A
+  - Returns: Updated packed matrix A
   -/
   gpr (order : Order) (uplo : UpLo) (N : Nat) (alpha : K)
     (X : Array) (offX incX : Nat)
     (Y : Array) (offY incY : Nat)
-    (A : Array) (offA : Nat) : array
+    (A : Array) (offA : Nat) : Array
 
 
 ----------------------------------------------------------------------------------------------------
@@ -135,7 +424,20 @@ variable {Array : Type*} {R K : Type*}
 variable [LevelOneData Array R K] [LevelTwoData Array R K]
 variable [Field K] [RCLike K] [Field R] [RCLike R]
 
-/-- Helper function to compute matrix element indices based on order -/
+/-- 
+Compute the linear index for a matrix element at position (i,j).
+
+Converts 2D matrix coordinates to a 1D array index based on the storage order.
+
+## Parameters
+- `order`: Storage order (row-major or column-major)
+- `i`: Row index
+- `j`: Column index  
+- `lda`: Leading dimension (stride between columns for column-major)
+
+## Returns
+The linear index in the underlying array
+-/
 def matrixIndex (order : Order) (i j : Nat) (lda : Nat) : Nat :=
   match order with
   | Order.RowMajor => i * lda + j
