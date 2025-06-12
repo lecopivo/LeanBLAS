@@ -30,8 +30,8 @@ def testDotProduct : IO Unit := do
   let y_small := #f64[2.0, 3.0, 4.0, 5.0]
   let result_small := ddot 4 x_small 0 1 y_small 0 1
   let expected_small := 1.0*2.0 + 2.0*3.0 + 3.0*4.0 + 4.0*5.0  -- = 40
-  IO.println s!"Small test: dot([1,2,3,4], [2,3,4,5]) = {result_small}"
-  IO.println s!"Expected: {expected_small}"
+  IO.println s!"Small test: dot([1,2,3,4], [2,3,4,5]) = {result_small}
+Expected: {expected_small}"
   if !approxEq result_small expected_small then
     IO.println "❌ DOT product failed correctness test!"
   else
@@ -48,8 +48,8 @@ def testDotProduct : IO Unit := do
   let result := ddot size x 0 1 y 0 1
   let end_single ← IO.monoNanosNow
   let single_time := Float.ofNat (end_single - start_single) / 1e9
-  IO.println s!"Single operation result: {result}"
-  IO.println s!"Single operation time: {single_time} seconds"
+  IO.println s!"Single operation result: {result}
+Single operation time: {single_time} seconds"
   
   -- Now benchmark multiple iterations
   -- We accumulate the results into a dummy variable to make sure the compiler
@@ -71,9 +71,9 @@ def testDotProduct : IO Unit := do
   let flops := Float.ofNat (2 * size) -- multiply + add per element
   let gflops := flops / (time_per_op * 1e9)
 
-  IO.println s!"Total time for {iterations} iterations: {total_time} seconds"
-  IO.println s!"Time per operation: {formatTime time_per_op}"
-  IO.println s!"Performance: {gflops} GFLOPS"
+  IO.println s!"Total time for {iterations} iterations: {total_time} seconds
+Time per operation: {formatTime time_per_op}
+Performance: {gflops} GFLOPS"
 
 /-- Test and benchmark norm computation -/
 def testNorm : IO Unit := do
@@ -83,8 +83,8 @@ def testNorm : IO Unit := do
   let x_small := #f64[3.0, 4.0]  -- Should give norm = 5
   let result_small := dnrm2 2 x_small 0 1
   let expected_small := 5.0
-  IO.println s!"Small test: norm([3, 4]) = {result_small}"
-  IO.println s!"Expected: {expected_small}"
+  IO.println s!"Small test: norm([3, 4]) = {result_small}
+Expected: {expected_small}"
   if !approxEq result_small expected_small then
     IO.println "❌ NORM failed correctness test!"
   else
@@ -109,9 +109,9 @@ def testNorm : IO Unit := do
   let gflops := flops / (time_per_op * 1e9)
 
   IO.println s!"Checksum (acc): {acc}"
-  IO.println s!"Total time for {iterations} iterations: {total_time} seconds"
-  IO.println s!"Time per operation: {formatTime time_per_op}"
-  IO.println s!"Performance: {gflops} GFLOPS"
+  IO.println s!"Total time for {iterations} iterations: {total_time} seconds
+Time per operation: {formatTime time_per_op}
+Performance: {gflops} GFLOPS"
 
 /-- Test and benchmark AXPY operation -/
 def testAxpy : IO Unit := do
@@ -158,9 +158,9 @@ def testAxpy : IO Unit := do
   let gflops := flops / (time_per_op * 1e9)
 
   IO.println s!"Checksum: {checksum}"
-  IO.println s!"Total time for {iterations} iterations: {total_time} seconds"
-  IO.println s!"Time per operation: {formatTime time_per_op}"
-  IO.println s!"Performance: {gflops} GFLOPS"
+  IO.println s!"Total time for {iterations} iterations: {total_time} seconds
+Time per operation: {formatTime time_per_op}
+Performance: {gflops} GFLOPS"
 
 /-- Memory bandwidth test -/
 def testMemoryBandwidth : IO Unit := do
