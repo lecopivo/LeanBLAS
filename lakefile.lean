@@ -24,7 +24,7 @@ package leanblas {
   preferReleaseBuild := true
 }
 
-require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.20.0-rc5"
+require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "9dbb163e576423ee953f0ee6f759f63714339162"
 
 ----------------------------------------------------------------------------------------------------
 -- Build Lean ↔ BLAS bindings ---------------------------------------------------------------------
@@ -56,6 +56,9 @@ lean_lib LeanBLAS.FFI where
   moreLinkObjs := #[libleanblasc]
 
 @[test_driver]
+lean_exe ComprehensiveTests where
+  root := `Test.TestRunner
+
 lean_exe CBLASLevelOneTest where
   root := `Test.cblas_level_one
 
@@ -64,6 +67,39 @@ lean_exe DenseVectorTest where
 
 lean_exe TriangularTest where
   root := `Test.packed_triangular
+
+lean_exe PropertyTests where
+  root := `Test.Property
+
+lean_exe EdgeCaseTests where
+  root := `Test.EdgeCases
+
+lean_exe BenchmarkTests where
+  root := `Test.Benchmarks
+
+lean_exe CorrectnessTests where
+  root := `Test.Correctness
+
+lean_exe Level3Tests where
+  root := `Test.Level3
+
+lean_exe SimpleTest where
+  root := `Test.Simple
+
+lean_exe BenchmarksFixedTest where
+  root := `Test.BenchmarksFixed
+
+-- Small utility executable used internally for measuring timings while
+-- developing the benchmark suite.  Not part of the public API.
+lean_exe TimeTest where
+  root := `TimeTest
+
+-- Public showcase executable
+lean_exe Gallery where
+  root := `Gallery
+
+lean_exe Level3Benchmarks where
+  root := `Test.BenchmarksLevel3
 
 
 -- ----------------------------------------------------------------------------------------------------
