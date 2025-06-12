@@ -30,6 +30,12 @@ inductive Diag where
   | Unit
 deriving BEq, DecidableEq
 
+/-- Determines whether a matrix appears on the left or right side of a product -/
+inductive Side where
+  | Left
+  | Right
+deriving BEq, DecidableEq
+
 class LevelTwoData (Array : Type*) (R K : outParam Type*) where
 
   /-- General matrix-vector multiplication
