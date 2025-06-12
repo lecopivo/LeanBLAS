@@ -1,0 +1,59 @@
+name: LeanBLAS CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # ------------------------------------------------------------
+      # Lean toolchain (elan) + Lake
+      # ------------------------------------------------------------
+      - name: Install Lean toolchain
+        uses: leanprover/lean-action@v1
+
+      # ------------------------------------------------------------
+      # Cache Lake build artefacts to speed up repeated CI runs.
+      # ------------------------------------------------------------
+      - name: Cache Lake build
+        id: cache-lake
+        uses: actions/cache@v3
+        with:
+          # Lake keeps build artefacts in a per-project `.lake` directory
+          # but also in a user-level `~/.lake` directory when building
+          # shared package dependencies.  Caching both yields the biggest
+          # win across CI runs.
+          path: |
+            ~/.lake
+            .lake/build
+            .lake/packages
+          # Change cache key when the manifest or any Lean file changes.
+          key: ${{ runner.os }}-lake-${{ hashFiles('lake-manifest.json', '**/*.lean', 'lakefile.lean') }}
+
+      # ------------------------------------------------------------
+      # System & Python dependencies
+      # ------------------------------------------------------------
+      - name: Install system dependencies (OpenBLAS)
+        run: sudo apt-get update && sudo apt-get install -y build-essential libopenblas-dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps
+        run: python -m pip install --upgrade pip numpy
+
+      # ------------------------------------------------------------
+      # Lean × NumPy cross-check: fails if answers diverge
+      # ------------------------------------------------------------
+      - name: Lean ✕ NumPy cross-test
+        run: python cross_check_numpy.py
