@@ -100,19 +100,32 @@
 - **Lean headers**: ✅ Found and configured at `/Users/alokbeniwal/.elan/toolchains/leanprover--lean4---v4.21.0-rc3/include`
 - **Level 3 C tests**: ✅ Compiling and running successfully
 
-### 🔧 Immediate Next Steps
-1. **Implement complex number support**: Extend to ZGEMM, CGEMM
+### 🔧 Current TODO List
+1. **Fix the build cycle issue with LeanBLAS.CBLAS.LevelThree** (HIGH PRIORITY)
+   - Resolve circular dependency blocking the build
+   - Ensure all modules compile without cycles
+2. **Create a proper README.md for the project** (HIGH PRIORITY)
+   - Project overview and goals
+   - Installation instructions
+   - Usage examples
+   - API documentation links
+3. **Create a pull request to merge Level 3 BLAS implementation** (HIGH PRIORITY)
+   - Prepare branch for merge
+   - Write comprehensive PR description
+4. **Add missing documentation for remaining modules** (MEDIUM PRIORITY)
+   - CBLAS implementation modules
+   - FFI binding modules
+   - ComplexFloat module
+5. **Implement remaining Level 3 BLAS operations for complex numbers** (MEDIUM PRIORITY)
    - Add ComplexFloat64 support to Level 3 operations
    - Create FFI bindings for complex BLAS functions
    - Test with complex matrices
-2. **Add formal mathematical proofs**: Verify BLAS properties in Lean
-   - Prove associativity of matrix multiplication
-   - Verify distributivity properties
-   - Establish numerical stability bounds
-3. **Create comprehensive documentation**:
-   - Usage examples for common operations
-   - Performance tuning guide
-   - API reference with type signatures
+6. **Add performance benchmarks comparing with native BLAS** (LOW PRIORITY)
+   - Comprehensive performance validation
+   - Comparison with optimized implementations
+7. **Write academic paper about the formalization** (LOW PRIORITY)
+   - Document the verification approach
+   - Highlight contributions to verified computing
 
 ### 🐛 Debugging Tips
 1. **Property test failures**: Check if the mathematical property is correctly stated

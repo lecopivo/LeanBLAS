@@ -48,9 +48,6 @@ target libleanblasc pkg : FilePath := do
 @[default_target]
 lean_lib LeanBLAS where
   roots := #[`LeanBLAS]
-
-lean_lib LeanBLAS.FFI where
-  precompileModules := true
   moreLinkObjs := #[libleanblasc]
 
 @[test_driver]
