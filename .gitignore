@@ -1,2 +1,5 @@
 /.lake
 *~
+.venv/
+.cursor/
+.cursorrules
