@@ -6,16 +6,14 @@ def linkArgs := -- (#[] : Array String)
   if System.Platform.isWindows then
     #[]
   else if System.Platform.isOSX then
-    #["-L/opt/homebrew/opt/openblas/lib",
-      "-L/usr/local/opt/openblas/lib", "-lblas"]
+    #["-L/opt/homebrew/opt/openblas/lib", "-lblas"]
   else -- assuming linux
     #["-L/usr/lib/x86_64-linux-gnu/", "-lblas"]
 def inclArgs :=
   if System.Platform.isWindows then
     #[]
   else if System.Platform.isOSX then
-    #["-I/opt/homebrew/opt/openblas/include",
-      "-I/usr/local/opt/openblas/include"]
+    #["-I/opt/homebrew/opt/openblas/include"]
   else -- assuming linux
     #[]
 
@@ -101,6 +99,9 @@ lean_exe Gallery where
 lean_exe Level3Benchmarks where
   root := `Test.BenchmarksLevel3
 
+lean_exe PropertyDebugTest where
+  root := `Test.PropertyDebug
+
 
 -- ----------------------------------------------------------------------------------------------------
 -- -- Download and build OpenBLAS ---------------------------------------------------------------------
@@ -134,6 +135,38 @@ lean_exe Level3Benchmarks where
 --     cwd := cwd
 --   }
 
+-- def getOpenBLASVersion (rootDir : FilePath) : LogIO String := do
+--   -- Try to extract version from openblas_config.h after build
+--   let configFile := rootDir / "openblas_config.h"
+--   if ← configFile.pathExists then
+--     let content ← IO.FS.readFile configFile
+--     -- Look for #define OPENBLAS_VERSION " OpenBLAS x.y.z "
+--     let lines := content.splitOn "\n"
+--     for line in lines do
+--       if line.contains "OPENBLAS_VERSION" && line.contains "define" then
+--         -- Extract version from line like: #define OPENBLAS_VERSION " OpenBLAS 0.3.29 "
+--         let parts := line.split (· == '"')
+--         if parts.length ≥ 2 then
+--           let versionStr := parts[1]!.trim
+--           -- Remove "OpenBLAS " prefix if present
+--           let version := if versionStr.startsWith "OpenBLAS " then
+--             versionStr.drop 9
+--           else
+--             versionStr
+--           return version.trim
+--   -- Fallback: try to get version from Makefile.rule
+--   let makefileRule := rootDir / "Makefile.rule"
+--   if ← makefileRule.pathExists then
+--     let content ← IO.FS.readFile makefileRule  
+--     let lines := content.splitOn "\n"
+--     for line in lines do
+--       if line.startsWith "VERSION" && line.contains "=" then
+--         let parts := line.split (· == '=')
+--         if parts.length ≥ 2 then
+--           return parts[1]!.trim
+--   -- Default fallback
+--   return "0.3"
+
 -- target libopenblas pkg : FilePath := do
 --   afterReleaseAsync pkg do
 --     let rootDir := pkg.buildDir / "OpenBLAS"
@@ -161,8 +194,9 @@ lean_exe Level3Benchmarks where
 --           cmd := "cp"
 --           args := #[(rootDir / nameToSharedLib "openblas").toString, dst.toString]
 --         }
---         -- TODO: Don't hardcode the version "0".
---         let dst' := pkg.sharedLibDir / (nameToVersionedSharedLib "openblas" "0")
+--         -- Extract version from built OpenBLAS
+--         let version ← getOpenBLASVersion rootDir
+--         let dst' := pkg.sharedLibDir / (nameToVersionedSharedLib "openblas" version)
 --         proc {
 --           cmd := "cp"
 --           args := #[dst.toString, dst'.toString]
@@ -175,7 +209,9 @@ lean_exe Level3Benchmarks where
 --         cmd := "cp"
 --         args := #[(rootDir / nameToSharedLib "openblas").toString, dst.toString]
 --       }
---       let dst' := pkg.sharedLibDir / (nameToVersionedSharedLib "openblas" "0")
+--       -- Extract version from built OpenBLAS
+--       let version ← getOpenBLASVersion rootDir
+--       let dst' := pkg.sharedLibDir / (nameToVersionedSharedLib "openblas" version)
 --       proc {
 --         cmd := "cp"
 --         args := #[dst.toString, dst'.toString]
