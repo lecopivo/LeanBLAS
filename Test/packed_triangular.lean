@@ -24,7 +24,7 @@ def main : IO Unit := do
   let Ap : DenseVector FloatArray .normal (n*(n-1)/2) Float :=
     ⟨⟨#[1,2,3,4,5,6]⟩,by simp[DenseVector.Storage.IsValid,LevelOneData.size,n]; sorry_proof⟩
 
-  -- lenght 4 vector that is a subvector of vector of length 8
+  -- length 4 vector that is a subvector of vector of length 8
   let x : DenseVector FloatArray (.subvector 1 2) n Float :=
     ⟨⟨#[-1,1,-2,10,-3,100,-4,1000]⟩, sorry_proof⟩
 
