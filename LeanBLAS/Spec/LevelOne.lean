@@ -300,7 +300,18 @@ class LevelOneSpec (Array : Type*) (R C : outParam Type*) [RCLike R] [RCLike C] 
     =
     (∑ (i : Fin N), let x := (toComplex (get X (offX + i.1*incX))); |x.re| + |x.im|)
 
-  -- TODO: iamax_spec - specification for index of maximum absolute value
+  /-- iamax finds the index of the element with maximum absolute value.
+      Returns the index i such that |X[i]| ≥ |X[j]| for all valid j.
+      If multiple elements have the same maximum absolute value, returns the first index. -/
+  iamax_spec (N : Nat) (X : Array) (offX incX : Nat) :
+    InBounds X offX incX (N-1)
+    →
+    N > 0
+    →
+    ∃ (i : Fin N), 
+      (∀ (j : Fin N), |toReal (get X (offX + i.1*incX))| ≥ |toReal (get X (offX + j.1*incX))|)
+      ∧
+      (∀ (j : Fin N), j.1 < i.1 → |toReal (get X (offX + j.1*incX))| < |toReal (get X (offX + i.1*incX))|)
 
   /-- Swap exchanges elements between two vectors. -/
   swap_spec (N : Nat) (X : Array) (offX incX : Nat) (Y : Array) (offY incY : Nat) :

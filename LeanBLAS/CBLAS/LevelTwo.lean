@@ -1,9 +1,45 @@
+/-!
+# CBLAS Level 2 Implementation
+
+This module provides the CBLAS (C interface to BLAS) implementation of Level 2 BLAS operations
+for Float64Array types. Level 2 operations are matrix-vector operations with O(n²) complexity.
+
+## Overview
+
+The implementation covers all standard Level 2 BLAS operations including:
+- General, symmetric, and triangular matrix-vector products
+- Rank-1 and rank-2 updates
+- Triangular solves
+- Banded and packed matrix operations
+
+## Matrix Storage Formats
+
+The implementation supports multiple matrix storage formats:
+- **General matrices**: Full storage in row-major or column-major order
+- **Symmetric matrices**: Only upper or lower triangle stored
+- **Triangular matrices**: Only non-zero triangle stored
+- **Banded matrices**: Only diagonals within bandwidth stored
+- **Packed matrices**: Triangular/symmetric matrices in compact 1D array
+
+## Implementation Details
+
+All operations use FFI bindings to optimized BLAS libraries. The module handles:
+- Layout conversion (row-major vs column-major)
+- Index transformation (Nat to USize)
+- Transpose and conjugate operations
+- Proper memory access patterns for cache efficiency
+-/
+
 import LeanBLAS.FFI.CBLASLevelTwoFloat64
 import LeanBLAS.Spec.LevelTwo
 
 namespace BLAS.CBLAS
 
+/-- CBLAS implementation of Level 2 BLAS operations for Float64Array.
 
+This instance provides efficient matrix-vector operations through FFI calls
+to optimized BLAS libraries. All matrix storage formats (general, symmetric,
+triangular, banded, packed) are supported with appropriate layout parameters. -/
 instance : LevelTwoData Float64Array Float Float where
 
   gemv order trans M N a A offA ldaA X offX incX b Y offY incY :=

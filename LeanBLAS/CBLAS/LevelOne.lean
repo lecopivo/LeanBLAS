@@ -1,3 +1,33 @@
+/-!
+# CBLAS Level 1 Implementation
+
+This module provides the CBLAS (C interface to BLAS) implementation of Level 1 BLAS operations
+for Float64Array types. Level 1 operations are vector-vector operations with O(n) complexity.
+
+## Overview
+
+The implementation uses FFI (Foreign Function Interface) bindings to call optimized BLAS
+libraries (OpenBLAS, MKL, or system BLAS) for actual computation. This ensures:
+- High performance through optimized machine code
+- Compatibility with existing BLAS ecosystem
+- Validated numerical algorithms
+
+## Implementation Details
+
+All operations map Lean's natural numbers to C's size_t/int types and handle the conversion
+between Lean arrays and C arrays through the FFI layer. The `sorry_proof` placeholders are
+used for array bounds checking proofs that will be formalized in future work.
+
+## Available Operations
+
+- Vector dot products: `dot`
+- Euclidean norm: `nrm2`
+- Sum of absolute values: `asum`
+- Index of maximum absolute value: `iamax`
+- Vector operations: `swap`, `copy`, `axpy`, `scal`
+- Givens rotations: `rotg`, `rotmg`, `rot`
+-/
+
 -- import LeanBLAS.CBLAS.LevelOneFloat32
 -- import LeanBLAS.CBLAS.LevelOneComplexFloat32
 import LeanBLAS.FFI.CBLASLevelOneFloat64
@@ -7,6 +37,11 @@ namespace BLAS.CBLAS
 
 open Sorry
 
+/-- CBLAS implementation of Level 1 BLAS operations for Float64Array.
+    
+This instance provides efficient implementations of vector operations by calling
+optimized BLAS libraries through FFI. All index parameters (offsets and strides)
+are converted from Nat to USize for C compatibility. -/
 instance : LevelOneData Float64Array Float Float where
   size x := x.size
   get x i := (cast sorry_proof x : FloatArray).uget i.toUSize sorry_proof
