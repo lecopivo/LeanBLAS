@@ -1,3 +1,6 @@
+import LeanBLAS.FFI.CBLASLevelTwoFloat64
+import LeanBLAS.Spec.LevelTwo
+
 /-!
 # CBLAS Level 2 Implementation
 
@@ -29,9 +32,6 @@ All operations use FFI bindings to optimized BLAS libraries. The module handles:
 - Transpose and conjugate operations
 - Proper memory access patterns for cache efficiency
 -/
-
-import LeanBLAS.FFI.CBLASLevelTwoFloat64
-import LeanBLAS.Spec.LevelTwo
 
 namespace BLAS.CBLAS
 

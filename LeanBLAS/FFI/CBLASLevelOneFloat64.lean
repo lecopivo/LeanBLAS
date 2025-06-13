@@ -2,7 +2,38 @@ import LeanBLAS.FFI.FloatArray
 
 namespace BLAS.CBLAS
 
-/-! Lean bindings to BLAS
+/-! # CBLAS Level 1 FFI Bindings for Float64
+
+This module provides low-level FFI (Foreign Function Interface) bindings to CBLAS Level 1
+operations for double-precision floating-point numbers (Float64).
+
+## Overview
+
+Level 1 BLAS operations work with vectors and have O(n) complexity. This module exposes
+the C interface directly to Lean through the `@[extern]` attribute, allowing zero-overhead
+calls to optimized BLAS implementations.
+
+## FFI Design
+
+Each function is declared as `opaque` with an `@[extern]` attribute pointing to the
+corresponding C function. The bindings handle:
+- Conversion between Lean's USize and C's size_t/int
+- Direct memory access through Float64Array pointers
+- Proper alignment and layout for BLAS compatibility
+
+## Naming Convention
+
+Functions follow the BLAS naming convention:
+- `d` prefix: double precision (Float64)
+- Operation name: dot, axpy, scal, etc.
+- Example: `ddot` = double-precision dot product
+
+## Performance Notes
+
+These are direct FFI calls with minimal overhead:
+- No memory copying (arrays passed by reference)
+- No runtime type checking (handled at Lean level)
+- Direct access to optimized BLAS kernels
 -/
 
 

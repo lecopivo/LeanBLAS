@@ -1,3 +1,6 @@
+import LeanBLAS.FFI.CBLASLevelThreeFloat64
+import LeanBLAS.Spec.LevelThree
+
 /-!
 # CBLAS Level 3 Implementation
 
@@ -36,9 +39,6 @@ The implementation leverages highly optimized BLAS libraries that:
 - Support multi-threading for large matrices
 - Provide architecture-specific optimizations
 -/
-
-import LeanBLAS.FFI.CBLASLevelThreeFloat64
-import LeanBLAS.Spec.LevelThree
 
 namespace BLAS.CBLAS
 

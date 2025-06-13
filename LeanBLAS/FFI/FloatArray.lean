@@ -1,3 +1,31 @@
+/-!
+# Float Array Types for BLAS FFI
+
+This module defines array types for floating-point numbers that are compatible with
+BLAS C interfaces. These types serve as the foundation for all BLAS operations in Lean.
+
+## Design Philosophy
+
+Instead of using Lean's native `Array Float`, we use `ByteArray` wrappers to ensure:
+- Direct memory layout compatibility with C arrays
+- Zero-copy FFI calls to BLAS libraries
+- Proper alignment for SIMD operations
+- Efficient memory management
+
+## Type Safety
+
+Each array type includes a proof that the underlying byte array has the correct size
+(multiple of element size), ensuring type safety at the Lean level while maintaining
+C compatibility.
+
+## Array Types
+
+- `Float32Array`: Single-precision real numbers (4 bytes per element)
+- `Float64Array`: Double-precision real numbers (8 bytes per element)
+- `ComplexFloat32Array`: Single-precision complex numbers (8 bytes per element)
+- `ComplexFloat64Array`: Double-precision complex numbers (16 bytes per element)
+-/
+
 namespace BLAS
 
 set_option linter.unusedVariables false
@@ -33,12 +61,16 @@ def Float64Array.size (a : Float64Array) := a.data.size / 8
 def ComplexFloat32Array.size (a : ComplexFloat32Array) := a.data.size / 8
 def ComplexFloat64Array.size (a : ComplexFloat64Array) := a.data.size / 16
 
-
+/-- Convert a Lean FloatArray to Float64Array for BLAS operations.
+    This is a zero-copy operation that reinterprets the memory layout. -/
 @[extern "leanblas_float_array_to_byte_array"]
 opaque _root_.FloatArray.toFloat64Array (a : FloatArray) : Float64Array
 
+/-- Convert a Float64Array back to Lean's FloatArray.
+    This is a zero-copy operation that reinterprets the memory layout. -/
 @[extern "leanblas_byte_array_to_float_array"]
 opaque Float64Array.toFloatArray (a : Float64Array) : FloatArray
 
-
+/-- Convenient syntax for creating Float64Arrays from literals.
+    Example: `#f64[1.0, 2.0, 3.0]` creates a Float64Array with three elements. -/
 macro "#f64[" xs:term,* "]" : term => `((FloatArray.mk #[$xs,*]).toFloat64Array)

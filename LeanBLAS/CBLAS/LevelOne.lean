@@ -1,3 +1,8 @@
+-- import LeanBLAS.CBLAS.LevelOneFloat32
+-- import LeanBLAS.CBLAS.LevelOneComplexFloat32
+import LeanBLAS.FFI.CBLASLevelOneFloat64
+import LeanBLAS.Spec.LevelOne
+
 /-!
 # CBLAS Level 1 Implementation
 
@@ -27,11 +32,6 @@ used for array bounds checking proofs that will be formalized in future work.
 - Vector operations: `swap`, `copy`, `axpy`, `scal`
 - Givens rotations: `rotg`, `rotmg`, `rot`
 -/
-
--- import LeanBLAS.CBLAS.LevelOneFloat32
--- import LeanBLAS.CBLAS.LevelOneComplexFloat32
-import LeanBLAS.FFI.CBLASLevelOneFloat64
-import LeanBLAS.Spec.LevelOne
 
 namespace BLAS.CBLAS
 
