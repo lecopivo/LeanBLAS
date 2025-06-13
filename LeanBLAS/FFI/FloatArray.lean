@@ -1,3 +1,5 @@
+import LeanBLAS.ComplexFloat
+
 /-!
 # Float Array Types for BLAS FFI
 
@@ -74,3 +76,17 @@ opaque Float64Array.toFloatArray (a : Float64Array) : FloatArray
 /-- Convenient syntax for creating Float64Arrays from literals.
     Example: `#f64[1.0, 2.0, 3.0]` creates a Float64Array with three elements. -/
 macro "#f64[" xs:term,* "]" : term => `((FloatArray.mk #[$xs,*]).toFloat64Array)
+
+/-- Convert a Lean ComplexFloatArray to ComplexFloat64Array for BLAS operations.
+    This maps the interleaved real/imaginary format to the BLAS-compatible layout. -/
+@[extern "leanblas_complex_float_array_to_byte_array"]
+opaque _root_.ComplexFloatArray.toComplexFloat64Array (a : ComplexFloatArray) : ComplexFloat64Array
+
+/-- Convert a ComplexFloat64Array back to Lean's ComplexFloatArray.
+    This reverses the layout transformation for use in Lean code. -/
+@[extern "leanblas_byte_array_to_complex_float_array"]
+opaque ComplexFloat64Array.toComplexFloatArray (a : ComplexFloat64Array) : ComplexFloatArray
+
+/-- Convenient syntax for creating ComplexFloat64Arrays from literals.
+    Example: `#c64[⟨1.0, 2.0⟩, ⟨3.0, 4.0⟩]` creates a ComplexFloat64Array with two complex numbers. -/
+macro "#c64[" xs:term,* "]" : term => `((ComplexFloatArray.mk #[$xs,*]).toComplexFloat64Array)
