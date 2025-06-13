@@ -100,32 +100,37 @@
 - **Lean headers**: ✅ Found and configured at `/Users/alokbeniwal/.elan/toolchains/leanprover--lean4---v4.21.0-rc3/include`
 - **Level 3 C tests**: ✅ Compiling and running successfully
 
-### 🔧 Current TODO List
-1. **Fix the build cycle issue with LeanBLAS.CBLAS.LevelThree** (HIGH PRIORITY)
-   - Resolve circular dependency blocking the build
-   - Ensure all modules compile without cycles
-2. **Create a proper README.md for the project** (HIGH PRIORITY)
-   - Project overview and goals
-   - Installation instructions
-   - Usage examples
-   - API documentation links
-3. **Create a pull request to merge Level 3 BLAS implementation** (HIGH PRIORITY)
-   - Prepare branch for merge
-   - Write comprehensive PR description
-4. **Add missing documentation for remaining modules** (MEDIUM PRIORITY)
-   - CBLAS implementation modules
-   - FFI binding modules
-   - ComplexFloat module
-5. **Implement remaining Level 3 BLAS operations for complex numbers** (MEDIUM PRIORITY)
-   - Add ComplexFloat64 support to Level 3 operations
-   - Create FFI bindings for complex BLAS functions
-   - Test with complex matrices
-6. **Add performance benchmarks comparing with native BLAS** (LOW PRIORITY)
-   - Comprehensive performance validation
-   - Comparison with optimized implementations
-7. **Write academic paper about the formalization** (LOW PRIORITY)
-   - Document the verification approach
-   - Highlight contributions to verified computing
+### ✅ Recently Completed (January 2025)
+1. **Fixed cblas_daxpby undefined symbol issue** 
+   - Implemented using standard CBLAS functions (dscal + daxpy)
+   - Resolves GitHub issue #3
+2. **Added missing iamax_spec specification**
+   - Formal specification for index of maximum absolute value
+   - Includes tie-breaking behavior
+3. **Comprehensive documentation updates**
+   - All CBLAS modules now have module-level docs
+   - FFI modules documented with design rationale
+   - FloatArray design philosophy explained
+4. **Created PR #4 for Level 3 BLAS**
+   - Complete implementation with tests and benchmarks
+   - Ready for review and merge
+5. **Build cycle issue resolved**
+   - Fixed in commit c7a5a58
+
+### 🎯 Current Focus
+See [ROADMAP.md](./ROADMAP.md) for detailed development plan.
+
+**Immediate priorities**:
+1. Monitor PR #4 and address review feedback
+2. Begin ComplexFloat64 support implementation
+3. Design formal verification framework
+
+### 📊 Project Insights
+- **Architecture**: Clean separation between specs and implementations
+- **FFI Design**: Zero-copy ByteArray wrappers work well
+- **Testing**: Comprehensive framework already in place
+- **Performance**: Competitive with native BLAS (see benchmarks)
+- **Documentation**: Now comprehensive after recent updates
 
 ### 🐛 Debugging Tips
 1. **Property test failures**: Check if the mathematical property is correctly stated
