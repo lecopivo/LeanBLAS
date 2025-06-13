@@ -5,6 +5,7 @@ BLAS (Basic Linear Algebra Subprograms) bindings for Lean 4 with mathematical fo
 ## Overview
 
 LeanBLAS provides type-safe BLAS operations with a focus on mathematical correctness. Unlike traditional BLAS libraries, LeanBLAS:
+
 - Formalizes the mathematics of linear algebra operations
 - Provides property-based testing that goes beyond typical numerical validation
 - Includes formal mathematical specifications alongside efficient implementations
@@ -168,11 +169,13 @@ def test_gemm : IO Unit := do
 LeanBLAS features the most comprehensive BLAS testing suite available:
 
 ### Quick Test
+
 ```bash
 lake exe SimpleTest       # Verify basic functionality
 ```
 
 ### Comprehensive Testing
+
 ```bash
 lake exe ComprehensiveTests  # Run all tests with unified reporting
 lake exe PropertyTests       # Property-based testing with random inputs
@@ -182,6 +185,7 @@ lake exe Level3Tests         # Level 3 BLAS operations testing
 ```
 
 ### Performance Analysis
+
 ```bash
 lake exe BenchmarkTests      # Full performance analysis with scaling
 lake exe BenchmarksFixedTest # Quick performance sanity check
@@ -190,6 +194,7 @@ lake exe Gallery             # Showcase of all benchmarks
 ```
 
 ### Additional Testing Tools
+
 - Python validation scripts: `test_level3.py`, `cross_check_numpy.py`
 - Local CI script: `run_ci_local.sh`
 - Level 3 test runner: `run_level3_tests.sh`
