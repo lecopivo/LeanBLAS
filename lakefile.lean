@@ -56,6 +56,7 @@ lean_exe ComprehensiveTests where
 
 lean_exe CBLASLevelOneTest where
   root := `Test.cblas_level_one
+  supportInterpreter := true
 
 lean_exe DenseVectorTest where
   root := `Test.dense_vector

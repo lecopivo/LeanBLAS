@@ -333,12 +333,20 @@ LEAN_EXPORT lean_obj_res leanblas_cblas_daxpby(const size_t N, const double alph
   if (lean_is_exclusive(X) && !lean_is_exclusive(Y) &&
       lean_sarray_size(X)*sizeof(double) == N && offX == 0 && incX == 1 &&
       lean_sarray_size(Y)*sizeof(double) == N && offY == 0 && incY == 1){
-    cblas_daxpby((int)N, beta, lean_float_array_cptr(Y) + offY, (int)incY, alpha, lean_float_array_cptr(X) + offX, (int)incX);
+    // daxpby is not standard CBLAS, implement using dscal and daxpy
+    // X = beta*Y + alpha*X
+    cblas_dscal((int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX);
+    cblas_daxpy((int)N, beta, lean_float_array_cptr(Y) + offY, (int)incY, 
+                lean_float_array_cptr(X) + offX, (int)incX);
     lean_dec(Y);
     return X;
   } else {
     ensure_exclusive_byte_array(&Y);
-    cblas_daxpby((int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX, beta, lean_float_array_cptr(Y) + offY, (int)incY);
+    // daxpby is not standard CBLAS, implement using dscal and daxpy
+    // Y = alpha*X + beta*Y
+    cblas_dscal((int)N, beta, lean_float_array_cptr(Y) + offY, (int)incY);
+    cblas_daxpy((int)N, alpha, lean_float_array_cptr(X) + offX, (int)incX,
+                lean_float_array_cptr(Y) + offY, (int)incY);
     lean_dec(X);
     return Y;
   }
