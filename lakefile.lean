@@ -10,7 +10,8 @@ def linkArgs := -- (#[] : Array String)
     #["-L/opt/homebrew/opt/openblas/lib",
       "-L/usr/local/opt/openblas/lib", "-lblas"]
   else -- assuming linux
-    #["-L/usr/lib/x86_64-linux-gnu/", "-lblas"]
+    -- #["-L/usr/lib/x86_64-linux-gnu/", "-lblas"]
+    #["/usr/lib/x86_64-linux-gnu/libblas.so"]
 def inclArgs :=
   if System.Platform.isWindows then
     #[]
@@ -25,7 +26,7 @@ package leanblas {
   preferReleaseBuild := true
 }
 
-require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.20.1"
+require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.22.0"
 
 ----------------------------------------------------------------------------------------------------
 -- Build Lean ↔ BLAS bindings ---------------------------------------------------------------------

@@ -184,4 +184,4 @@ def main : IO Unit := do
   test_daxpy_2
   test_dconst
 
-#eval main
+-- #eval main
