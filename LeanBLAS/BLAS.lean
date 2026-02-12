@@ -1,7 +1,9 @@
 import LeanBLAS.Spec.LevelOne
 import LeanBLAS.Spec.LevelTwo
+import LeanBLAS.Spec.LevelThree
 import LeanBLAS.CBLAS.LevelOne
 import LeanBLAS.CBLAS.LevelTwo
+import LeanBLAS.CBLAS.LevelThree
 
 open BLAS
 
@@ -23,7 +25,8 @@ class BLAS (Array : Type*) (R K : outParam Type*)
   extends
     LevelOneData Array R K,
     LevelOneDataExt Array R K,
-    LevelTwoData Array R K
+    LevelTwoData Array R K,
+    LevelThreeData Array R K
   where
 
 instance : BLAS Float64Array Float Float where

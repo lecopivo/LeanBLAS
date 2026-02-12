@@ -47,6 +47,15 @@ def Diag.toUInt8 : Diag → UInt8
   | NonUnit => 0
   | Unit => 1
 
+inductive Side where
+  | Left
+  | Right
+deriving BEq, DecidableEq
+
+def Side.toUInt8 : Side → UInt8
+  | Left => 0
+  | Right => 1
+
 class LevelTwoData (Array : Type*) (R K : outParam Type*) where
 
   /-- General matrix-vector multiplication
@@ -109,6 +118,7 @@ class LevelTwoData (Array : Type*) (R K : outParam Type*) where
     (A : Array) (offA : Nat) (lda : Nat) : Array
 
 
+export LevelTwoData (gemv bmv trmv tbmv tpmv trsv tbsv tpsv ger her her2)
 /-- Level 2 BLAS function that seems to be missing from the BLAS standard. -/
 class LevelTwoDataExt (Array : Type*) (R K : outParam Type*) where
 
@@ -130,7 +140,10 @@ class LevelTwoDataExt (Array : Type*) (R K : outParam Type*) where
   gpr (order : Order) (uplo : UpLo) (N : Nat) (alpha : K)
     (X : Array) (offX incX : Nat)
     (Y : Array) (offY incY : Nat)
-    (A : Array) (offA : Nat) : array
+    (A : Array) (offA : Nat) : Array
+
+
+export LevelTwoDataExt (packedToDense denseToPacked gpr)
 
 
 -- todo: add spec!!!

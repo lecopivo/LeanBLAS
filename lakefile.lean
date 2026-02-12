@@ -60,6 +60,10 @@ lean_exe CBLASLevelOneTest where
 lean_exe CBLASLevelTwoTest where
   root := `Test.cblas_level_two
 
+lean_exe CBLASLevelThreeTest where
+  root := `Test.cblas_level_three
+  supportInterpreter := true
+
 
 -- ----------------------------------------------------------------------------------------------------
 -- -- Download and build OpenBLAS ---------------------------------------------------------------------
