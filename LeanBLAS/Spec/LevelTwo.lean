@@ -8,12 +8,21 @@ inductive Order where
   | ColMajor
 deriving BEq, DecidableEq
 
+def Order.toUInt8 : Order → UInt8
+  | RowMajor => 0
+  | ColMajor => 1
+
 -- move this to Spec directory
 inductive Transpose where
   | NoTrans
   | Trans
   | ConjTrans
 deriving BEq, DecidableEq
+
+def Transpose.toUInt8 : Transpose → UInt8
+  | NoTrans => 0
+  | Trans => 1
+  | ConjTrans => 2
 
 -- move this to Spec directory
 inductive UpLo where
@@ -23,12 +32,20 @@ inductive UpLo where
   | Lower
 deriving BEq, DecidableEq
 
+def UpLo.toUInt8 : UpLo → UInt8
+  | Upper => 0
+  | Lower => 1
+
 inductive Diag where
   /-- Non-unit triangular matrix --/
   | NonUnit
   /-- Unit triangular matrix --/
   | Unit
 deriving BEq, DecidableEq
+
+def Diag.toUInt8 : Diag → UInt8
+  | NonUnit => 0
+  | Unit => 1
 
 class LevelTwoData (Array : Type*) (R K : outParam Type*) where
 

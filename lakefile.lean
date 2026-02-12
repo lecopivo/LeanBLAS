@@ -57,11 +57,8 @@ lean_lib LeanBLAS.FFI where
 lean_exe CBLASLevelOneTest where
   root := `Test.cblas_level_one
 
-lean_exe DenseVectorTest where
-  root := `Test.dense_vector
-
-lean_exe TriangularTest where
-  root := `Test.packed_triangular
+lean_exe CBLASLevelTwoTest where
+  root := `Test.cblas_level_two
 
 
 -- ----------------------------------------------------------------------------------------------------
