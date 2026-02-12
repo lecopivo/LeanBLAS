@@ -1,5 +1,10 @@
 import Mathlib.Analysis.SpecialFunctions.Sqrt
-import Mathlib.Analysis.NormedSpace.RCLike
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Algebra.Order.BigOperators.Expect
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.Data.EReal.Inv
+import Mathlib.Data.Real.Sqrt
+import Mathlib.Tactic.ContinuousFunctionalCalculus
 
 import LeanBLAS.Spec.Scalar
 
